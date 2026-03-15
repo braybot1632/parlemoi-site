@@ -31,8 +31,8 @@ onMounted(() => {
         class="hero-headline font-display font-bold text-cream transition-all duration-1000 delay-150"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        The only true way to<br />
-        <span class="text-orange">learn French.</span>
+        Speak to me,<br />
+        <span class="text-orange">begin learning.</span>
       </h1>
 
       <!-- Subheadline -->

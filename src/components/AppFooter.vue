@@ -10,7 +10,7 @@ import LogoFullLight from './brand/LogoFullLight.vue'
           <router-link to="/" class="inline-block">
             <LogoFullLight :width="120" :height="30" />
           </router-link>
-          <p class="mt-2 text-sm text-text-muted">The only true way to learn French.</p>
+          <p class="mt-2 text-sm text-text-muted">Speak to me, begin learning.</p>
         </div>
 
         <nav class="flex flex-col md:flex-row gap-4 md:gap-8 text-sm" aria-label="Legal">
