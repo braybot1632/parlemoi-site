@@ -18,12 +18,12 @@ import LogoFullLight from './brand/LogoFullLight.vue'
           <router-link to="/privacy" class="text-text-muted hover:text-text-light transition-colors">Privacy</router-link>
           <router-link to="/terms" class="text-text-muted hover:text-text-light transition-colors">Terms</router-link>
           <router-link to="/eula" class="text-text-muted hover:text-text-light transition-colors">EULA</router-link>
-          <a href="mailto:support@parlemoi.app" class="text-text-muted hover:text-text-light transition-colors">Contact</a>
+          <a href="mailto:support@parlemoiapp.com" class="text-text-muted hover:text-text-light transition-colors">Contact</a>
         </nav>
       </div>
 
       <div class="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row justify-between gap-4 text-sm text-text-muted">
-        <p>Questions? Feedback? <a href="mailto:support@parlemoi.app" class="text-text-light/60 hover:text-text-light transition-colors">support@parlemoi.app</a> — We read every email.</p>
+        <p>Questions? Feedback? <a href="mailto:support@parlemoiapp.com" class="text-text-light/60 hover:text-text-light transition-colors">support@parlemoiapp.com</a> — We read every email.</p>
         <p>&copy; 2026 ParleMoi</p>
       </div>
     </div>
