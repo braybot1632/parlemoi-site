@@ -7,7 +7,7 @@ const scenarios = [
   { label: 'At a pharmacy', detail: 'You need to describe what hurts.' },
   { label: 'Checking into a hotel', detail: 'Time to get your room.' },
   { label: 'Lost without your phone', detail: 'Ask for directions in French.' },
-  { label: 'At the train station', detail: 'Buy a ticket to Lyon.' },
+  { label: 'At the dépanneur', detail: 'Ask for help finding what you need.' },
   { label: 'Meeting someone new', detail: 'Introduce yourself at a dinner party.' },
 ]
 </script>
