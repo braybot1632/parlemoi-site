@@ -35,7 +35,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <button @click="scrollTo('voice-games')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">Games</button>
         <button @click="scrollTo('features')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">Features</button>
         <button @click="scrollTo('how-it-works')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">How It Works</button>
-        <button @click="scrollTo('pricing')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">Pricing</button>
+        <!-- <button @click="scrollTo('pricing')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">Pricing</button> -->
         <button @click="scrollTo('hero')" class="glow-btn text-sm font-medium text-white px-5 py-2 rounded-full cursor-pointer">Join the Beta</button>
       </nav>
 

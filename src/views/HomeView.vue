@@ -27,7 +27,7 @@ import DownloadCTA from '../components/DownloadCTA.vue'
     <FeaturesSection />
     <HowItWorksSection />
     <FAQSection />
-    <PricingSection />
+    <!-- <PricingSection /> -->
     <DownloadCTA />
   </main>
 </template>
