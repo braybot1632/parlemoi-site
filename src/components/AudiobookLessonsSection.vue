@@ -19,8 +19,7 @@ useReveal()
         <p>
           Each lesson starts like an audiobook. A natural voice introduces
           the topic, reads the phrases aloud, and explains when you'd use
-          them. Text appears on screen as the voice reads it — listen,
-          absorb, no pressure.
+          them.
         </p>
         <p>
           Then you practice. Say the phrases. Get a pronunciation score.
