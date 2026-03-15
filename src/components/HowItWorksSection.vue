@@ -6,7 +6,7 @@ const steps = [
   {
     number: '01',
     title: 'First, you listen.',
-    description: 'Your lesson starts like an audiobook. A natural voice reads the phrases while the text appears on screen. Context. Pronunciation. When you\'d use it. No pressure — just absorb.',
+    description: 'Your lesson starts like an audiobook. A natural voice reads the phrases while the text appears on screen.',
     color: 'orange',
   },
   {
