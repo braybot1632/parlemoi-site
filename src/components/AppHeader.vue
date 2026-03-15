@@ -60,7 +60,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <button @click="scrollTo('voice-games')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">Games</button>
         <button @click="scrollTo('features')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">Features</button>
         <button @click="scrollTo('how-it-works')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">How It Works</button>
-        <button @click="scrollTo('pricing')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">Pricing</button>
         <button @click="scrollTo('hero')" class="glow-btn text-sm font-medium text-white px-5 py-3 rounded-full cursor-pointer text-center">Join the Beta</button>
       </div>
     </Transition>
