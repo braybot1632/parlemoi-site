@@ -21,7 +21,7 @@ const scenarios = [
           Real conversations. Real situations.
         </h2>
         <p class="text-text-light/50 max-w-lg mx-auto">
-          Multiple real-life scenarios where you speak French and someone responds — based on what you actually said, not a script.
+          Our goal is to create realistic scenarios one may encounter when living in a French speaking place. Our app will simulate these scenarios to give you the confidence to practice when you are out in the real world.
         </p>
       </div>
 
