@@ -37,9 +37,7 @@ function onSubmit() {
         class="mt-6 text-lg md:text-xl text-text-light/60 max-w-2xl mx-auto leading-relaxed transition-all duration-1000 delay-300"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        Not flashcards. Not multiple choice. You listen to a lesson,
-        then say the phrases out loud, play voice games, and practice
-        real conversations — all scored on pronunciation.
+        Practice speaking, real learning.
       </p>
 
       <!-- Beta signup form -->
