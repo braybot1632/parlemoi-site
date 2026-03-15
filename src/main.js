@@ -5,6 +5,11 @@ import App from './App.vue'
 import router from './router'
 import './assets/main.css'
 
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual'
+}
+window.scrollTo(0, 0)
+
 const app = createApp(App)
 app.use(router)
 
