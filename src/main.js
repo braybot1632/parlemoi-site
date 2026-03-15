@@ -19,7 +19,8 @@ router.isReady().then(() => {
 
 router.afterEach(() => {
   nextTick(() => {
-    AOS.refreshHard()
+    window.scrollTo(0, 0)
+    setTimeout(() => AOS.refreshHard(), 100)
   })
 })
 
