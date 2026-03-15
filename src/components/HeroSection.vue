@@ -1,15 +1,34 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxakNNzReV-0ka9pyzHN08G3hVay0jVUGaoAiV22zSyw1CuJ-pKW6X3DVTGeYM_pRAHtA/exec'
+
 const visible = ref(false)
 const submitted = ref(false)
+const submitting = ref(false)
+const error = ref('')
+const email = ref('')
 
 onMounted(() => {
   requestAnimationFrame(() => { visible.value = true })
 })
 
-function onSubmit() {
-  submitted.value = true
+async function onSubmit() {
+  submitting.value = true
+  error.value = ''
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.value }),
+    })
+    submitted.value = true
+  } catch (e) {
+    error.value = 'Something went wrong. Please try again.'
+  } finally {
+    submitting.value = false
+  }
 }
 </script>
 
@@ -54,31 +73,25 @@ function onSubmit() {
 
         <form
           v-else
-          action="https://formsubmit.co/braybot1632@gmail.com"
-          method="POST"
-          @submit="onSubmit"
+          @submit.prevent="onSubmit"
           class="flex flex-col sm:flex-row gap-3"
         >
-          <input type="hidden" name="_subject" value="ParleMoi Beta Signup" />
-          <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="_template" value="table" />
-          <input type="hidden" name="_next" value="https://parlemoiapp.com" />
-          <input type="text" name="_honey" style="display:none" />
-
           <input
+            v-model="email"
             type="email"
-            name="email"
             required
             placeholder="Your email address"
             class="flex-1 px-5 py-3.5 rounded-full bg-white/5 border border-white/10 text-cream placeholder-text-muted text-sm focus:outline-none focus:border-orange/50 transition-colors"
           />
           <button
             type="submit"
-            class="glow-btn text-white font-medium px-7 py-3.5 rounded-full text-sm whitespace-nowrap cursor-pointer"
+            :disabled="submitting"
+            class="glow-btn text-white font-medium px-7 py-3.5 rounded-full text-sm whitespace-nowrap cursor-pointer disabled:opacity-50"
           >
-            Join the Beta
+            {{ submitting ? 'Sending...' : 'Join the Beta' }}
           </button>
         </form>
+        <p v-if="error" class="mt-3 text-sm text-error">{{ error }}</p>
       </div>
 
       <!-- Trust signals -->
