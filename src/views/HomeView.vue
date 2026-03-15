@@ -19,7 +19,7 @@ import DownloadCTA from '../components/DownloadCTA.vue'
     <HeroSection />
     <PhilosophySection />
     <SocialProofBar />
-    <ProblemSolution />
+    <!-- <ProblemSolution /> -->
     <VoiceGamesSection />
     <AudiobookLessonsSection />
     <RoleplaySection />
