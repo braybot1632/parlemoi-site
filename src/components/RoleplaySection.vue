@@ -21,7 +21,7 @@ const scenarios = [
           Real conversations. Real situations.
         </h2>
         <p class="text-text-light/50 max-w-lg mx-auto">
-          16 real-life scenarios where you speak French and someone responds — based on what you actually said, not a script.
+          Multiple real-life scenarios where you speak French and someone responds — based on what you actually said, not a script.
         </p>
       </div>
 
