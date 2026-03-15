@@ -12,7 +12,7 @@ const steps = [
   {
     number: '02',
     title: 'Then, you speak.',
-    description: 'Say the phrases out loud. See your pronunciation score in real-time. The app tells you exactly which sounds need work. Fix them. Try again.',
+    description: 'Say the phrases out loud. See your pronunciation score in real-time. The app tells you exactly which sounds need work.',
     color: 'gold',
   },
   {
