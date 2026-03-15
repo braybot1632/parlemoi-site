@@ -73,7 +73,7 @@ async function onSubmit() {
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
         ParleMoi,<br />
-        <span class="text-orange">speak and learn.</span>
+        <span class="text-orange">Speak and Learn.</span>
       </h1>
 
       <!-- Subheadline -->
