@@ -1,35 +1,61 @@
 <script setup>
+import { useReveal } from '../composables/useReveal'
+useReveal()
 </script>
 
 <template>
-  <section id="philosophy" class="bg-navy py-20 md:py-28">
-    <div class="max-w-3xl mx-auto px-6">
-      <h2 class="font-display text-3xl md:text-4xl font-bold text-cream">Built different.</h2>
+  <section class="section-pad relative overflow-hidden">
+    <!-- Subtle orb -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-orange/5 blur-[120px] pointer-events-none"></div>
 
-      <div class="mt-10 space-y-6 text-text-light/80 leading-relaxed">
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <div class="reveal">
+        <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Our Philosophy</p>
+        <h2 class="font-display text-4xl md:text-5xl font-bold text-cream mb-10" style="letter-spacing: -0.02em; line-height: 1.1;">
+          Built different.
+        </h2>
+      </div>
+
+      <div class="space-y-6 text-lg md:text-xl text-text-light/50 leading-relaxed reveal">
         <p>
-          Most language apps treat you like a child who needs to be tricked into learning. ParleMoi treats you like an adult who chose to learn.
+          Most language apps treat you like a child who needs to be tricked into learning.
+        </p>
+        <p class="text-cream/80">
+          ParleMoi treats you like an adult who chose to learn.
         </p>
         <p>
-          No guilt trips about streaks. No cartoon mascots nagging you. No confetti for basic answers.
+          No guilt trips about streaks. No cartoon mascots nagging you.<br class="hidden md:block" />
+          No confetti for basic answers.
         </p>
-        <p>
-          Just clean, effective tools that help you speak French — at your own pace, on your own terms.
+        <p class="text-cream/80">
+          Just clean, effective tools that help you speak French —<br class="hidden md:block" />
+          at your own pace, on your own terms.
         </p>
       </div>
 
-      <div class="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div class="border-l-2 border-orange pl-4">
-          <h3 class="font-display font-bold text-cream">No dark patterns</h3>
-          <p class="mt-1 text-sm text-text-light/60">We built this for learners, not metrics.</p>
+      <div class="divider-gradient mt-16 mb-16"></div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 stagger">
+        <div class="reveal text-center">
+          <div class="w-10 h-10 rounded-full bg-orange/10 flex items-center justify-center mx-auto mb-3">
+            <svg class="w-5 h-5 text-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+          </div>
+          <h3 class="font-display font-bold text-cream mb-1">No dark patterns</h3>
+          <p class="text-sm text-text-muted">Built for learners, not metrics</p>
         </div>
-        <div class="border-l-2 border-gold pl-4">
-          <h3 class="font-display font-bold text-cream">Respect your time</h3>
-          <p class="mt-1 text-sm text-text-light/60">No streak anxiety. No guilt notifications.</p>
+        <div class="reveal text-center">
+          <div class="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-3">
+            <svg class="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3 class="font-display font-bold text-cream mb-1">Respects your time</h3>
+          <p class="text-sm text-text-muted">No streak anxiety or guilt</p>
         </div>
-        <div class="border-l-2 border-orange pl-4">
-          <h3 class="font-display font-bold text-cream">Honest pricing</h3>
-          <p class="mt-1 text-sm text-text-light/60">All tiers visible. No hidden charges.</p>
+        <div class="reveal text-center">
+          <div class="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-3">
+            <svg class="w-5 h-5 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3 class="font-display font-bold text-cream mb-1">Honest pricing</h3>
+          <p class="text-sm text-text-muted">All tiers visible, always</p>
         </div>
       </div>
     </div>

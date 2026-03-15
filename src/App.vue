@@ -4,7 +4,7 @@ import AppFooter from './components/AppFooter.vue'
 </script>
 
 <template>
-  <div class="min-h-screen bg-warm-white font-body text-text-dark">
+  <div class="min-h-screen bg-darkest font-body text-text-light">
     <AppHeader />
     <router-view />
     <AppFooter />

@@ -1,45 +1,62 @@
 <script setup>
+import { useReveal } from '../composables/useReveal'
+useReveal()
+
 const steps = [
-  { number: '1', title: 'Listen', description: 'Hear native French pronunciation from Henri or Marie in real conversation context.' },
-  { number: '2', title: 'Speak', description: 'Record yourself saying it. No typing, no tapping — just speaking.' },
-  { number: '3', title: 'Improve', description: 'Get instant pronunciation feedback with accuracy scores and gentle corrections.' },
+  {
+    number: '01',
+    title: 'Listen',
+    description: 'Hear native French pronunciation in real conversation context. Not isolated vocabulary — full sentences you will actually use.',
+    color: 'orange',
+  },
+  {
+    number: '02',
+    title: 'Speak',
+    description: 'Record yourself saying it back. No typing, no tapping, no multiple choice. Just your voice, the microphone, and French.',
+    color: 'gold',
+  },
+  {
+    number: '03',
+    title: 'Improve',
+    description: 'Get instant pronunciation feedback with accuracy scores. See exactly which sounds to work on, then try again.',
+    color: 'success',
+  },
 ]
 </script>
 
 <template>
-  <section id="how-it-works" class="bg-warm-white py-20 md:py-28">
-    <div class="max-w-4xl mx-auto px-6">
-      <div class="text-center mb-14">
-        <h2 class="font-display text-3xl md:text-4xl font-bold text-navy">How it works</h2>
-        <p class="mt-4 text-text-muted">Three steps. Every lesson.</p>
+  <section id="how-it-works" class="section-pad relative">
+    <div class="divider-gradient mb-16"></div>
+
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">How It Works</p>
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-cream" style="letter-spacing: -0.02em;">
+          Three steps. Every lesson.
+        </h2>
       </div>
 
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 md:gap-4">
+      <div class="space-y-6 stagger">
         <div
-          v-for="(step, i) in steps"
+          v-for="step in steps"
           :key="step.number"
-          class="flex-1 text-center"
+          class="glass rounded-2xl p-8 md:p-10 reveal flex flex-col md:flex-row items-start gap-6 md:gap-10 group transition-all duration-300"
         >
-          <div class="w-14 h-14 rounded-full bg-orange text-white font-display text-xl font-bold flex items-center justify-center mx-auto">
-            {{ step.number }}
+          <div class="shrink-0">
+            <span
+              class="font-display text-4xl md:text-5xl font-bold transition-colors"
+              :class="{
+                'text-orange/30 group-hover:text-orange/60': step.color === 'orange',
+                'text-gold/30 group-hover:text-gold/60': step.color === 'gold',
+                'text-success/30 group-hover:text-success/60': step.color === 'success',
+              }"
+            >{{ step.number }}</span>
           </div>
-          <h3 class="mt-5 font-display text-xl font-bold text-navy">{{ step.title }}</h3>
-          <p class="mt-3 text-sm text-text-muted leading-relaxed max-w-xs mx-auto">{{ step.description }}</p>
-
-          <!-- Connector arrow (not on last) -->
-          <div v-if="i < steps.length - 1" class="hidden md:block absolute" aria-hidden="true"></div>
+          <div>
+            <h3 class="font-display text-xl md:text-2xl font-bold text-cream mb-2">{{ step.title }}</h3>
+            <p class="text-text-light/50 leading-relaxed max-w-lg">{{ step.description }}</p>
+          </div>
         </div>
-
-        <!-- Arrows between steps (desktop) -->
-      </div>
-
-      <div class="hidden md:flex justify-between px-[calc(16.67%+1rem)] mt-[-5.5rem] mb-[3rem] pointer-events-none" aria-hidden="true">
-        <svg class="w-8 h-8 text-orange/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-        </svg>
-        <svg class="w-8 h-8 text-orange/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-        </svg>
       </div>
     </div>
   </section>
