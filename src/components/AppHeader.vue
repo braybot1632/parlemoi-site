@@ -36,7 +36,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <button @click="scrollTo('features')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">Features</button>
         <button @click="scrollTo('how-it-works')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">How It Works</button>
         <button @click="scrollTo('pricing')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">Pricing</button>
-        <button @click="scrollTo('hero')" class="glow-btn text-sm font-medium text-white px-5 py-2 rounded-full cursor-pointer">Get the App</button>
+        <button @click="scrollTo('hero')" class="glow-btn text-sm font-medium text-white px-5 py-2 rounded-full cursor-pointer">Join the Beta</button>
       </nav>
 
       <button
@@ -61,7 +61,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <button @click="scrollTo('features')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">Features</button>
         <button @click="scrollTo('how-it-works')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">How It Works</button>
         <button @click="scrollTo('pricing')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">Pricing</button>
-        <button @click="scrollTo('hero')" class="glow-btn text-sm font-medium text-white px-5 py-3 rounded-full cursor-pointer text-center">Get the App</button>
+        <button @click="scrollTo('hero')" class="glow-btn text-sm font-medium text-white px-5 py-3 rounded-full cursor-pointer text-center">Join the Beta</button>
       </div>
     </Transition>
   </header>

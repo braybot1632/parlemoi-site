@@ -8,7 +8,6 @@ const facts = [
   { value: '16+ roleplay scenarios', icon: null },
   { value: '6 voice games', icon: null },
   { value: 'Works offline', icon: null },
-  { value: 'Built for adults', icon: null },
 ]
 </script>
 
