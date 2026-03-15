@@ -34,9 +34,6 @@ const games = [
         <h2 class="font-display text-3xl md:text-4xl font-bold text-cream mb-4" style="letter-spacing: -0.02em;">
           Say it to play it
         </h2>
-        <p class="text-text-light/50 max-w-lg mx-auto">
-          These aren't quizzes. Every game uses your voice. Every game teaches real French.
-        </p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger">
