@@ -7,27 +7,36 @@ const plans = [
     name: 'Free',
     price: '$0',
     period: 'forever',
-    features: ['First 2 lessons', '10 AI messages per day', 'All exercise types', 'Pronunciation feedback'],
+    features: ['First 2 lessons', '10 conversation messages per day', 'All exercise types', 'Pronunciation feedback'],
     highlighted: false,
     cta: 'Get Started',
+  },
+  {
+    name: 'Monthly',
+    price: '$5.99',
+    period: '/month',
+    features: ['Full curriculum (A1-B2)', 'Unlimited conversations', 'All mini-games', 'Advanced pronunciation analytics'],
+    highlighted: false,
+    cta: 'Start Learning',
   },
   {
     name: 'Yearly',
     price: '$39.99',
     period: '/year',
-    features: ['Full curriculum (A1-B2)', 'Unlimited AI conversations', '7-day free trial', 'All mini-games', 'Advanced analytics'],
+    features: ['Full curriculum (A1-B2)', 'Unlimited conversations', '7-day free trial', 'All mini-games', 'Advanced analytics'],
     highlighted: true,
     badge: 'Best Value',
     cta: 'Start Free Trial',
     savings: 'Save 44% vs monthly',
   },
   {
-    name: 'Monthly',
-    price: '$5.99',
-    period: '/month',
-    features: ['Full curriculum (A1-B2)', 'Unlimited AI conversations', 'All mini-games', 'Advanced pronunciation analytics'],
+    name: 'Lifetime',
+    price: '$79.99',
+    period: 'one-time',
+    features: ['Full curriculum (A1-B2)', 'Unlimited conversations', 'All mini-games', 'Advanced analytics', 'All future updates'],
     highlighted: false,
-    cta: 'Start Learning',
+    badge: 'Pay Once',
+    cta: 'Get Lifetime Access',
   },
 ]
 </script>
@@ -40,18 +49,18 @@ const plans = [
       <div class="text-center mb-16 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Pricing</p>
         <h2 class="font-display text-3xl md:text-4xl font-bold text-cream" style="letter-spacing: -0.02em;">
-          Simple. Transparent. No surprises.
+          Pick a plan that works for you
         </h2>
-        <p class="mt-4 text-text-muted max-w-md mx-auto">No hidden charges. No bait-and-switch. Every tier is right here.</p>
+        <p class="mt-4 text-text-muted max-w-md mx-auto">Every option, right here. What you see is what you pay.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 stagger">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
         <div
           v-for="plan in plans"
           :key="plan.name"
           class="relative rounded-2xl p-6 md:p-8 flex flex-col reveal transition-all duration-300"
           :class="plan.highlighted
-            ? 'glass border-orange/30 md:scale-105 md:-my-2'
+            ? 'glass border-orange/30 lg:scale-105 lg:-my-2'
             : 'glass'"
         >
           <div v-if="plan.badge" class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange to-gold text-white text-xs font-semibold px-4 py-1 rounded-full shadow-lg shadow-orange/20">
@@ -86,7 +95,7 @@ const plans = [
       </div>
 
       <p class="mt-10 text-center text-sm text-text-muted">
-        Lifetime access also available for $79.99. All prices in USD. Billed through the App Store or Google Play.
+        All prices in USD. Billed through the App Store or Google Play.
       </p>
     </div>
   </section>

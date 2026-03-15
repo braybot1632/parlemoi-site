@@ -6,19 +6,19 @@ const steps = [
   {
     number: '01',
     title: 'Listen',
-    description: 'Hear native French pronunciation in real conversation context. Not isolated vocabulary — full sentences you will actually use.',
+    description: 'Hear how it sounds in a real conversation. Full sentences you will actually use, not random vocabulary lists.',
     color: 'orange',
   },
   {
     number: '02',
     title: 'Speak',
-    description: 'Record yourself saying it back. No typing, no tapping, no multiple choice. Just your voice, the microphone, and French.',
+    description: 'Say it out loud. Just you, the microphone, and French. This is where the real learning happens.',
     color: 'gold',
   },
   {
     number: '03',
     title: 'Improve',
-    description: 'Get instant pronunciation feedback with accuracy scores. See exactly which sounds to work on, then try again.',
+    description: 'See how you did, learn which sounds to focus on, and try again. Every attempt gets you closer.',
     color: 'success',
   },
 ]

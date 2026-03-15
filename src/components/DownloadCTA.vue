@@ -4,17 +4,17 @@ useReveal()
 </script>
 
 <template>
-  <section class="section-pad relative overflow-hidden">
+  <section id="download" class="section-pad relative overflow-hidden">
     <!-- Background orb -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-orange/5 blur-[150px] pointer-events-none"></div>
 
     <div class="relative max-w-3xl mx-auto px-6 text-center">
       <div class="reveal">
         <h2 class="font-display text-3xl md:text-5xl font-bold text-cream" style="letter-spacing: -0.02em; line-height: 1.1;">
-          Ready to speak French?
+          Your first French conversation is waiting.
         </h2>
         <p class="mt-5 text-lg text-text-light/50 max-w-md mx-auto">
-          Download ParleMoi and have your first conversation today. No credit card required.
+          Download ParleMoi and start speaking today. Free to try, nothing to lose.
         </p>
       </div>
 

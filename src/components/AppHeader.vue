@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import LogoFullLight from './brand/LogoFullLight.vue'
 
 const menuOpen = ref(false)
 const scrolled = ref(false)
@@ -26,8 +27,8 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
     :class="scrolled ? 'bg-darkest/80 backdrop-blur-xl border-b border-white/5' : ''"
   >
     <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-0 text-xl font-display tracking-tight">
-        <span class="text-cream font-bold">Parle</span><span class="text-orange font-bold">Moi</span>
+      <a href="/" class="flex items-center">
+        <LogoFullLight :width="120" :height="30" />
       </a>
 
       <nav class="hidden md:flex items-center gap-8">
@@ -55,9 +56,9 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       leave-to-class="opacity-0 -translate-y-2"
     >
       <div v-if="menuOpen" class="md:hidden bg-darkest/95 backdrop-blur-xl border-t border-white/5 px-6 py-6 flex flex-col gap-5">
-        <button @click="scrollTo('features')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer">Features</button>
-        <button @click="scrollTo('how-it-works')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer">How It Works</button>
-        <button @click="scrollTo('pricing')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer">Pricing</button>
+        <button @click="scrollTo('features')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">Features</button>
+        <button @click="scrollTo('how-it-works')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">How It Works</button>
+        <button @click="scrollTo('pricing')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">Pricing</button>
         <button @click="scrollTo('hero')" class="glow-btn text-sm font-medium text-white px-5 py-3 rounded-full cursor-pointer text-center">Get the App</button>
       </div>
     </Transition>

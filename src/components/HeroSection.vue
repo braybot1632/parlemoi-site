@@ -31,8 +31,8 @@ onMounted(() => {
         class="hero-headline font-display font-bold text-cream transition-all duration-1000 delay-150"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        Learn French by<br />
-        <span class="text-orange">actually speaking it.</span>
+        The only true way to<br />
+        <span class="text-orange">learn French.</span>
       </h1>
 
       <!-- Subheadline -->
@@ -40,8 +40,8 @@ onMounted(() => {
         class="mt-6 text-lg md:text-xl text-text-light/60 max-w-xl mx-auto leading-relaxed transition-all duration-1000 delay-300"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        Real conversations with AI tutors. Real pronunciation feedback.
-        No cartoon owls. No guilt trips. No tricks.
+        Have real conversations from your very first lesson.
+        Get pronunciation feedback that actually helps. Learn at your own pace.
       </p>
 
       <!-- CTA -->

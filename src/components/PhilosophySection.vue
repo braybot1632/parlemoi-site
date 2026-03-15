@@ -4,7 +4,7 @@ useReveal()
 </script>
 
 <template>
-  <section class="section-pad relative overflow-hidden">
+  <section id="philosophy" class="section-pad relative overflow-hidden">
     <!-- Subtle orb -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-orange/5 blur-[120px] pointer-events-none"></div>
 
@@ -18,18 +18,18 @@ useReveal()
 
       <div class="space-y-6 text-lg md:text-xl text-text-light/50 leading-relaxed reveal">
         <p>
-          Most language apps treat you like a child who needs to be tricked into learning.
+          We believe learning a language should feel like a conversation, not a chore.
         </p>
         <p class="text-cream/80">
-          ParleMoi treats you like an adult who chose to learn.
+          ParleMoi was made for adults who want to learn on their own terms.
         </p>
         <p>
-          No guilt trips about streaks. No cartoon mascots nagging you.<br class="hidden md:block" />
-          No confetti for basic answers.
+          We skipped the streaks, the mascots, and the confetti.<br class="hidden md:block" />
+          Instead, we focused on what actually works: speaking.
         </p>
         <p class="text-cream/80">
-          Just clean, effective tools that help you speak French —<br class="hidden md:block" />
-          at your own pace, on your own terms.
+          Clean tools, real progress, and respect for your time —<br class="hidden md:block" />
+          that's it. That's the whole idea.
         </p>
       </div>
 
@@ -40,22 +40,22 @@ useReveal()
           <div class="w-10 h-10 rounded-full bg-orange/10 flex items-center justify-center mx-auto mb-3">
             <svg class="w-5 h-5 text-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
           </div>
-          <h3 class="font-display font-bold text-cream mb-1">No dark patterns</h3>
-          <p class="text-sm text-text-muted">Built for learners, not metrics</p>
+          <h3 class="font-display font-bold text-cream mb-1">You come first</h3>
+          <p class="text-sm text-text-muted">Built for learners, always</p>
         </div>
         <div class="reveal text-center">
           <div class="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-3">
             <svg class="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
           <h3 class="font-display font-bold text-cream mb-1">Respects your time</h3>
-          <p class="text-sm text-text-muted">No streak anxiety or guilt</p>
+          <p class="text-sm text-text-muted">Learn when it works for you</p>
         </div>
         <div class="reveal text-center">
           <div class="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-3">
             <svg class="w-5 h-5 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <h3 class="font-display font-bold text-cream mb-1">Honest pricing</h3>
-          <p class="text-sm text-text-muted">All tiers visible, always</p>
+          <p class="text-sm text-text-muted">Every price, right on this page</p>
         </div>
       </div>
     </div>

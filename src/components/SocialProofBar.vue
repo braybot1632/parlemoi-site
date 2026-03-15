@@ -3,10 +3,10 @@ import { useReveal } from '../composables/useReveal'
 useReveal()
 
 const metrics = [
-  { value: '50K+', label: 'Conversations practiced' },
-  { value: '94%', label: 'Avg pronunciation score' },
+  { value: '50K+', label: 'Conversations had' },
+  { value: '94%', label: 'Pronunciation accuracy' },
   { value: '4.8', label: 'App Store rating', icon: 'star' },
-  { value: 'A1-B2', label: 'CEFR levels covered' },
+  { value: 'A1-B2', label: 'Beginner to confident' },
 ]
 </script>
 

@@ -4,6 +4,13 @@ export function useReveal() {
   let observer = null
 
   onMounted(() => {
+    if (typeof IntersectionObserver === 'undefined') {
+      document.querySelectorAll('.reveal').forEach((el) => {
+        el.classList.add('visible')
+      })
+      return
+    }
+
     observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
