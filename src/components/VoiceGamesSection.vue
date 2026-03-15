@@ -34,6 +34,9 @@ const games = [
         <h2 class="font-display text-3xl md:text-4xl font-bold text-cream mb-4" style="letter-spacing: -0.02em;">
           Say it to play it
         </h2>
+        <p class="text-text-light/50 max-w-lg mx-auto">
+          We believe that having engaging games will promote a fun environment to keep trying.
+        </p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger">
@@ -47,7 +50,7 @@ const games = [
         </div>
       </div>
 
-      <p class="mt-8 text-center text-text-muted text-sm reveal">+ many more</p>
+      <p class="mt-10 text-center text-orange font-display text-lg font-bold reveal">+ many more</p>
     </div>
   </section>
 </template>
