@@ -4,34 +4,54 @@ useReveal()
 
 const games = [
   {
-    name: 'Word Catch',
-    description: 'French words fall from the screen. Say them before they hit the bottom. Get faster as you level up.',
-    icon: 'arrow-down',
+    name: 'Wall Runner',
+    description: 'A wall races toward you with a French word on it. Say it correctly to pass through. Walls come faster the further you get.',
     color: 'orange',
+  },
+  {
+    name: 'Word Drop',
+    description: 'French words fall from the sky. Say them before they hit the ground. Miss three and it\'s over.',
+    color: 'gold',
   },
   {
     name: 'Speed Say',
-    description: 'Phrases flash one at a time. Say each one correctly, as fast as you can. Beat your best time.',
-    icon: 'timer',
-    color: 'gold',
-  },
-  {
-    name: 'Echo Game',
-    description: "Listen to a phrase. Repeat it. The next one's longer. And the next one's longer still. How far can you go?",
-    icon: 'repeat',
+    description: 'A phrase flashes on screen. Say it. The next one appears. How fast can you clear them all?',
     color: 'success',
   },
   {
-    name: 'Translation Sprint',
-    description: "An English phrase appears. Say it in French. Ten phrases. Clock's ticking.",
-    icon: 'languages',
+    name: 'Echo Chain',
+    description: 'Repeat after the voice. One phrase. Then two. Then three. The chain keeps growing. How long before you break it?',
     color: 'orange',
   },
   {
-    name: 'Fill the Gap',
-    description: '"Bonjour, je voudrais un ___" — Say the missing word. Out loud. Not tap it. Say it.',
-    icon: 'text-cursor',
+    name: 'Translation Sprint',
+    description: 'An English phrase appears. Say it in French. You have five seconds. Then four. Then three.',
     color: 'gold',
+  },
+  {
+    name: 'Fill the Gap',
+    description: 'A sentence plays with one word missing. Say the missing word. Out loud. Not tap it.',
+    color: 'success',
+  },
+  {
+    name: 'Pronunciation Duel',
+    description: 'Two similar-sounding words appear. "Dessus" or "dessous"? Listen. Pick the right one. Then say it yourself.',
+    color: 'orange',
+  },
+  {
+    name: 'Sentence Builder',
+    description: 'Scrambled French words on screen. Say them in the right order to build the sentence.',
+    color: 'gold',
+  },
+  {
+    name: 'Rapid Fire',
+    description: 'A category appears: "Food." You have 30 seconds. Say as many French words as you can. Go.',
+    color: 'success',
+  },
+  {
+    name: 'Survival Mode',
+    description: 'All games. Mixed together. 3 lives. How far can you go?',
+    color: 'orange',
   },
 ]
 </script>
@@ -55,35 +75,6 @@ const games = [
           :key="game.name"
           class="glass rounded-2xl p-6 reveal group transition-all duration-300"
         >
-          <div
-            class="w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-colors"
-            :class="{
-              'bg-orange/10 group-hover:bg-orange/15': game.color === 'orange',
-              'bg-gold/10 group-hover:bg-gold/15': game.color === 'gold',
-              'bg-success/10 group-hover:bg-success/15': game.color === 'success',
-            }"
-          >
-            <!-- Arrow Down -->
-            <svg v-if="game.icon === 'arrow-down'" class="w-5 h-5 text-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>
-            </svg>
-            <!-- Timer -->
-            <svg v-if="game.icon === 'timer'" class="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="m20 5-1.5 1.5"/>
-            </svg>
-            <!-- Repeat -->
-            <svg v-if="game.icon === 'repeat'" class="w-5 h-5 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>
-            </svg>
-            <!-- Languages -->
-            <svg v-if="game.icon === 'languages'" class="w-5 h-5 text-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/>
-            </svg>
-            <!-- Text Cursor -->
-            <svg v-if="game.icon === 'text-cursor'" class="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 22h-1a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4h1"/><path d="M7 22h1a4 4 0 0 0 4-4V6a4 4 0 0 0-4-4H7"/><path d="M8 12h8"/>
-            </svg>
-          </div>
           <h3 class="font-display text-lg font-bold text-cream mb-2">{{ game.name }}</h3>
           <p class="text-sm text-text-light/50 leading-relaxed">{{ game.description }}</p>
         </div>

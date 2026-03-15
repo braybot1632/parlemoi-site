@@ -5,7 +5,7 @@ useReveal()
 const facts = [
   { value: 'Lessons based on A1 to B2 levels', icon: null },
   { value: 'Roleplay scenarios you speak through to complete', icon: null },
-  { value: '6+ voice games', icon: null },
+  { value: '10 voice games', icon: null },
 ]
 </script>
 

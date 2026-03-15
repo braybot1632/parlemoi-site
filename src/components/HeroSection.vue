@@ -47,8 +47,8 @@ async function onSubmit() {
         class="hero-headline font-display font-bold text-cream transition-all duration-1000 delay-150"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        Learn French by<br />
-        <span class="text-orange">actually speaking it.</span>
+        ParleMoi,<br />
+        <span class="text-orange">speak and learn.</span>
       </h1>
 
       <!-- Subheadline -->

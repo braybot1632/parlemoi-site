@@ -4,7 +4,7 @@ useReveal()
 
 const scenarios = [
   { label: 'Visiting a cafe for the first time', detail: 'The barista asks what you\'d like.' },
-  { label: 'At a pharmacy', detail: 'You need to describe what hurts.' },
+  { label: 'At the doctor', detail: 'You need to describe what hurts.' },
   { label: 'Checking into a hotel', detail: 'Time to get your room.' },
   { label: 'Lost without your phone', detail: 'Ask for directions in French.' },
   { label: 'At the dépanneur', detail: 'Ask for help finding what you need.' },
