@@ -23,7 +23,7 @@ import DownloadCTA from '../components/DownloadCTA.vue'
     <VoiceGamesSection />
     <AudiobookLessonsSection />
     <RoleplaySection />
-    <PronunciationSection />
+    <!-- <PronunciationSection /> -->
     <FeaturesSection />
     <HowItWorksSection />
     <FAQSection />
