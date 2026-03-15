@@ -30,20 +30,6 @@ useReveal()
         </p>
       </div>
 
-      <!-- Visual: score example -->
-      <div class="mt-10 glass rounded-2xl p-8 reveal">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-sm text-text-muted">Your pronunciation</span>
-          <span class="text-xs text-text-muted uppercase tracking-wider">Every phrase. Every game. Scored.</span>
-        </div>
-        <div class="flex items-end gap-1">
-          <div v-for="(h, i) in [40, 55, 50, 65, 60, 72, 68, 78, 75, 85, 82, 88, 90, 92]" :key="i"
-            class="flex-1 rounded-t-sm transition-all"
-            :class="h >= 85 ? 'bg-success/60' : 'bg-orange/40'"
-            :style="{ height: h + '%', maxHeight: h * 0.6 + 'px' }"
-          ></div>
-        </div>
-      </div>
     </div>
   </section>
 </template>
