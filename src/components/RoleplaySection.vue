@@ -3,7 +3,7 @@ import { useReveal } from '../composables/useReveal'
 useReveal()
 
 const scenarios = [
-  { label: 'At a cafe in Paris', detail: 'The waiter asks what you\'d like.' },
+  { label: 'Visiting a cafe for the first time', detail: 'The barista asks what you\'d like.' },
   { label: 'At a pharmacy', detail: 'You need to describe what hurts.' },
   { label: 'Checking into a hotel', detail: 'Time to get your room.' },
   { label: 'Lost without your phone', detail: 'Ask for directions in French.' },
