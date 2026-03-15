@@ -14,38 +14,8 @@ const games = [
     color: 'gold',
   },
   {
-    name: 'Speed Say',
-    description: 'A phrase flashes on screen. Say it. The next one appears. How fast can you clear them all?',
-    color: 'success',
-  },
-  {
     name: 'Echo Chain',
     description: 'Repeat after the voice. One phrase. Then two. Then three. The chain keeps growing. How long before you break it?',
-    color: 'orange',
-  },
-  {
-    name: 'Translation Sprint',
-    description: 'An English phrase appears. Say it in French. You have five seconds. Then four. Then three.',
-    color: 'gold',
-  },
-  {
-    name: 'Fill the Gap',
-    description: 'A sentence plays with one word missing. Say the missing word. Out loud. Not tap it.',
-    color: 'success',
-  },
-  {
-    name: 'Pronunciation Duel',
-    description: 'Two similar-sounding words appear. "Dessus" or "dessous"? Listen. Pick the right one. Then say it yourself.',
-    color: 'orange',
-  },
-  {
-    name: 'Sentence Builder',
-    description: 'Scrambled French words on screen. Say them in the right order to build the sentence.',
-    color: 'gold',
-  },
-  {
-    name: 'Rapid Fire',
-    description: 'A category appears: "Food." You have 30 seconds. Say as many French words as you can. Go.',
     color: 'success',
   },
   {
@@ -79,6 +49,8 @@ const games = [
           <p class="text-sm text-text-light/50 leading-relaxed">{{ game.description }}</p>
         </div>
       </div>
+
+      <p class="mt-8 text-center text-text-muted text-sm reveal">+ many more</p>
     </div>
   </section>
 </template>
