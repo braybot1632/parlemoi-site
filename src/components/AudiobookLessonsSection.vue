@@ -28,9 +28,6 @@ useReveal()
         <p>
           Then you play voice games with what you just learned.
         </p>
-        <p class="text-cream/80">
-          Ten minutes. One lesson. You actually remember it.
-        </p>
       </div>
 
       <!-- Visual: lesson flow -->
