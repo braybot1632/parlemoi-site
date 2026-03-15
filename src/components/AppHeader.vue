@@ -32,6 +32,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       </a>
 
       <nav class="hidden md:flex items-center gap-8">
+        <button @click="scrollTo('voice-games')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">Games</button>
         <button @click="scrollTo('features')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">Features</button>
         <button @click="scrollTo('how-it-works')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">How It Works</button>
         <button @click="scrollTo('pricing')" class="text-sm text-text-light/60 hover:text-text-light transition-colors cursor-pointer">Pricing</button>
@@ -56,6 +57,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       leave-to-class="opacity-0 -translate-y-2"
     >
       <div v-if="menuOpen" class="md:hidden bg-darkest/95 backdrop-blur-xl border-t border-white/5 px-6 py-6 flex flex-col gap-5">
+        <button @click="scrollTo('voice-games')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">Games</button>
         <button @click="scrollTo('features')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">Features</button>
         <button @click="scrollTo('how-it-works')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">How It Works</button>
         <button @click="scrollTo('pricing')" class="text-left text-sm text-text-light/70 hover:text-text-light cursor-pointer py-2">Pricing</button>

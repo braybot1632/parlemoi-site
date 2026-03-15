@@ -5,20 +5,20 @@ useReveal()
 const steps = [
   {
     number: '01',
-    title: 'Listen',
-    description: 'Hear the sentence in context. Full phrases you would say at a cafe, on the street, at dinner. Not random vocab.',
+    title: 'First, you listen.',
+    description: 'Your lesson starts like an audiobook. A natural voice reads the phrases while the text appears on screen. Context. Pronunciation. When you\'d use it. No pressure — just absorb.',
     color: 'orange',
   },
   {
     number: '02',
-    title: 'Speak',
-    description: 'Say it out loud. Just you, the mic, and French. This is the part most apps skip.',
+    title: 'Then, you speak.',
+    description: 'Say the phrases out loud. See your pronunciation score in real-time. The app tells you exactly which sounds need work. Fix them. Try again.',
     color: 'gold',
   },
   {
     number: '03',
-    title: 'Improve',
-    description: 'See your score, spot what needs work, try again. You can feel yourself getting better.',
+    title: 'Then, you play.',
+    description: 'Voice games drill what you just learned until it sticks. The whole thing takes about ten minutes.',
     color: 'success',
   },
 ]
@@ -32,7 +32,7 @@ const steps = [
       <div class="text-center mb-16 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">How It Works</p>
         <h2 class="font-display text-3xl md:text-4xl font-bold text-cream" style="letter-spacing: -0.02em;">
-          Three steps. Every lesson.
+          How a lesson works
         </h2>
       </div>
 
@@ -58,6 +58,10 @@ const steps = [
           </div>
         </div>
       </div>
+
+      <p class="mt-10 text-center text-text-muted text-sm reveal">
+        That's one lesson. Tomorrow, the next one picks up where you left off.
+      </p>
     </div>
   </section>
 </template>

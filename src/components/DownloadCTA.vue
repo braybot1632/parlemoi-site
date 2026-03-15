@@ -11,10 +11,10 @@ useReveal()
     <div class="relative max-w-3xl mx-auto px-6 text-center">
       <div class="reveal">
         <h2 class="font-display text-3xl md:text-5xl font-bold text-cream" style="letter-spacing: -0.02em; line-height: 1.1;">
-          Five minutes from now, you could be speaking French.
+          Your first lesson is free.
         </h2>
         <p class="mt-5 text-lg text-text-light/50 max-w-md mx-auto">
-          Download it, open it, start talking. The free plan is yours forever.
+          No credit card. No commitment. Just open it and start talking.
         </p>
       </div>
 

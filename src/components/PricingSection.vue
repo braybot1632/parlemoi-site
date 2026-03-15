@@ -7,7 +7,7 @@ const plans = [
     name: 'Free',
     price: '$0',
     period: 'forever',
-    features: ['First 2 lessons', '10 conversation messages per day', 'All exercise types', 'Pronunciation feedback'],
+    features: ['First 2 lessons', '10 conversation messages per day', 'All exercise types', 'Pronunciation feedback', 'No credit card required'],
     highlighted: false,
     cta: 'Get Started',
   },
@@ -15,7 +15,7 @@ const plans = [
     name: 'Monthly',
     price: '$5.99',
     period: '/month',
-    features: ['Full curriculum (A1-B2)', 'Unlimited conversations', 'All mini-games', 'Advanced pronunciation analytics'],
+    features: ['Full curriculum (A1-B2)', 'Unlimited conversations', 'All voice games', 'Advanced pronunciation analytics'],
     highlighted: false,
     cta: 'Start Learning',
   },
@@ -23,17 +23,18 @@ const plans = [
     name: 'Yearly',
     price: '$39.99',
     period: '/year',
-    features: ['Full curriculum (A1-B2)', 'Unlimited conversations', '7-day free trial', 'All mini-games', 'Advanced analytics'],
+    features: ['Full curriculum (A1-B2)', 'Unlimited conversations', '7-day free trial', 'All voice games', 'Advanced analytics'],
     highlighted: true,
     badge: 'Best Value',
     cta: 'Start Free Trial',
-    savings: 'Save 44% vs monthly',
+    savings: 'Save 44% vs monthly ($3.33/month)',
   },
   {
     name: 'Lifetime',
     price: '$79.99',
     period: 'one-time',
-    features: ['Full curriculum (A1-B2)', 'Unlimited conversations', 'All mini-games', 'Advanced analytics', 'All future updates'],
+    subtitle: 'One payment. Yours forever.',
+    features: ['Full curriculum (A1-B2)', 'Unlimited conversations', 'All voice games', 'Advanced analytics', 'All future updates'],
     highlighted: false,
     badge: 'Pay Once',
     cta: 'Get Lifetime Access',
@@ -49,9 +50,9 @@ const plans = [
       <div class="text-center mb-16 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Pricing</p>
         <h2 class="font-display text-3xl md:text-4xl font-bold text-cream" style="letter-spacing: -0.02em;">
-          Four plans, zero surprises
+          Pricing
         </h2>
-        <p class="mt-4 text-text-muted max-w-md mx-auto">What you see is what you pay. That's it.</p>
+        <p class="mt-4 text-text-muted max-w-md mx-auto">What you see is what you pay.</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
@@ -68,6 +69,7 @@ const plans = [
           </div>
 
           <h3 class="font-display text-lg font-bold text-cream">{{ plan.name }}</h3>
+          <p v-if="plan.subtitle" class="text-xs text-text-muted mt-1">{{ plan.subtitle }}</p>
 
           <div class="mt-4 flex items-baseline gap-1">
             <span class="text-3xl md:text-4xl font-bold text-cream font-display">{{ plan.price }}</span>

@@ -10,7 +10,8 @@ import LogoFullLight from './brand/LogoFullLight.vue'
           <router-link to="/" class="inline-block">
             <LogoFullLight :width="120" :height="30" />
           </router-link>
-          <p class="mt-2 text-sm text-text-muted">Speak to me, begin learning.</p>
+          <p class="mt-2 text-sm text-text-muted">Learn French by speaking it.</p>
+          <p class="mt-1 text-sm text-text-muted">Built in Montreal.</p>
         </div>
 
         <nav class="flex flex-col md:flex-row gap-4 md:gap-8 text-sm" aria-label="Legal">
@@ -21,8 +22,9 @@ import LogoFullLight from './brand/LogoFullLight.vue'
         </nav>
       </div>
 
-      <div class="mt-8 pt-6 border-t border-white/5 text-sm text-text-muted">
-        &copy; 2026 ParleMoi. Built in Montreal.
+      <div class="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row justify-between gap-4 text-sm text-text-muted">
+        <p>Questions? Feedback? <a href="mailto:support@parlemoi.app" class="text-text-light/60 hover:text-text-light transition-colors">support@parlemoi.app</a> — We read every email.</p>
+        <p>&copy; 2026 ParleMoi</p>
       </div>
     </div>
   </footer>

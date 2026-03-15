@@ -17,31 +17,23 @@ onMounted(() => {
     </div>
 
     <div class="relative z-10 max-w-4xl mx-auto px-6 pt-24 pb-20 text-center">
-      <!-- Badge -->
-      <div
-        class="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 mb-8 transition-all duration-700"
-        :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
-      >
-        <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
-        <span class="text-xs font-medium text-text-light/70 tracking-wide uppercase">Now Available on iOS and Android</span>
-      </div>
-
       <!-- Headline -->
       <h1
         class="hero-headline font-display font-bold text-cream transition-all duration-1000 delay-150"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        Speak to me,<br />
-        <span class="text-orange">begin learning.</span>
+        Learn French by<br />
+        <span class="text-orange">actually speaking it.</span>
       </h1>
 
       <!-- Subheadline -->
       <p
-        class="mt-6 text-lg md:text-xl text-text-light/60 max-w-xl mx-auto leading-relaxed transition-all duration-1000 delay-300"
+        class="mt-6 text-lg md:text-xl text-text-light/60 max-w-2xl mx-auto leading-relaxed transition-all duration-1000 delay-300"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        Open the app, start talking. You'll have your first French
-        conversation in under five minutes.
+        Not flashcards. Not multiple choice. You listen to a lesson,
+        then say the phrases out loud, play voice games, and practice
+        real conversations — all scored on pronunciation.
       </p>
 
       <!-- CTA -->
@@ -59,9 +51,18 @@ onMounted(() => {
         </a>
       </div>
 
+      <!-- Trust signals -->
+      <p
+        class="mt-8 text-sm text-text-muted transition-all duration-1000 delay-600"
+        :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+      >
+        Free to start · Works offline · No credit card<br />
+        Built in Montreal, where French is spoken every day.
+      </p>
+
       <!-- Scroll indicator -->
       <div
-        class="mt-20 transition-all duration-1000 delay-700"
+        class="mt-16 transition-all duration-1000 delay-700"
         :class="visible ? 'opacity-100' : 'opacity-0'"
       >
         <div class="w-6 h-10 border border-white/20 rounded-full mx-auto flex items-start justify-center p-1.5">
