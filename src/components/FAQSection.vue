@@ -9,20 +9,8 @@ const faqs = [
     answer: 'The first two lessons and 10 daily conversation messages are free forever. No credit card required. Premium unlocks the full curriculum and unlimited conversations.',
   },
   {
-    question: 'Do I need to know any French?',
-    answer: 'No. Lesson 1 starts with "Bonjour." We assume zero knowledge.',
-  },
-  {
-    question: 'How is this different from Duolingo?',
-    answer: 'Duolingo teaches you to recognize French by tapping answers. ParleMoi teaches you to speak French by using your voice. Every exercise requires you to say something out loud.',
-  },
-  {
     question: 'Can I use it offline?',
     answer: 'Lessons and voice games work without internet. The live conversation feature needs WiFi.',
-  },
-  {
-    question: 'What level will I reach?',
-    answer: 'A1 (complete beginner) to B2 (upper intermediate). Enough for everyday conversations, travel, and basic professional situations.',
   },
   {
     question: 'Who made this?',
