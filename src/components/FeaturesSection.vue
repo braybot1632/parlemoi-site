@@ -42,6 +42,19 @@ useReveal()
           </p>
         </div>
 
+        <!-- Chatroom -->
+        <div class="glass rounded-2xl p-8 reveal group transition-all duration-300">
+          <div class="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center mb-4 group-hover:bg-gold/15 transition-colors">
+            <svg class="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <h3 class="font-display text-lg font-bold text-cream mb-2">Chatroom</h3>
+          <p class="text-sm text-text-light/50 leading-relaxed">
+            Practice conversations in ParleMoi's chatroom for real feedback, simulating a tutor right in your phone.
+          </p>
+        </div>
+
         <!-- Pronunciation Tracked -->
         <div class="glass rounded-2xl p-8 reveal group transition-all duration-300">
           <div class="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center mb-4 group-hover:bg-success/15 transition-colors">
