@@ -11,10 +11,10 @@ useReveal()
     <div class="relative max-w-3xl mx-auto px-6 text-center">
       <div class="reveal">
         <h2 class="font-display text-3xl md:text-5xl font-bold text-cream" style="letter-spacing: -0.02em; line-height: 1.1;">
-          Your first French conversation is waiting.
+          Five minutes from now, you could be speaking French.
         </h2>
         <p class="mt-5 text-lg text-text-light/50 max-w-md mx-auto">
-          Download ParleMoi and start speaking today. Free to try, nothing to lose.
+          Download it, open it, start talking. The free plan is yours forever.
         </p>
       </div>
 

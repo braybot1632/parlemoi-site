@@ -11,9 +11,9 @@ const problems = [
 
 const solutions = [
   'Every exercise starts with your voice',
-  'A clean, calm experience that respects your time',
-  'Conversations that match your level and grow with you',
-  'All pricing visible, right on this page',
+  'A quiet app that lets you focus',
+  'Conversations that get harder as you do',
+  'All pricing visible — scroll down and look',
 ]
 </script>
 

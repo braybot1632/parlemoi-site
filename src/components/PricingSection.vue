@@ -49,9 +49,9 @@ const plans = [
       <div class="text-center mb-16 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Pricing</p>
         <h2 class="font-display text-3xl md:text-4xl font-bold text-cream" style="letter-spacing: -0.02em;">
-          Pick a plan that works for you
+          Four plans, zero surprises
         </h2>
-        <p class="mt-4 text-text-muted max-w-md mx-auto">Every option, right here. What you see is what you pay.</p>
+        <p class="mt-4 text-text-muted max-w-md mx-auto">What you see is what you pay. That's it.</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger">

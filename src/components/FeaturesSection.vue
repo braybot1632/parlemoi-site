@@ -9,7 +9,7 @@ useReveal()
       <div class="text-center mb-16 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Features</p>
         <h2 class="font-display text-3xl md:text-4xl font-bold text-cream" style="letter-spacing: -0.02em;">
-          Built around the way you actually learn
+          Six things we got right
         </h2>
       </div>
 
@@ -24,7 +24,7 @@ useReveal()
           </div>
           <h3 class="font-display text-2xl font-bold text-cream mb-3">Speak from Day One</h3>
           <p class="text-text-light/50 leading-relaxed max-w-sm">
-            From the moment you open the app, you're speaking French. Every exercise puts your voice first — because that's how you actually get better.
+            You open the app, you talk. Every exercise is built around your voice. Flashcards and multiple choice don't make you fluent. Speaking does.
           </p>
           <div class="mt-8 glass rounded-xl p-4 max-w-xs">
             <div class="flex items-center gap-3 mb-3">
@@ -46,7 +46,7 @@ useReveal()
           </div>
           <h3 class="font-display text-lg font-bold text-cream mb-2">Conversation Partners</h3>
           <p class="text-sm text-text-light/50 leading-relaxed">
-            Practice with tutors who respond naturally, correct you gently, and never judge. Like a patient friend who happens to be fluent.
+            Talk with tutors who feel like a friend in Paris. They'll keep the conversation going and help when you get stuck.
           </p>
         </div>
 
@@ -57,9 +57,9 @@ useReveal()
               <path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2"/>
             </svg>
           </div>
-          <h3 class="font-display text-lg font-bold text-cream mb-2">Pronunciation Feedback</h3>
+          <h3 class="font-display text-lg font-bold text-cream mb-2">Know How You Sound</h3>
           <p class="text-sm text-text-light/50 leading-relaxed">
-            Hear how you sound, see where to improve, and get better with each try.
+            Say a word, see your score. You'll know exactly which sounds need work.
           </p>
         </div>
 
@@ -85,7 +85,7 @@ useReveal()
           </div>
           <h3 class="font-display text-lg font-bold text-cream mb-2">Made for Grown-Ups</h3>
           <p class="text-sm text-text-light/50 leading-relaxed">
-            A clean, thoughtful experience that values your time. Finally, a language app that feels like it was made for you.
+            No cartoon owls. No confetti. Just a well-made app that treats you like an adult.
           </p>
         </div>
 
@@ -98,7 +98,7 @@ useReveal()
           </div>
           <h3 class="font-display text-lg font-bold text-cream mb-2">Full Offline Mode</h3>
           <p class="text-sm text-text-light/50 leading-relaxed">
-            Take your lessons on the plane, the metro, the cabin. Learn wherever life takes you.
+            Download your lessons before the flight. Works on the metro, at the cabin, wherever.
           </p>
         </div>
       </div>

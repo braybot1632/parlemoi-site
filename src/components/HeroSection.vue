@@ -40,8 +40,8 @@ onMounted(() => {
         class="mt-6 text-lg md:text-xl text-text-light/60 max-w-xl mx-auto leading-relaxed transition-all duration-1000 delay-300"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        Have real conversations from your very first lesson.
-        Get pronunciation feedback that actually helps. Learn at your own pace.
+        Open the app, start talking. You'll have your first French
+        conversation in under five minutes.
       </p>
 
       <!-- CTA -->

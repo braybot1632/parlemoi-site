@@ -6,19 +6,19 @@ const steps = [
   {
     number: '01',
     title: 'Listen',
-    description: 'Hear how it sounds in a real conversation. Full sentences you will actually use, not random vocabulary lists.',
+    description: 'Hear the sentence in context. Full phrases you would say at a cafe, on the street, at dinner. Not random vocab.',
     color: 'orange',
   },
   {
     number: '02',
     title: 'Speak',
-    description: 'Say it out loud. Just you, the microphone, and French. This is where the real learning happens.',
+    description: 'Say it out loud. Just you, the mic, and French. This is the part most apps skip.',
     color: 'gold',
   },
   {
     number: '03',
     title: 'Improve',
-    description: 'See how you did, learn which sounds to focus on, and try again. Every attempt gets you closer.',
+    description: 'See your score, spot what needs work, try again. You can feel yourself getting better.',
     color: 'success',
   },
 ]
