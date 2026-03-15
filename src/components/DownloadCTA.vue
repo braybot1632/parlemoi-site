@@ -20,6 +20,9 @@ async function onSubmit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email.value }),
     })
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'beta_signup', { location: 'bottom_cta' })
+    }
     submitted.value = true
   } catch (e) {
     error.value = 'Something went wrong. Please try again.'
