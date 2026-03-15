@@ -9,8 +9,30 @@ const submitted = ref(false)
 const submitting = ref(false)
 const error = ref('')
 const email = ref('')
+const lastSubmitTime = ref(0)
+
+function sanitizeEmail(input) {
+  return input.trim().toLowerCase().slice(0, 254)
+}
+
+function isValidEmail(input) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input) && input.length <= 254
+}
 
 async function onSubmit() {
+  const now = Date.now()
+  if (now - lastSubmitTime.value < 5000) {
+    error.value = 'Please wait a moment before trying again.'
+    return
+  }
+  lastSubmitTime.value = now
+
+  const cleanEmail = sanitizeEmail(email.value)
+  if (!isValidEmail(cleanEmail)) {
+    error.value = 'Please enter a valid email address.'
+    return
+  }
+
   submitting.value = true
   error.value = ''
   try {
@@ -18,7 +40,7 @@ async function onSubmit() {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value }),
+      body: JSON.stringify({ email: cleanEmail }),
     })
     if (typeof window.gtag !== 'undefined') {
       window.gtag('event', 'beta_signup', { location: 'bottom_cta' })
