@@ -32,7 +32,7 @@ const games = [
       <div class="text-center mb-16 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Voice Games</p>
         <h2 class="font-display text-3xl md:text-4xl font-bold text-cream mb-4" style="letter-spacing: -0.02em;">
-          Games you play with your mouth
+          Say it to play it
         </h2>
         <p class="text-text-light/50 max-w-lg mx-auto">
           These aren't quizzes. Every game uses your voice. Every game teaches real French.
