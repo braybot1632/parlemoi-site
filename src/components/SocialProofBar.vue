@@ -3,7 +3,6 @@ import { useReveal } from '../composables/useReveal'
 useReveal()
 
 const facts = [
-  { value: 'Free forever plan', icon: null },
   { value: 'A1 to B2 curriculum', icon: null },
   { value: '16+ roleplay scenarios', icon: null },
   { value: '6 voice games', icon: null },

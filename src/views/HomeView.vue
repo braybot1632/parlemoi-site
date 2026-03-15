@@ -17,6 +17,7 @@ import DownloadCTA from '../components/DownloadCTA.vue'
 <template>
   <main>
     <HeroSection />
+    <PhilosophySection />
     <SocialProofBar />
     <ProblemSolution />
     <VoiceGamesSection />
@@ -25,7 +26,6 @@ import DownloadCTA from '../components/DownloadCTA.vue'
     <PronunciationSection />
     <FeaturesSection />
     <HowItWorksSection />
-    <PhilosophySection />
     <FAQSection />
     <PricingSection />
     <DownloadCTA />
