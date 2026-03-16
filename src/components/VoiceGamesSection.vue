@@ -35,7 +35,7 @@ const games = [
           Say it to play it
         </h2>
         <p class="text-text-light/50 max-w-lg mx-auto">
-          We believe that providing engaging games will promote a fun environment to keep trying.
+          We believe that providing engaging games will accelerate the learning experience.
         </p>
       </div>
 
