@@ -49,7 +49,7 @@ const plans = [
     <div class="max-w-5xl mx-auto px-6">
       <div class="text-center mb-16 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Pricing</p>
-        <h2 class="font-display text-3xl md:text-4xl font-bold text-text-dark" style="letter-spacing: -0.02em;">
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-navy" style="letter-spacing: -0.02em;">
           Pricing
         </h2>
         <p class="mt-4 text-text-muted max-w-md mx-auto">What you see is what you pay.</p>
@@ -68,11 +68,11 @@ const plans = [
             {{ plan.badge }}
           </div>
 
-          <h3 class="font-display text-lg font-bold text-text-dark">{{ plan.name }}</h3>
+          <h3 class="font-display text-lg font-bold text-navy">{{ plan.name }}</h3>
           <p v-if="plan.subtitle" class="text-xs text-text-muted mt-1">{{ plan.subtitle }}</p>
 
           <div class="mt-4 flex items-baseline gap-1">
-            <span class="text-3xl md:text-4xl font-bold text-text-dark font-display">{{ plan.price }}</span>
+            <span class="text-3xl md:text-4xl font-bold text-navy font-display">{{ plan.price }}</span>
             <span class="text-sm text-text-muted">{{ plan.period }}</span>
           </div>
 
@@ -89,7 +89,7 @@ const plans = [
             class="mt-8 w-full py-3 rounded-full text-sm font-medium transition-all cursor-pointer"
             :class="plan.highlighted
               ? 'glow-btn text-white'
-              : 'bg-white text-text-dark hover:bg-white border border-card-border'"
+              : 'bg-white text-navy hover:bg-white border border-card-border'"
           >
             {{ plan.cta }}
           </button>

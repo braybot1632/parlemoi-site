@@ -31,7 +31,7 @@ function toggle(index) {
 
     <div class="max-w-3xl mx-auto px-6">
       <div class="text-center mb-16 reveal">
-        <h2 class="font-display text-3xl md:text-4xl font-bold text-text-dark" style="letter-spacing: -0.02em;">
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-navy" style="letter-spacing: -0.02em;">
           Questions
         </h2>
       </div>
@@ -46,7 +46,7 @@ function toggle(index) {
             @click="toggle(index)"
             class="w-full flex items-center justify-between p-6 text-left cursor-pointer group"
           >
-            <h3 class="font-display font-bold text-text-dark pr-4">{{ faq.question }}</h3>
+            <h3 class="font-display font-bold text-navy pr-4">{{ faq.question }}</h3>
             <svg
               class="w-5 h-5 text-text-muted shrink-0 transition-transform duration-300"
               :class="{ 'rotate-45': openIndex === index }"

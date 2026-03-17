@@ -8,7 +8,7 @@ useReveal()
     <div class="max-w-5xl mx-auto px-6">
       <div class="text-center mb-16 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Features</p>
-        <h2 class="font-display text-3xl md:text-4xl font-bold text-text-dark" style="letter-spacing: -0.02em;">
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-navy" style="letter-spacing: -0.02em;">
           And a few more things
         </h2>
       </div>
@@ -21,7 +21,7 @@ useReveal()
               <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
             </svg>
           </div>
-          <h3 class="font-display text-lg font-bold text-text-dark mb-2">A1 to B2 Curriculum</h3>
+          <h3 class="font-display text-lg font-bold text-navy mb-2">A1 to B2 Curriculum</h3>
           <p class="text-sm text-text-secondary leading-relaxed">
             From "Bonjour" to debating politics. Sixty lessons across four
             levels, each one building on the last.
@@ -35,7 +35,7 @@ useReveal()
               <path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="m2 2 20 20"/>
             </svg>
           </div>
-          <h3 class="font-display text-lg font-bold text-text-dark mb-2">Works Offline</h3>
+          <h3 class="font-display text-lg font-bold text-navy mb-2">Works Offline</h3>
           <p class="text-sm text-text-secondary leading-relaxed">
             Download lessons before the flight. Voice games and lesson content
             work without WiFi. Only live conversations need a connection.
@@ -49,7 +49,7 @@ useReveal()
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
           </div>
-          <h3 class="font-display text-lg font-bold text-text-dark mb-2">Chatroom</h3>
+          <h3 class="font-display text-lg font-bold text-navy mb-2">Chatroom</h3>
           <p class="text-sm text-text-secondary leading-relaxed">
             Practice conversations in ParleMoi's chatroom for real feedback, simulating a tutor right in your phone.
           </p>
@@ -62,7 +62,7 @@ useReveal()
               <path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2"/>
             </svg>
           </div>
-          <h3 class="font-display text-lg font-bold text-text-dark mb-2">Your Pronunciation, Tracked</h3>
+          <h3 class="font-display text-lg font-bold text-navy mb-2">Your Pronunciation, Tracked</h3>
           <p class="text-sm text-text-secondary leading-relaxed">
             See your accuracy improve over time. Not just per-word — your
             overall trend across lessons, games, and conversations.

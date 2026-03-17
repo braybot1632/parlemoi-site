@@ -22,7 +22,7 @@ const isActive = (path) => computed(() => route.path === path)
       class="transition-colors"
       :class="isActive(link.to).value
         ? 'text-orange font-semibold'
-        : 'text-text-muted hover:text-text-dark'"
+        : 'text-text-muted hover:text-navy'"
     >
       {{ link.label }}
     </router-link>

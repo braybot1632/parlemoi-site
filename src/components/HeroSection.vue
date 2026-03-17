@@ -69,7 +69,7 @@ async function onSubmit() {
     <div class="relative z-10 max-w-4xl mx-auto px-6 pt-24 pb-20 text-center">
       <!-- Headline -->
       <h1
-        class="hero-headline font-display font-bold text-text-dark transition-all duration-1000 delay-150"
+        class="hero-headline font-display font-bold text-navy transition-all duration-1000 delay-150"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
         ParleMoi,<br />
@@ -92,7 +92,7 @@ async function onSubmit() {
         <p class="text-sm font-medium text-orange uppercase tracking-wider mb-4">Sign up to be a beta tester</p>
 
         <div v-if="submitted" class="glass rounded-2xl p-6">
-          <p class="text-text-dark font-medium">You're on the list.</p>
+          <p class="text-navy font-medium">You're on the list.</p>
           <p class="text-text-muted text-sm mt-1">We'll email you when the beta is ready.</p>
         </div>
 
@@ -106,7 +106,7 @@ async function onSubmit() {
             type="email"
             required
             placeholder="Your email address"
-            class="flex-1 px-5 py-3.5 rounded-full bg-white border border-card-border text-text-dark placeholder-text-muted text-sm focus:outline-none focus:border-orange/50 transition-colors"
+            class="flex-1 px-5 py-3.5 rounded-full bg-white border border-card-border text-navy placeholder-text-muted text-sm focus:outline-none focus:border-orange/50 transition-colors"
           />
           <button
             type="submit"

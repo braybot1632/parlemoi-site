@@ -17,7 +17,7 @@ const scenarios = [
     <div class="max-w-5xl mx-auto px-6">
       <div class="text-center mb-16 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Roleplay Scenarios</p>
-        <h2 class="font-display text-3xl md:text-4xl font-bold text-text-dark mb-4" style="letter-spacing: -0.02em;">
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-navy mb-4" style="letter-spacing: -0.02em;">
           Real conversations. Real situations.
         </h2>
         <p class="text-text-secondary max-w-lg mx-auto">
@@ -31,7 +31,7 @@ const scenarios = [
           :key="scenario.label"
           class="glass rounded-2xl p-6 reveal group transition-all duration-300"
         >
-          <h3 class="font-display text-base font-bold text-text-dark mb-1">{{ scenario.label }}</h3>
+          <h3 class="font-display text-base font-bold text-navy mb-1">{{ scenario.label }}</h3>
           <p class="text-sm text-text-secondary leading-relaxed">{{ scenario.detail }}</p>
         </div>
       </div>

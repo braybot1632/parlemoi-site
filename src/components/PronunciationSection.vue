@@ -10,7 +10,7 @@ useReveal()
     <div class="max-w-3xl mx-auto px-6">
       <div class="reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Pronunciation</p>
-        <h2 class="font-display text-3xl md:text-4xl font-bold text-text-dark mb-8" style="letter-spacing: -0.02em;">
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-navy mb-8" style="letter-spacing: -0.02em;">
           Know exactly how you sound
         </h2>
       </div>
@@ -25,7 +25,7 @@ useReveal()
           Below that? The app tells you which sound was off.
           The R. The nasal vowel. The liaison you missed.
         </p>
-        <p class="text-text-dark/80">
+        <p class="text-navy/80">
           Fix it. Try again. Watch the number climb.
         </p>
       </div>
