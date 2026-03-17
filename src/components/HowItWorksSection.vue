@@ -31,7 +31,7 @@ const steps = [
     <div class="max-w-5xl mx-auto px-6">
       <div class="text-center mb-16 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">How It Works</p>
-        <h2 class="font-display text-3xl md:text-4xl font-bold text-cream" style="letter-spacing: -0.02em;">
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-text-dark" style="letter-spacing: -0.02em;">
           How a lesson works
         </h2>
       </div>
@@ -53,8 +53,8 @@ const steps = [
             >{{ step.number }}</span>
           </div>
           <div>
-            <h3 class="font-display text-xl md:text-2xl font-bold text-cream mb-2">{{ step.title }}</h3>
-            <p class="text-text-light/50 leading-relaxed max-w-lg">{{ step.description }}</p>
+            <h3 class="font-display text-xl md:text-2xl font-bold text-text-dark mb-2">{{ step.title }}</h3>
+            <p class="text-text-secondary leading-relaxed max-w-lg">{{ step.description }}</p>
           </div>
         </div>
       </div>

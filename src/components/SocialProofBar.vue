@@ -10,13 +10,13 @@ const facts = [
 </script>
 
 <template>
-  <section class="relative border-y border-white/5 bg-darkest/60 backdrop-blur-sm">
+  <section class="relative border-y border-card-border bg-cream backdrop-blur-sm">
     <div class="max-w-6xl mx-auto px-6 py-8">
       <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 stagger">
         <span
           v-for="fact in facts"
           :key="fact.value"
-          class="reveal text-sm text-text-light/50 tracking-wide"
+          class="reveal text-sm text-text-secondary tracking-wide"
         >
           {{ fact.value }}
         </span>

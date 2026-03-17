@@ -13,9 +13,10 @@
   --color-success: #4CAF7D;
   --color-error: #D35454;
   --color-text-dark: #2C2C2C;
+  --color-text-secondary: #6B6B6B;
   --color-text-light: #E8E4DF;
-  --color-text-muted: #8B8B8B;
-  --color-card-border: rgba(255, 255, 255, 0.08);
+  --color-text-muted: #9B9B9B;
+  --color-card-border: #E8E3DC;
   --color-glass: rgba(255, 255, 255, 0.05);
   --color-glass-border: rgba(255, 255, 255, 0.1);
   --color-glass-hover: rgba(255, 255, 255, 0.08);
@@ -38,20 +39,8 @@ html {
 }
 
 body {
-  background: #080D1A;
-  color: #E8E4DF;
-}
-
-/* Grain overlay */
-.grain::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0.035;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background: #FFFDF9;
+  color: #2C2C2C;
 }
 
 /* Gradient mesh orbs */
@@ -72,7 +61,7 @@ body {
   height: 600px;
   top: -10%;
   left: -5%;
-  background: radial-gradient(circle, rgba(232, 134, 58, 0.25), transparent 70%);
+  background: radial-gradient(circle, rgba(232, 134, 58, 0.12), transparent 70%);
   animation: meshDrift1 14s ease-in-out infinite alternate;
 }
 .mesh-gradient .orb-2 {
@@ -80,7 +69,7 @@ body {
   height: 500px;
   top: 20%;
   right: -10%;
-  background: radial-gradient(circle, rgba(212, 168, 83, 0.18), transparent 70%);
+  background: radial-gradient(circle, rgba(212, 168, 83, 0.08), transparent 70%);
   animation: meshDrift2 18s ease-in-out infinite alternate;
 }
 .mesh-gradient .orb-3 {
@@ -88,7 +77,7 @@ body {
   height: 400px;
   bottom: -5%;
   left: 30%;
-  background: radial-gradient(circle, rgba(27, 42, 74, 0.4), transparent 70%);
+  background: radial-gradient(circle, rgba(251, 245, 239, 0.5), transparent 70%);
   animation: meshDrift3 16s ease-in-out infinite alternate;
 }
 
@@ -105,34 +94,27 @@ body {
   100% { transform: translate(40px, -30px) scale(1.2); }
 }
 
-/* Glass cards */
+/* Light cards */
 .glass {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  background: #FFFFFF;
+  border: 1px solid #E8E3DC;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 .glass:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: #FFFFFF;
+  border-color: #d6d0c8;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 /* Glow CTA */
 .glow-btn {
   background: linear-gradient(135deg, #E8863A, #D4A853);
-  box-shadow:
-    0 0 20px rgba(232, 134, 58, 0.3),
-    0 0 60px rgba(232, 134, 58, 0.12);
+  box-shadow: 0 4px 16px rgba(232, 134, 58, 0.25);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 .glow-btn:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 0 30px rgba(232, 134, 58, 0.5),
-    0 0 80px rgba(232, 134, 58, 0.2);
+  box-shadow: 0 6px 24px rgba(232, 134, 58, 0.35);
 }
 
 /* Scroll reveal */
@@ -175,11 +157,6 @@ body {
 }
 .marquee-track {
   animation: marquee 30s linear infinite;
-}
-
-/* Metric counter glow */
-.metric-glow {
-  text-shadow: 0 0 40px rgba(232, 134, 58, 0.3);
 }
 
 /* Divider gradient */

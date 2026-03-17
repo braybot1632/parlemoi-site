@@ -10,12 +10,12 @@ useReveal()
     <div class="max-w-3xl mx-auto px-6">
       <div class="reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Audiobook Lessons</p>
-        <h2 class="font-display text-3xl md:text-4xl font-bold text-cream mb-8" style="letter-spacing: -0.02em;">
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-text-dark mb-8" style="letter-spacing: -0.02em;">
           Lessons that teach before they test
         </h2>
       </div>
 
-      <div class="space-y-6 text-lg text-text-light/50 leading-relaxed reveal">
+      <div class="space-y-6 text-lg text-text-secondary leading-relaxed reveal">
         <p>
           Each lesson starts like an audiobook. A natural voice introduces
           the topic, reads the phrases aloud, and explains when you'd use
@@ -58,7 +58,7 @@ useReveal()
         </div>
       </div>
 
-      <p class="mt-8 text-text-light/40 text-sm reveal">
+      <p class="mt-8 text-text-muted text-sm reveal">
         Other apps throw you into a quiz on day one. ParleMoi teaches you first.
       </p>
     </div>
