@@ -24,7 +24,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 <template>
   <header
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-    :class="scrolled ? 'bg-warm-white/90 backdrop-blur-xl border-b border-card-border' : ''"
+    :class="scrolled ? 'bg-white/90 backdrop-blur-xl border-b border-card-border' : ''"
   >
     <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="/" class="flex items-center">
@@ -56,7 +56,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       enter-from-class="opacity-0 -translate-y-2"
       leave-to-class="opacity-0 -translate-y-2"
     >
-      <div v-if="menuOpen" class="md:hidden bg-warm-white/95 backdrop-blur-xl border-t border-card-border px-6 py-6 flex flex-col gap-5">
+      <div v-if="menuOpen" class="md:hidden bg-white/95 backdrop-blur-xl border-t border-card-border px-6 py-6 flex flex-col gap-5">
         <button @click="scrollTo('voice-games')" class="text-left text-sm text-text-secondary hover:text-text-dark cursor-pointer py-2">Games</button>
         <button @click="scrollTo('features')" class="text-left text-sm text-text-secondary hover:text-text-dark cursor-pointer py-2">Features</button>
         <button @click="scrollTo('how-it-works')" class="text-left text-sm text-text-secondary hover:text-text-dark cursor-pointer py-2">How It Works</button>

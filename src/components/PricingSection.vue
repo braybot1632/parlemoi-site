@@ -89,7 +89,7 @@ const plans = [
             class="mt-8 w-full py-3 rounded-full text-sm font-medium transition-all cursor-pointer"
             :class="plan.highlighted
               ? 'glow-btn text-white'
-              : 'bg-cream text-text-dark hover:bg-cream border border-card-border'"
+              : 'bg-white text-text-dark hover:bg-white border border-card-border'"
           >
             {{ plan.cta }}
           </button>

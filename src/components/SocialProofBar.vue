@@ -10,7 +10,7 @@ const facts = [
 </script>
 
 <template>
-  <section class="relative border-y border-card-border bg-cream backdrop-blur-sm">
+  <section class="relative border-y border-card-border bg-white backdrop-blur-sm">
     <div class="max-w-6xl mx-auto px-6 py-8">
       <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 stagger">
         <span

@@ -85,7 +85,7 @@ async function onSubmit() {
             type="email"
             required
             placeholder="Your email address"
-            class="flex-1 px-5 py-3.5 rounded-full bg-cream border border-card-border text-text-dark placeholder-text-muted text-sm focus:outline-none focus:border-orange/50 transition-colors"
+            class="flex-1 px-5 py-3.5 rounded-full bg-white border border-card-border text-text-dark placeholder-text-muted text-sm focus:outline-none focus:border-orange/50 transition-colors"
           />
           <button
             type="submit"
