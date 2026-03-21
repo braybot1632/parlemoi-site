@@ -4,11 +4,6 @@ useReveal()
 
 const games = [
   {
-    name: 'Wall Runner',
-    description: 'A wall races toward you with a French word on it. Say it correctly to pass through. Walls come faster the further you get.',
-    color: 'orange',
-  },
-  {
     name: 'Word Drop',
     description: 'French words fall from the sky. Say them before they hit the ground. Miss three and it\'s over.',
     color: 'gold',

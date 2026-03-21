@@ -22,11 +22,7 @@ useReveal()
           them.
         </p>
         <p>
-          Then you practice. Say the phrases. Get a pronunciation score.
-          Hear what to fix. Try again.
-        </p>
-        <p>
-          Then you play voice games with what you just learned.
+          You practice the phrases and get instant feedback on your pronunciation. Hear exactly what needs work, then try again until you nail it.
         </p>
       </div>
 

@@ -18,7 +18,7 @@ const scenarios = [
       <div class="text-center mb-16 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Roleplay Scenarios</p>
         <h2 class="font-display text-3xl md:text-4xl font-bold text-navy mb-4" style="letter-spacing: -0.02em;">
-          Practice scenarios that occur in daily life.
+          Practice real conversations
         </h2>
         <p class="text-text-secondary max-w-lg mx-auto">
           Our goal is to create realistic scenarios one may encounter when living in a French speaking place. Our app will simulate these scenarios to give you the confidence to practice when you are out in the real world.

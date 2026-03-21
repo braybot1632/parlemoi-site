@@ -5,20 +5,20 @@ useReveal()
 const steps = [
   {
     number: '01',
-    title: 'First, you listen.',
-    description: 'Your lesson starts like an audiobook. A natural voice reads the phrases while the text appears on screen.',
+    title: 'Listen to a lesson',
+    description: 'Your lesson starts like an audiobook. A native speaker reads the phrases aloud while text appears on screen.',
     color: 'orange',
   },
   {
     number: '02',
-    title: 'Then, you speak.',
-    description: 'Say the phrases out loud. See your pronunciation score in real-time. The app tells you exactly which sounds need work.',
+    title: 'Say it out loud',
+    description: 'Practice the phrases yourself. You get instant pronunciation scores that show exactly which sounds need work. Keep trying until you nail it.',
     color: 'gold',
   },
   {
     number: '03',
-    title: 'Then, you play.',
-    description: 'Voice games drill what you just learned until it sticks. The whole thing takes about ten minutes.',
+    title: 'Test your skills, earn rewards',
+    description: 'Compete against your own personal bests. Set scores, challenge yourself to beat them, and watch your skill improve across every game.',
     color: 'success',
   },
 ]
