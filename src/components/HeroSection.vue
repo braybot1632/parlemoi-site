@@ -145,15 +145,6 @@ async function onSubmit() {
         Built in Montreal.
       </p>
 
-      <!-- Scroll indicator -->
-      <div
-        class="mt-16 transition-all duration-1000 delay-700"
-        :class="visible ? 'opacity-100' : 'opacity-0'"
-      >
-        <div class="w-6 h-10 border border-card-border rounded-full mx-auto flex items-start justify-center p-1.5">
-          <div class="w-1 h-2.5 bg-orange/60 rounded-full animate-bounce"></div>
-        </div>
-      </div>
     </div>
   </section>
 </template>
