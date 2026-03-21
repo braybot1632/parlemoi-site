@@ -23,7 +23,7 @@ import LogoFull from './brand/LogoFull.vue'
       </div>
 
       <div class="mt-8 pt-6 border-t border-card-border flex flex-col sm:flex-row justify-between gap-4 text-sm text-text-muted">
-        <p>Questions? Feedback? <a href="mailto:support@parlemoiapp.com" class="text-text-secondary hover:text-navy transition-colors">support@parlemoiapp.com</a> — We read every email.</p>
+        <p>Questions? Feedback? <a href="mailto:support@parlemoiapp.com" class="text-text-secondary hover:text-navy transition-colors">support@parlemoiapp.com</a>, We read every email.</p>
         <p>&copy; 2026 ParleMoi</p>
       </div>
     </div>

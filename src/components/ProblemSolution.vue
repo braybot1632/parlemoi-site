@@ -15,7 +15,7 @@ useReveal()
       <div class="space-y-6 text-lg text-text-secondary leading-relaxed reveal">
         <p>
           You tapped buttons for six months and still can't order a coffee
-          in French. That's not your fault — those apps taught you to
+          in French. That's not your fault, those apps taught you to
           recognize French, not speak it.
         </p>
         <p class="text-navy/80">

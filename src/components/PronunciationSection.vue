@@ -17,7 +17,7 @@ useReveal()
 
       <div class="space-y-6 text-lg text-text-secondary leading-relaxed reveal">
         <p>
-          Say a French word. See a number. Not a vague "good job" — an actual
+          Say a French word. See a number. Not a vague "good job," an actual
           score that tells you how close you got.
         </p>
         <p>

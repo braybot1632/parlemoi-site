@@ -81,7 +81,7 @@ async function onSubmit() {
         class="mt-6 text-lg md:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed transition-all duration-1000 delay-300"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        Practice speaking, real learning.
+        The app that gets you speaking French out loud.
       </p>
 
       <!-- Beta signup form -->
@@ -119,7 +119,7 @@ async function onSubmit() {
         <p v-if="error" class="mt-3 text-sm text-error">{{ error }}</p>
       </div>
 
-      <!-- Store buttons — Coming Soon -->
+      <!-- Store buttons, Coming Soon -->
       <div
         class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 transition-all duration-1000 delay-600"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
@@ -142,7 +142,7 @@ async function onSubmit() {
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
       >
         Free to start · No credit card<br />
-        Built in Montreal, where French is spoken every day.
+        Built in Montreal.
       </p>
 
       <!-- Scroll indicator -->

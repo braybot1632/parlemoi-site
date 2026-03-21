@@ -59,9 +59,6 @@ const steps = [
         </div>
       </div>
 
-      <p class="mt-10 text-center text-text-muted text-sm reveal">
-        That's one lesson. Tomorrow, the next one picks up where you left off.
-      </p>
     </div>
   </section>
 </template>

@@ -64,7 +64,7 @@ useReveal()
           </div>
           <h3 class="font-display text-lg font-bold text-navy mb-2">Your Pronunciation, Tracked</h3>
           <p class="text-sm text-text-secondary leading-relaxed">
-            See your accuracy improve over time. Not just per-word — your
+            See your accuracy improve over time. Not just per-word, your
             overall trend across lessons, games, and conversations.
           </p>
         </div>

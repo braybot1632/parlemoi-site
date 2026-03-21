@@ -7,7 +7,7 @@ import LegalNav from '../components/LegalNav.vue'
     <LegalNav />
 
     <h1 class="font-display text-3xl md:text-4xl text-cream mb-2">End User License Agreement (EULA)</h1>
-    <p class="font-bold text-text-muted mb-1">ParleMoi — Language Learning Application</p>
+    <p class="font-bold text-text-muted mb-1">ParleMoi, Language Learning Application</p>
     <p class="font-bold text-text-muted mb-6">Effective Date: March 14, 2026</p>
 
     <div class="legal-prose text-text-light/85 leading-relaxed space-y-4">

@@ -15,16 +15,15 @@ defineProps({
   >
     <circle cx="32" cy="32" r="32" fill="#1B2A4A" />
     <text
-      x="32" y="34"
+      x="32" y="35"
       text-anchor="middle"
       dominant-baseline="central"
-      font-family="-apple-system, 'SF Pro Rounded', 'Helvetica Neue', sans-serif"
+      font-family="Georgia, 'Times New Roman', serif"
       font-weight="700"
-      font-size="24"
-      fill="#E8E4DF"
-      letter-spacing="-1"
+      font-size="26"
+      letter-spacing="-0.8"
     >
-      PM
+      <tspan fill="#FFFFFF">P</tspan><tspan fill="#E8863A">M</tspan>
     </text>
   </svg>
 </template>

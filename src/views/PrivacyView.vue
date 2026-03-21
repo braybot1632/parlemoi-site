@@ -38,7 +38,7 @@ import LegalNav from '../components/LegalNav.vue'
 
       <h3 class="font-display text-lg text-cream mt-7 mb-2">1.3 Learning Progress</h3>
 
-      <p>All learning progress data — including lesson completion status, scores, XP (experience points), streaks, and other performance metrics — is stored exclusively in a local SQLite database on your device.</p>
+      <p>All learning progress data, including lesson completion status, scores, XP (experience points), streaks, and other performance metrics, is stored exclusively in a local SQLite database on your device.</p>
 
       <p><strong class="text-cream">This data is never sent to any server.</strong> It exists only on your device. If you uninstall the app or clear its data, your learning progress will be permanently deleted.</p>
 
@@ -154,7 +154,7 @@ import LegalNav from '../components/LegalNav.vue'
         <li><strong class="text-cream">Right to withdraw consent:</strong> You may withdraw consent at any time.</li>
       </ul>
 
-      <p>Our legal basis for processing transcribed conversation text is legitimate interest — specifically, to provide you with the AI conversation feature you initiated. Since we do not permanently store personal data on our servers, most data subject requests are already addressed by our minimal-collection approach. You can delete all locally stored data at any time by clearing the app or uninstalling it.</p>
+      <p>Our legal basis for processing transcribed conversation text is legitimate interest, specifically to provide you with the AI conversation feature you initiated. Since we do not permanently store personal data on our servers, most data subject requests are already addressed by our minimal-collection approach. You can delete all locally stored data at any time by clearing the app or uninstalling it.</p>
 
       <p>To exercise any of these rights, contact us at <a href="mailto:support@parlemoi.app" class="text-orange hover:underline">support@parlemoi.app</a>.</p>
 

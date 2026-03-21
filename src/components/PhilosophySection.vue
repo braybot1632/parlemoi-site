@@ -32,7 +32,7 @@ useReveal()
         </p>
         <p>
           We believe the only way to truly learn a language is through
-          immersion. ParleMoi brings that world to you — surrounding you
+          immersion. ParleMoi brings that world to you, surrounding you
           with spoken French so that learning feels less like studying
           and more like living it.
         </p>

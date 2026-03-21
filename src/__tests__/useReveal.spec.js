@@ -29,7 +29,7 @@ describe('useReveal', () => {
     mockUnobserve = vi.fn()
     mockDisconnect = vi.fn()
 
-    // Mock IntersectionObserver — must use function keyword for new-ability
+    // Mock IntersectionObserver, must use function keyword for new-ability
     globalThis.IntersectionObserver = vi.fn(function (callback) {
       observerCallback = callback
       this.observe = mockObserve
