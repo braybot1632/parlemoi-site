@@ -3,8 +3,6 @@ import { ref } from 'vue'
 import { useReveal } from '../composables/useReveal'
 useReveal()
 
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxakNNzReV-0ka9pyzHN08G3hVay0jVUGaoAiV22zSyw1CuJ-pKW6X3DVTGeYM_pRAHtA/exec'
-
 const submitted = ref(false)
 const submitting = ref(false)
 const error = ref('')
@@ -36,12 +34,15 @@ async function onSubmit() {
   submitting.value = true
   error.value = ''
   try {
-    await fetch(SHEETS_URL, {
+    const res = await fetch('/api/beta-signup', {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: cleanEmail }),
     })
+    if (!res.ok) {
+      const data = await res.json()
+      throw new Error(data.error || 'Request failed')
+    }
     if (typeof window.gtag !== 'undefined') {
       window.gtag('event', 'beta_signup', { location: 'bottom_cta' })
     }
