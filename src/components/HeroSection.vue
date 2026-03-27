@@ -82,7 +82,7 @@ async function onSubmit() {
         class="mt-6 text-lg md:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed transition-all duration-1000 delay-300"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        The app that gets you speaking French out loud.
+        The app that gets you speaking French.
       </p>
 
       <!-- Beta signup form -->
