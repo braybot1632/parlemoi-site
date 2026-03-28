@@ -8,7 +8,7 @@ import LegalNav from '../components/LegalNav.vue'
 
     <h1 class="font-display text-3xl md:text-4xl text-cream mb-2">Terms of Use</h1>
     <p class="font-bold text-text-muted mb-1">ParleMoi, French Language Learning App</p>
-    <p class="font-bold text-text-muted mb-6">Effective Date: March 14, 2026</p>
+    <p class="font-bold text-text-muted mb-6">Effective Date: March 28, 2026</p>
 
     <div class="legal-prose text-text-light/85 leading-relaxed space-y-4">
       <p>Welcome to ParleMoi. These Terms of Use ("Terms") govern your access to and use of the ParleMoi mobile application ("App," "Service," or "ParleMoi"), developed and operated by Braydon Viragh, based in Montreal, Quebec, Canada ("we," "us," "our," or "Developer").</p>
@@ -83,32 +83,28 @@ import LegalNav from '../components/LegalNav.vue'
       <h3 class="font-display text-lg text-cream mt-7 mb-2">Free Plan</h3>
 
       <ul class="list-disc pl-6 space-y-2">
-        <li>Access to the <strong class="text-cream">first 2 lessons</strong> of the curriculum at no charge.</li>
-        <li>Up to <strong class="text-cream">10 AI conversation messages per day</strong> with Henri and Marie.</li>
+        <li>Access to <strong class="text-cream">all A1 (beginner) lessons</strong> at no charge.</li>
+        <li><strong class="text-cream">3 voice games:</strong> Word Drop, Number Drop, and Telephone Practice.</li>
+        <li>All A1-level practice scenarios (guided roleplay conversations).</li>
+        <li>Up to <strong class="text-cream">5 AI conversation messages per day</strong>.</li>
+        <li>Full speech recognition, streaks, XP, and progress tracking.</li>
         <li>No payment information required.</li>
       </ul>
 
-      <h3 class="font-display text-lg text-cream mt-7 mb-2">Monthly Subscription</h3>
+      <h3 class="font-display text-lg text-cream mt-7 mb-2">Monthly Premium</h3>
 
       <ul class="list-disc pl-6 space-y-2">
-        <li><strong class="text-cream">$5.99 USD per month.</strong></li>
-        <li>Provides unlimited access to all lessons, exercises, and AI conversation features.</li>
-        <li><strong class="text-cream">Auto-renewing:</strong> Your subscription will automatically renew each month at the then-current price unless cancelled at least 24 hours before the end of the current billing period.</li>
+        <li>Recurring monthly subscription at the <strong class="text-cream">then-current price</strong> (see the App Store or Google Play for current pricing).</li>
+        <li>Unlocks all <strong class="text-cream">88 lessons</strong> across A1, A2, B1, and B2 CEFR levels.</li>
+        <li>Unlocks all <strong class="text-cream">13 voice games</strong> and all <strong class="text-cream">18 practice scenarios</strong>.</li>
+        <li><strong class="text-cream">Unlimited</strong> AI conversation messages per day.</li>
+        <li><strong class="text-cream">Auto-renewing:</strong> Your subscription will automatically renew each month unless cancelled at least 24 hours before the end of the current billing period.</li>
       </ul>
 
-      <h3 class="font-display text-lg text-cream mt-7 mb-2">Yearly Subscription</h3>
+      <h3 class="font-display text-lg text-cream mt-7 mb-2">Lifetime Premium</h3>
 
       <ul class="list-disc pl-6 space-y-2">
-        <li><strong class="text-cream">$39.99 USD per year.</strong></li>
-        <li>Provides the same unlimited access as the Monthly plan at a reduced annual rate.</li>
-        <li><strong class="text-cream">Includes a 7-day free trial</strong> for first-time subscribers. If you do not cancel before the trial ends, you will be charged the full annual price.</li>
-        <li><strong class="text-cream">Auto-renewing:</strong> Your subscription will automatically renew each year at the then-current price unless cancelled at least 24 hours before the end of the current billing period.</li>
-      </ul>
-
-      <h3 class="font-display text-lg text-cream mt-7 mb-2">Lifetime Access</h3>
-
-      <ul class="list-disc pl-6 space-y-2">
-        <li><strong class="text-cream">$79.99 USD, one-time payment.</strong></li>
+        <li>One-time payment at the <strong class="text-cream">then-current price</strong> (see the App Store or Google Play for current pricing).</li>
         <li>Provides permanent unlimited access to all features available at the time of purchase and all future updates for as long as the App remains available.</li>
         <li>No recurring charges.</li>
       </ul>
@@ -325,7 +321,7 @@ import LegalNav from '../components/LegalNav.vue'
 
       <hr class="border-white/5 my-8">
 
-      <p class="text-text-muted italic">These Terms of Use were last updated on March 14, 2026.</p>
+      <p class="text-text-muted italic">These Terms of Use were last updated on March 28, 2026.</p>
 
       <p class="text-text-muted italic">For information about how we handle your data, please review our <router-link to="/privacy" class="text-orange hover:underline">Privacy Policy</router-link>.</p>
     </div>
