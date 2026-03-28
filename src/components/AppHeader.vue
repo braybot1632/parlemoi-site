@@ -36,6 +36,9 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <button @click="scrollTo('features')" class="text-sm text-text-secondary hover:text-navy transition-colors cursor-pointer">Features</button>
         <button @click="scrollTo('how-it-works')" class="text-sm text-text-secondary hover:text-navy transition-colors cursor-pointer">How It Works</button>
         <!-- <button @click="scrollTo('pricing')" class="text-sm text-text-secondary hover:text-navy transition-colors cursor-pointer">Pricing</button> -->
+        <a href="https://www.instagram.com/parlemoi.app" target="_blank" rel="noopener noreferrer" class="text-text-secondary hover:text-navy transition-colors" aria-label="Instagram">
+          <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
         <button @click="scrollTo('hero')" class="glow-btn text-sm font-medium text-white px-5 py-2 rounded-full cursor-pointer">Join the Beta</button>
       </nav>
 
@@ -60,6 +63,10 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <button @click="scrollTo('voice-games')" class="text-left text-sm text-text-secondary hover:text-navy cursor-pointer py-2">Games</button>
         <button @click="scrollTo('features')" class="text-left text-sm text-text-secondary hover:text-navy cursor-pointer py-2">Features</button>
         <button @click="scrollTo('how-it-works')" class="text-left text-sm text-text-secondary hover:text-navy cursor-pointer py-2">How It Works</button>
+        <a href="https://www.instagram.com/parlemoi.app" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-sm text-text-secondary hover:text-navy py-2">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          @parlemoi.app
+        </a>
         <button @click="scrollTo('hero')" class="glow-btn text-sm font-medium text-white px-5 py-3 rounded-full cursor-pointer text-center">Join the Beta</button>
       </div>
     </Transition>
