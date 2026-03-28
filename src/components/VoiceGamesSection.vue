@@ -9,14 +9,19 @@ const games = [
     color: 'gold',
   },
   {
-    name: 'Echo Chain',
-    description: 'Repeat after the voice. One phrase. Then two. Then three. The chain keeps growing. How long before you break it?',
+    name: 'Number Drop',
+    description: 'Numbers fall. Say them in French. Master everything from un to cent, including soixante-dix.',
     color: 'success',
   },
   {
-    name: 'Survival Mode',
-    description: 'All games. Mixed together. 3 lives. How far can you go?',
+    name: 'Telephone Practice',
+    description: 'A phone number appears. Say every digit in French. Real practice for real conversations.',
     color: 'orange',
+  },
+  {
+    name: 'Speed Say',
+    description: 'A French phrase appears. A timer counts down. Say it before time runs out.',
+    color: 'gold',
   },
 ]
 </script>
@@ -34,7 +39,7 @@ const games = [
         </p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 stagger">
         <div
           v-for="game in games"
           :key="game.name"
