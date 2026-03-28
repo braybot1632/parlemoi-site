@@ -2,7 +2,7 @@ import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { Resend } from 'resend'
-import { betaWelcomeEmail } from './emailTemplate.js'
+import { betaWelcomeEmail, adminSignupNotification } from './emailTemplate.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -39,16 +39,26 @@ app.post('/api/beta-signup', async (req, res) => {
       console.error('Google Sheets error:', err.message)
     })
 
-    // 2. Send welcome email via Resend
-    const emailPromise = resend.emails.send({
+    // 2. Send welcome email to the user
+    const welcomePromise = resend.emails.send({
       from: 'Braydon Viragh <braydonpaul@parlemoiapp.com>',
       to: cleanEmail,
       subject: 'Welcome to ParleMoi Beta',
       html: betaWelcomeEmail(),
     })
 
-    // Wait for both in parallel
-    const [, emailResult] = await Promise.all([sheetsPromise, emailPromise])
+    // 3. Send admin notification
+    const adminPromise = resend.emails.send({
+      from: 'ParleMoi <braydonpaul@parlemoiapp.com>',
+      to: 'braydonpaul@parlemoiapp.com',
+      subject: `New beta signup: ${cleanEmail}`,
+      html: adminSignupNotification(cleanEmail),
+    }).catch((err) => {
+      console.error('Admin notification error:', err.message)
+    })
+
+    // Wait for all in parallel
+    const [, emailResult] = await Promise.all([sheetsPromise, welcomePromise, adminPromise])
 
     if (emailResult.error) {
       console.error('Resend error:', emailResult.error)

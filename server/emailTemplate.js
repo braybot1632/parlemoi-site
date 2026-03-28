@@ -1,16 +1,26 @@
 /**
- * Beta welcome email template — matches ParleMoi branding.
- * Table-based layout for maximum email-client compatibility.
+ * Reusable ParleMoi branded email template.
+ *
+ * brandedEmail({ title, preheader, headline, body, footerNote, showSignature })
+ *   - title:         <title> tag content
+ *   - preheader:     hidden preview text in inbox
+ *   - headline:      Georgia serif heading inside the card
+ *   - body:          raw HTML string for the main content area
+ *   - footerNote:    small text below the card (e.g. "You're receiving this because…")
+ *   - showSignature: whether to include Braydon's signature block (default true)
  */
 
-export function betaWelcomeEmail() {
+const FONT_BODY = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+const P = `font-family: ${FONT_BODY}; font-size: 15px; line-height: 1.7; color: #4A4A4A;`
+
+export function brandedEmail({ title, preheader, headline, body, footerNote, showSignature = true }) {
   return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Welcome to ParleMoi Beta</title>
+  <title>${title}</title>
   <!--[if mso]>
   <noscript>
     <xml>
@@ -38,7 +48,7 @@ export function betaWelcomeEmail() {
 
   <!-- Preheader (hidden preview text) -->
   <div style="display: none; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #F5F3F0;">
-    Thanks for signing up for ParleMoi beta — we'll reach out when it's ready.
+    ${preheader}
   </div>
 
   <!-- Outer wrapper -->
@@ -52,7 +62,6 @@ export function betaWelcomeEmail() {
           <!-- Header bar -->
           <tr>
             <td style="background-color: #1B2A4A; padding: 32px 40px; text-align: center;" class="px-mobile">
-              <!-- Logo as text (most reliable across email clients) -->
               <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.5px;">Parle<span style="color: #E8863A;">Moi</span></span>
             </td>
           </tr>
@@ -66,49 +75,33 @@ export function betaWelcomeEmail() {
           <tr>
             <td style="padding: 40px 40px 16px;" class="px-mobile">
               <h1 style="margin: 0 0 24px; font-family: Georgia, 'Times New Roman', serif; font-size: 24px; font-weight: 700; color: #1B2A4A; line-height: 1.3; letter-spacing: -0.3px;">
-                Thanks for joining ParleMoi.
+                ${headline}
               </h1>
-
-              <p style="margin: 0 0 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; color: #4A4A4A;">
-                Hello,
-              </p>
-
-              <p style="margin: 0 0 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; color: #4A4A4A;">
-                Thank you for signing up for the ParleMoi beta. We're currently in active development, building something we believe will genuinely change the way people learn to speak French.
-              </p>
-
-              <p style="margin: 0 0 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; color: #4A4A4A;">
-                Rest assured, we will reach out to you as soon as our beta is ready. You'll be among the first to try it.
-              </p>
-
-              <p style="margin: 0 0 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; color: #4A4A4A;">
-                Hope you enjoy the rest of your day.
-              </p>
+              ${body}
             </td>
           </tr>
 
-          <!-- Signature -->
+          ${showSignature ? `<!-- Signature -->
           <tr>
             <td style="padding: 0 40px 40px;" class="px-mobile">
-              <!-- Signature divider -->
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                 <tr>
                   <td style="border-top: 1px solid #E8E4DF; padding-top: 24px;">
-                    <p style="margin: 0 0 2px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 600; color: #1B2A4A; line-height: 1.5;">
+                    <p style="margin: 0 0 2px; font-family: ${FONT_BODY}; font-size: 15px; font-weight: 600; color: #1B2A4A; line-height: 1.5;">
                       Braydon Viragh
                     </p>
-                    <p style="margin: 0 0 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; color: #8B8B8B; line-height: 1.5;">
+                    <p style="margin: 0 0 12px; font-family: ${FONT_BODY}; font-size: 13px; color: #8B8B8B; line-height: 1.5;">
                       Founder &amp; Developer, Parlifica Inc.
                     </p>
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                       <tr>
                         <td style="padding-right: 16px;">
                           <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 14px; font-weight: 700; color: #1B2A4A; letter-spacing: -0.3px;">Parle<span style="color: #E8863A;">Moi</span></span>
-                          <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; color: #8B8B8B; margin-left: 4px;">AI-powered French language learning</span>
+                          <span style="font-family: ${FONT_BODY}; font-size: 11px; color: #8B8B8B; margin-left: 4px;">The app that gets you speaking French</span>
                         </td>
                       </tr>
                       <tr>
-                        <td style="padding-top: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: #8B8B8B; line-height: 1.6;">
+                        <td style="padding-top: 8px; font-family: ${FONT_BODY}; font-size: 12px; color: #8B8B8B; line-height: 1.6;">
                           <a href="https://parlemoiapp.com" style="color: #E8863A; text-decoration: none;">parlemoiapp.com</a>
                           &nbsp;&middot;&nbsp;
                           <a href="mailto:braydonpaul@parlemoiapp.com" style="color: #8B8B8B; text-decoration: none;">braydonpaul@parlemoiapp.com</a>
@@ -121,17 +114,16 @@ export function betaWelcomeEmail() {
                 </tr>
               </table>
             </td>
-          </tr>
+          </tr>` : ''}
 
         </table>
-        <!-- /Email container -->
 
         <!-- Footer -->
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="560" class="email-container" style="max-width: 560px; width: 100%;">
           <tr>
-            <td style="padding: 24px 16px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; color: #8B8B8B; line-height: 1.5;">
+            <td style="padding: 24px 16px; text-align: center; font-family: ${FONT_BODY}; font-size: 11px; color: #8B8B8B; line-height: 1.5;">
               &copy; 2026 Parlifica Inc. &middot; Montr&eacute;al, Qu&eacute;bec<br />
-              You're receiving this because you signed up for the ParleMoi beta.
+              ${footerNote}
             </td>
           </tr>
         </table>
@@ -142,4 +134,40 @@ export function betaWelcomeEmail() {
 
 </body>
 </html>`
+}
+
+// Helper to wrap text in a styled paragraph
+export function p(text) {
+  return `<p style="margin: 0 0 16px; font-family: ${FONT_BODY}; font-size: 15px; line-height: 1.7; color: #4A4A4A;">${text}</p>`
+}
+
+// ── Pre-built emails ────────────────────────────────────────────────
+
+export function betaWelcomeEmail() {
+  return brandedEmail({
+    title: 'Welcome to ParleMoi Beta',
+    preheader: "Thanks for signing up for ParleMoi beta \u2014 we'll reach out when it's ready.",
+    headline: 'Thanks for joining ParleMoi.',
+    body: [
+      p('Hello,'),
+      p("Thank you for signing up for the ParleMoi beta. We're currently in active development, building something we believe will genuinely change the way people learn to speak French."),
+      p("Rest assured, we will reach out to you as soon as our beta is ready. You'll be among the first to try it."),
+      p('Hope you enjoy the rest of your day.'),
+    ].join('\n'),
+    footerNote: "You're receiving this because you signed up for the ParleMoi beta.",
+  })
+}
+
+export function adminSignupNotification(signupEmail) {
+  return brandedEmail({
+    title: 'New Beta Signup',
+    preheader: `New beta signup: ${signupEmail}`,
+    headline: 'New beta signup.',
+    showSignature: false,
+    body: [
+      p(`<strong>${signupEmail}</strong> just signed up for the ParleMoi beta.`),
+      p(`<a href="https://docs.google.com/spreadsheets" style="color: #E8863A; text-decoration: none;">View all signups in Google Sheets</a>`),
+    ].join('\n'),
+    footerNote: 'Internal notification — ParleMoi beta signups.',
+  })
 }
