@@ -5,27 +5,22 @@ import HomeView from '../views/HomeView.vue'
 describe('HomeView', () => {
   it('renders the hero headline', () => {
     const wrapper = mount(HomeView)
-    expect(wrapper.text()).toContain('Learn French by')
-    expect(wrapper.text()).toContain('actually speaking it.')
+    expect(wrapper.text()).toContain('ParleMoi')
+    expect(wrapper.text()).toContain('Speak and Learn.')
+    expect(wrapper.text()).toContain('The app that gets you speaking French.')
   })
 
   it('renders the features section', () => {
     const wrapper = mount(HomeView)
-    expect(wrapper.text()).toContain('Everything you need to speak French')
+    expect(wrapper.text()).toContain('Features')
+    expect(wrapper.text()).toContain('And a few more things')
   })
 
   it('renders the how it works section', () => {
     const wrapper = mount(HomeView)
-    expect(wrapper.text()).toContain('Listen')
-    expect(wrapper.text()).toContain('Speak')
-    expect(wrapper.text()).toContain('Improve')
-  })
-
-  it('renders the pricing section', () => {
-    const wrapper = mount(HomeView)
-    expect(wrapper.text()).toContain('Free')
-    expect(wrapper.text()).toContain('Yearly')
-    expect(wrapper.text()).toContain('Monthly')
+    expect(wrapper.text()).toContain('How a lesson works')
+    expect(wrapper.text()).toContain('Listen to a lesson')
+    expect(wrapper.text()).toContain('Say it out loud')
   })
 
   it('has all section IDs for anchor navigation', () => {
@@ -33,6 +28,5 @@ describe('HomeView', () => {
     expect(wrapper.find('#hero').exists()).toBe(true)
     expect(wrapper.find('#features').exists()).toBe(true)
     expect(wrapper.find('#how-it-works').exists()).toBe(true)
-    expect(wrapper.find('#pricing').exists()).toBe(true)
   })
 })
