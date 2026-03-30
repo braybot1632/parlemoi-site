@@ -139,10 +139,10 @@ async function onSubmit() {
 
       <!-- Trust signals -->
       <div
-        class="mt-6 transition-all duration-1000 delay-700"
+        class="mt-6 flex flex-wrap items-center justify-center gap-3 transition-all duration-1000 delay-700"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
       >
-        <p class="text-sm text-text-muted mb-3">
+        <p class="text-sm text-text-muted">
           Built in Montreal.
         </p>
         <a href="https://www.instagram.com/parlemoi.app" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-navy transition-colors">
