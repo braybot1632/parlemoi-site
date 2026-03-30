@@ -5,22 +5,22 @@ useReveal()
 const games = [
   {
     name: 'Word Drop',
-    description: 'French words fall from the sky. Say them before they hit the ground. Miss three and it\'s over.',
+    description: 'Words appear on screen. Say each one in French. Miss three and the round ends.',
     color: 'gold',
   },
   {
     name: 'Number Drop',
-    description: 'Numbers fall. Say them in French. Master everything from un to cent, including soixante-dix.',
+    description: 'Numbers appear. Say them in French. Master everything from un to cent, including soixante-dix.',
     color: 'success',
   },
   {
     name: 'Telephone Practice',
-    description: 'A phone number appears. Say every digit in French. Real practice for real conversations.',
+    description: 'A phone number appears. Say every digit in French. Practice the numbers you\'ll actually need.',
     color: 'orange',
   },
   {
     name: 'Speed Say',
-    description: 'A French phrase appears. A timer counts down. Say it before time runs out.',
+    description: 'Practice your French words as quickly as you can. Set your average speaking time and perfect your pronunciation with each attempt.',
     color: 'gold',
   },
 ]

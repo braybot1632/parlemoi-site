@@ -13,10 +13,10 @@ const scenarios = [
 </script>
 
 <template>
-  <section id="roleplay" class="section-pad relative">
+  <section id="scenarios" class="section-pad relative">
     <div class="max-w-5xl mx-auto px-6">
       <div class="text-center mb-16 reveal">
-        <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Roleplay Scenarios</p>
+        <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Scenarios</p>
         <h2 class="font-display text-3xl md:text-4xl font-bold text-navy mb-4" style="letter-spacing: -0.02em;">
           Practice real conversations
         </h2>

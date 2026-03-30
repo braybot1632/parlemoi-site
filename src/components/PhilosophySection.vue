@@ -10,7 +10,7 @@ useReveal()
 
     <div class="relative max-w-3xl mx-auto px-6">
       <div class="reveal">
-        <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Why This Exists</p>
+        <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Our story</p>
         <h2 class="font-display text-3xl md:text-4xl font-bold text-navy mb-10" style="letter-spacing: -0.02em; line-height: 1.1;">
           We tried every French app.
         </h2>

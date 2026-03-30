@@ -17,7 +17,7 @@ const steps = [
   },
   {
     number: '03',
-    title: 'Test your skills, earn rewards',
+    title: 'Test your skills',
     description: 'Compete against your own personal bests. Set scores, challenge yourself to beat them, and watch your skill improve across every game.',
     color: 'success',
   },
