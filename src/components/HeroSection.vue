@@ -138,13 +138,19 @@ async function onSubmit() {
       </div>
 
       <!-- Trust signals -->
-      <p
-        class="mt-6 text-sm text-text-muted transition-all duration-1000 delay-700"
+      <div
+        class="mt-6 transition-all duration-1000 delay-700"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
       >
-        Free to start · No credit card<br />
-        Built in Montreal.
-      </p>
+        <p class="text-sm text-text-muted">
+          Free to start · No credit card<br />
+          Built in Montreal.
+        </p>
+        <a href="https://www.instagram.com/parlemoi.app" target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-navy transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          @parlemoi.app
+        </a>
+      </div>
 
     </div>
   </section>
