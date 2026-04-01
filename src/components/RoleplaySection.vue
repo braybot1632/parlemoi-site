@@ -1,5 +1,7 @@
 <script setup>
 import { useReveal } from '../composables/useReveal'
+import PhoneSimulatorFrame from './PhoneSimulatorFrame.vue'
+
 useReveal()
 
 const scenarios = [
@@ -10,19 +12,28 @@ const scenarios = [
   { label: 'Meeting Someone New', detail: 'Introduce yourself at a dinner party.' },
   { label: 'Getting a Taxi', detail: 'Tell the driver where you\'re going.' },
 ]
+
+const scenarioSimSrc = '/simulators/scenario.html?embed=1&autoplay=1&loop=1&delay=400'
 </script>
 
 <template>
   <section id="scenarios" class="section-pad relative">
-    <div class="max-w-5xl mx-auto px-6">
-      <div class="text-center mb-16 reveal">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-10 md:mb-12 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Scenarios</p>
-        <h2 class="font-display text-3xl md:text-4xl font-bold text-navy mb-4" style="letter-spacing: -0.02em;">
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-navy mb-5" style="letter-spacing: -0.02em;">
           Practice real conversations
         </h2>
-        <p class="text-text-secondary max-w-lg mx-auto">
-          Our goal is to create realistic scenarios one may encounter when living in a French speaking place. Our app will simulate these scenarios to give you the confidence to practice when you are out in the real world.
+        <p class="text-text-secondary max-w-2xl mx-auto leading-relaxed text-base md:text-lg">
+          Realistic situations you might face in a French-speaking place. You read what the other person says, respond in French, and get pronunciation feedback, so you feel readier when it happens for real.
         </p>
+      </div>
+
+      <div class="flex justify-center mb-14 md:mb-20 reveal">
+        <PhoneSimulatorFrame
+          :src="scenarioSimSrc"
+          title="ParleMoi scenario practice chat simulator preview"
+        />
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger">

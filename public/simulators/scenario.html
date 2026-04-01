@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ParleMoi — Scenario Practice (Chat) Simulator</title>
+  <!--
+    Chat: tutor (left). User line = orange bubble after each turn.
+    Respond panel (above mic): "Respond with" + target phrase + EN gloss; mic row; then score + "You said" in-panel.
+    Pronunciation under 100%: up to 3 tries (initial + 2 retries), then orange bubble with the final transcript.
+    Autoplay ?autoplay=0. ?loop=0. ?embed=1.
+  -->
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --orange: #E8863A;
+      --orange-soft: rgba(232, 134, 58, 0.12);
+      --orange-border: rgba(232, 134, 58, 0.45);
+      --navy: #1B2A4A;
+      --text: #2C2C2C;
+      --textSecondary: #6B6B6B;
+      --textMuted: #9B9B9B;
+      --cream: #FBF5EF;
+      --white: #FFFFFF;
+      --border: #E8E3DC;
+      --correct: #4CAF7D;
+      --incorrect: #D35454;
+      --wrong-bg: rgba(211, 84, 84, 0.08);
+      --wrong-border: rgba(211, 84, 84, 0.19);
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background: #d9d9d9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    body.embed {
+      background: transparent;
+      padding: 0;
+      display: grid;
+      place-items: start center;
+      align-content: start;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .iphone-frame {
+      width: 411px;
+      height: 915px;
+      border: 14px solid #252525;
+      border-radius: 44px;
+      background: #111;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Inner surface — dev/worddrop.html .screen (#FFFDF9) + room for notch */
+    .device-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+      background: #fffdf9;
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    .notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 146px;
+      height: 34px;
+      background: #000;
+      border-radius: 0 0 22px 22px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    /* dev/worddrop.html status-bar */
+    .status-bar {
+      height: 28px;
+      flex-shrink: 0;
+      color: #646464;
+      background: #fffdf9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .status-left { display: flex; align-items: center; }
+    .status-logo { width: 56px; height: 14px; display: inline-block; }
+    .status-logo svg { width: 100%; height: 100%; display: block; }
+    .status-logo .brand-main { fill: #1b2a4a; }
+    .status-logo .brand-accent { fill: #e8863a; }
+    .status-right { letter-spacing: 0.5px; font-size: 12px; }
+
+    /* conversation.tsx dialogueHeader — sits under status like in-app stack */
+    .dialogue-header {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: #ffffff;
+    }
+    .dialogue-exit {
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      cursor: pointer;
+      color: var(--orange);
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .dialogue-title {
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      flex: 1;
+      padding: 0 8px;
+    }
+    .dialogue-header-spacer { width: 44px; flex-shrink: 0; }
+
+    /* GuidedDialogue container */
+    .guided-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: var(--cream);
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+    .progress-fill {
+      height: 4px;
+      background: var(--orange);
+      transition: width 0.4s ease;
+    }
+
+    .chat-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* Tutor row (left) */
+    .tutor-row {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 12px;
+    }
+    .tutor-bubble {
+      background: var(--white);
+      border-radius: 16px;
+      border-top-left-radius: 4px;
+      padding: 14px;
+      max-width: 80%;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    .tutor-fr {
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 22px;
+    }
+    .tutor-en {
+      color: var(--textMuted);
+      font-size: 13px;
+      margin-top: 4px;
+      line-height: 18px;
+    }
+
+    /* User spoken line in chat (right, solid orange — like chat user bubble) */
+    .user-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+    .user-chat-bubble {
+      background: var(--orange);
+      border-radius: 16px;
+      border-bottom-right-radius: 4px;
+      padding: 14px;
+      max-width: 85%;
+      box-shadow: 0 1px 3px rgba(232, 134, 58, 0.25);
+    }
+    .user-chat-text {
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 22px;
+    }
+
+    /* Bottom column: target phrase + score + mic */
+    .response-column {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 16px 10px;
+      background: var(--cream);
+      border-top: 1px solid rgba(232, 227, 220, 0.85);
+    }
+    .respond-panel {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 14px 14px 12px;
+      border: 1.5px dashed var(--orange-border);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    }
+    .respond-panel.is-hidden { display: none; }
+    .respond-label {
+      color: var(--orange);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .respond-target {
+      color: var(--text);
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 24px;
+    }
+    .respond-target .q { color: var(--textSecondary); font-weight: 600; }
+    .respond-en {
+      color: var(--textMuted);
+      font-size: 13px;
+      margin-top: 6px;
+      line-height: 18px;
+    }
+    .respond-feedback {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .respond-feedback.is-hidden { display: none; }
+    .respond-feedback.correct {
+      background: rgba(76, 175, 125, 0.06);
+      margin-left: -14px;
+      margin-right: -14px;
+      margin-bottom: -12px;
+      padding: 12px 14px;
+      border-radius: 0 0 12px 12px;
+      border-top: 1px solid rgba(76, 175, 125, 0.2);
+    }
+    .respond-feedback.wrong {
+      background: var(--wrong-bg);
+      margin-left: -14px;
+      margin-right: -14px;
+      margin-bottom: -12px;
+      padding: 12px 14px;
+      border-radius: 0 0 12px 12px;
+      border-top: 1px solid var(--wrong-border);
+    }
+    .feedback-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+    .feedback-row svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .feedback-pct {
+      font-size: 17px;
+      font-weight: 800;
+    }
+    .feedback-pct.ok { color: var(--correct); }
+    .feedback-pct.bad { color: var(--incorrect); }
+    .feedback-transcript {
+      color: var(--textSecondary);
+      font-size: 13px;
+      font-style: italic;
+      margin-top: 6px;
+      line-height: 18px;
+    }
+
+    .system-row {
+      display: flex;
+      justify-content: center;
+      margin: 8px 0;
+    }
+    .system-text {
+      color: var(--textMuted);
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    /* Mic row only (under respond panel) */
+    .bottom-area {
+      flex-shrink: 0;
+      min-height: 52px;
+    }
+    .listening-indicator {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      background: var(--white);
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid var(--border);
+    }
+    .listening-text {
+      color: var(--textSecondary);
+      font-size: 15px;
+      font-style: italic;
+    }
+    .listening-live {
+      color: var(--text);
+      font-weight: 500;
+      text-align: left;
+      flex: 1;
+      min-width: 0;
+      line-height: 1.35;
+    }
+    .listen-pulse {
+      animation: listenFade 1.2s ease-in-out infinite;
+    }
+    @keyframes listenFade {
+      0%, 100% { opacity: 0.45; }
+      50% { opacity: 1; }
+    }
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 2.5px solid rgba(232, 134, 58, 0.25);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* app/(tabs)/_layout.tsx — tabBarStyle + tabBarLabelStyle */
+    .tab-bar {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: stretch;
+      min-height: 56px;
+      padding: 4px 2px;
+      padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px));
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      box-shadow: none;
+    }
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      max-width: 88px;
+      color: var(--textMuted);
+      font-size: 10px;
+      font-weight: 500;
+      line-height: 1.1;
+    }
+    .tab-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+    .tab-item.active {
+      color: var(--orange);
+      font-weight: 600;
+    }
+
+    svg { stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+</head>
+<body>
+  <div class="iphone-frame" id="deviceFrame">
+    <div class="device-screen">
+      <div class="notch" aria-hidden="true"></div>
+      <div class="status-bar">
+        <div class="status-left">
+          <span class="status-logo" aria-label="ParleMoi">
+            <svg viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+              <text x="0" y="56" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="48" letter-spacing="-1">
+                <tspan class="brand-main">Parle</tspan><tspan class="brand-accent">Moi</tspan>
+              </text>
+            </svg>
+          </span>
+        </div>
+        <div class="status-right">◌ ⌁ ◔ ◢ 35%</div>
+      </div>
+
+      <header class="dialogue-header">
+        <button type="button" class="dialogue-exit" id="btnExit" aria-label="Exit conversation">Exit</button>
+        <h1 class="dialogue-title">Meeting Someone</h1>
+        <div class="dialogue-header-spacer" aria-hidden="true"></div>
+      </header>
+
+      <div class="guided-wrap">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <div class="chat-scroll" id="chatScroll"></div>
+        <div class="response-column" id="responseColumn">
+          <div class="respond-panel is-hidden" id="respondPanel" aria-live="polite">
+            <div class="respond-label">Respond with</div>
+            <div class="respond-target" id="respondTargetFr"></div>
+            <div class="respond-en" id="respondTargetEn"></div>
+            <div class="respond-feedback is-hidden" id="respondFeedback"></div>
+          </div>
+          <div class="bottom-area" id="bottomArea"></div>
+        </div>
+      </div>
+
+      <!--
+        Tab bar mirrors app/(tabs)/_layout.tsx (lucide-react-native@0.577, icon size 22).
+        Home / Chat / Profile: house.js, message-circle.js, user.js.
+      -->
+      <nav class="tab-bar" aria-label="Main navigation">
+        <div class="tab-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/>
+            <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          </svg>
+          <span>Home</span>
+        </div>
+        <!-- Learn: _layout.tsx learn tab — title 'Learn', BookOpen 22px, headerTitle 'Lessons' (stack only) -->
+        <div class="tab-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 7v14"/>
+            <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>
+          </svg>
+          <span>Learn</span>
+        </div>
+        <div class="tab-item active">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/>
+          </svg>
+          <span>Chat</span>
+        </div>
+        <!-- Games: _layout.tsx games tab — title 'Games', Gamepad2 22px -->
+        <div class="tab-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <line x1="6" x2="10" y1="11" y2="11"/>
+            <line x1="8" x2="8" y1="9" y2="13"/>
+            <line x1="15" x2="15.01" y1="12" y2="12"/>
+            <line x1="18" x2="18.01" y1="10" y2="10"/>
+            <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>
+          </svg>
+          <span>Games</span>
+        </div>
+        <div class="tab-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>Profile</span>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <script>
+    /** Simulated STT lines (aligned with EXCHANGES user prompts); score drives retries */
+    /** Robert + Enchanté: STT often merges "je m'" → "jem"; then missing gloss; then full match */
+    const FIRST_USER_ATTEMPTS = [
+      { text: 'jem appelle Robert', pct: 64 },
+      { text: "Je m'appelle Robert enchanté", pct: 90 },
+      { text: "Je m'appelle Robert. Enchanté!", pct: 100 },
+    ];
+    const SECOND_USER_ATTEMPTS = [
+      { text: 'je vien Canada', pct: 75 },
+      { text: 'Je viens du Canada.', pct: 100 },
+    ];
+    const THIRD_USER_ATTEMPTS = [
+      { text: "Oui j'habite Montréal", pct: 73 },
+      { text: "Oui, j'habite à Montréal.", pct: 100 },
+    ];
+    const LISTEN_PULSE_BEFORE_TYPE_MS = 420;
+    const FEEDBACK_TO_BUBBLE_MS = 600;
+    const BUBBLE_TO_HIDE_PANEL_MS = 550;
+    const TRY_AGAIN_PAUSE_MS = 750;
+
+    const EXCHANGES = [
+      { speaker: 'tutor', french: "Bonjour! Comment vous appelez-vous?", english: 'Hello! What is your name?' },
+      { speaker: 'user', french: "Je m'appelle Robert. Enchanté!", english: 'My name is Robert. Nice to meet you!' },
+      { speaker: 'tutor', french: "Enchanté! Vous êtes d'où?", english: 'Nice to meet you! Where are you from?' },
+      { speaker: 'user', french: 'Je viens du Canada.', english: "I'm from Canada." },
+      { speaker: 'tutor', french: 'Ah, super! Vous habitez à Montréal?', english: 'Oh great! Do you live in Montreal?' },
+      { speaker: 'user', french: "Oui, j'habite à Montréal.", english: 'Yes, I live in Montreal.' },
+    ];
+
+    const params = new URLSearchParams(window.location.search);
+    const autoplay = params.get('autoplay') !== '0';
+    const loop = params.get('loop') !== '0';
+    const startDelayMs = Number(params.get('delay') != null && params.get('delay') !== '' ? params.get('delay') : 400);
+    if (params.get('embed') === '1') document.body.classList.add('embed');
+
+    function fitEmbedMockup() {
+      if (!document.body.classList.contains('embed')) return;
+      const mockup = document.getElementById('deviceFrame');
+      if (!mockup) return;
+      const w = 393;
+      const h = 851;
+      const scale = Math.min(window.innerWidth / w, window.innerHeight / h);
+      mockup.style.width = `${w}px`;
+      mockup.style.height = `${h}px`;
+      mockup.style.transformOrigin = 'top center';
+      mockup.style.transform = `scale(${scale})`;
+    }
+    fitEmbedMockup();
+    window.addEventListener('resize', fitEmbedMockup);
+
+    const timers = [];
+    function schedule(fn, ms) {
+      const id = setTimeout(fn, ms);
+      timers.push(id);
+    }
+    function clearAllTimers() {
+      timers.forEach(clearTimeout);
+      timers.length = 0;
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function tutorHtml(fr, en) {
+      return `<div class="tutor-row"><div class="tutor-bubble"><div class="tutor-fr">${escapeHtml(fr)}</div><div class="tutor-en">${escapeHtml(en)}</div></div></div>`;
+    }
+    function userBubbleHtml(text) {
+      return `<div class="user-row"><div class="user-chat-bubble"><div class="user-chat-text">${escapeHtml(text)}</div></div></div>`;
+    }
+    function systemHtml(fr) {
+      return `<div class="system-row"><span class="system-text">${escapeHtml(fr)}</span></div>`;
+    }
+
+    function showRespondPanel(ex) {
+      const panel = document.getElementById('respondPanel');
+      const fr = document.getElementById('respondTargetFr');
+      const en = document.getElementById('respondTargetEn');
+      const fb = document.getElementById('respondFeedback');
+      if (!panel || !fr || !en || !fb) return;
+      fb.classList.add('is-hidden');
+      fb.innerHTML = '';
+      fb.classList.remove('correct', 'wrong');
+      fr.innerHTML = `<span class="q">"</span>${escapeHtml(ex.french)}<span class="q">"</span>`;
+      en.textContent = ex.english;
+      panel.classList.remove('is-hidden');
+    }
+
+    function hideRespondPanel() {
+      document.getElementById('respondPanel')?.classList.add('is-hidden');
+      const fb = document.getElementById('respondFeedback');
+      if (fb) {
+        fb.classList.add('is-hidden');
+        fb.innerHTML = '';
+        fb.classList.remove('correct', 'wrong');
+      }
+    }
+
+    function clearRespondFeedbackOnly() {
+      const fb = document.getElementById('respondFeedback');
+      if (!fb) return;
+      fb.classList.add('is-hidden');
+      fb.innerHTML = '';
+      fb.classList.remove('correct', 'wrong');
+    }
+
+    /**
+     * Simulated pronunciation: each attempt types into the mic bar, then in-panel score.
+     * If score is under 100% and tries remain, clear feedback and show "Try again..." before the next listen pass.
+     * Orange chat bubble uses the final attempt line (success or last try).
+     */
+    function runPronunciationSeries(attempts, charMs, onComplete) {
+      function attemptK(k) {
+        if (demoAbort) return;
+        const isLast = k === attempts.length - 1;
+        const a = attempts[k];
+        runTypingTranscript(a.text, charMs, () => {
+          if (demoAbort) return;
+          renderBottom('none', '');
+          const perfect = a.pct >= 100;
+          showRespondFeedback(perfect, a.pct, a.text);
+          schedule(() => {
+            if (demoAbort) return;
+            if (perfect || isLast) {
+              pushChat(userBubbleHtml(a.text));
+            }
+          }, FEEDBACK_TO_BUBBLE_MS);
+          schedule(() => {
+            if (demoAbort) return;
+            if (perfect || isLast) {
+              hideRespondPanel();
+              renderBottom('none', '');
+              schedule(() => {
+                if (!demoAbort && typeof onComplete === 'function') onComplete();
+              }, 200);
+            } else {
+              clearRespondFeedbackOnly();
+              schedule(() => {
+                if (demoAbort) return;
+                renderBottom('ready', 'Try again...');
+              }, 350);
+              schedule(() => {
+                if (demoAbort) return;
+                attemptK(k + 1);
+              }, 350 + TRY_AGAIN_PAUSE_MS);
+            }
+          }, FEEDBACK_TO_BUBBLE_MS + BUBBLE_TO_HIDE_PANEL_MS);
+        });
+      }
+      attemptK(0);
+    }
+
+    function showRespondFeedback(correct, pct, transcript) {
+      const fb = document.getElementById('respondFeedback');
+      if (!fb) return;
+      const iconOk = '<svg viewBox="0 0 24 24" fill="none" stroke="#4CAF7D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 12 2 2 4-4"/></svg>';
+      const iconBad = '<svg viewBox="0 0 24 24" fill="none" stroke="#D35454" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>';
+      fb.className = `respond-feedback ${correct ? 'correct' : 'wrong'}`;
+      fb.innerHTML = `
+        <div class="feedback-row">${correct ? iconOk : iconBad}<span class="feedback-pct ${correct ? 'ok' : 'bad'}">${pct}%</span></div>
+        <div class="feedback-transcript">You said: "${escapeHtml(transcript)}"</div>`;
+      fb.classList.remove('is-hidden');
+    }
+
+    function setProgress(idx, total) {
+      const pct = total > 0 ? Math.round((idx / total) * 100) : 0;
+      const el = document.getElementById('progressFill');
+      if (el) el.style.width = `${pct}%`;
+    }
+
+    function scrollChatToEnd() {
+      const el = document.getElementById('chatScroll');
+      if (el) el.scrollTop = el.scrollHeight;
+    }
+
+    let demoAbort = false;
+    let chatHtml = '';
+
+    function renderBottom(mode, text) {
+      const bottom = document.getElementById('bottomArea');
+      if (!bottom) return;
+      if (mode === 'none') {
+        bottom.innerHTML = '';
+        return;
+      }
+      if (mode === 'listen') {
+        const body = text && text.length > 0
+          ? `<span class="listening-text listening-live">${escapeHtml(text)}</span>`
+          : `<span class="listening-text listen-pulse">Listening...</span>`;
+        bottom.innerHTML = `<div class="listening-indicator"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8863A" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>${body}</div>`;
+        return;
+      }
+      if (mode === 'ready') {
+        bottom.innerHTML = `<div class="listening-indicator"><div class="spinner" aria-hidden="true"></div><span class="listening-text">${escapeHtml(text || 'Get ready to speak...')}</span></div>`;
+      }
+    }
+
+    /** Pulsing "Listening..." then type spoken line like live transcription */
+    function runTypingTranscript(full, charMs, onDone) {
+      renderBottom('listen', '');
+      schedule(() => {
+        if (demoAbort) return;
+        let i = 0;
+        function tick() {
+          if (demoAbort) return;
+          i += 1;
+          renderBottom('listen', full.slice(0, i));
+          if (i < full.length) {
+            schedule(tick, charMs);
+          } else {
+            onDone();
+          }
+        }
+        tick();
+      }, LISTEN_PULSE_BEFORE_TYPE_MS);
+    }
+
+    function pushChat(html) {
+      chatHtml += html;
+      const scroll = document.getElementById('chatScroll');
+      if (scroll) scroll.innerHTML = chatHtml;
+      requestAnimationFrame(scrollChatToEnd);
+    }
+
+    function resetDemo() {
+      clearAllTimers();
+      demoAbort = true;
+      chatHtml = '';
+      const scroll = document.getElementById('chatScroll');
+      if (scroll) scroll.innerHTML = '';
+      setProgress(0, EXCHANGES.length);
+      hideRespondPanel();
+      renderBottom('none', '');
+      demoAbort = false;
+    }
+
+    function runStory() {
+      demoAbort = false;
+      const total = EXCHANGES.length;
+      const charMs = 38;
+      const charMs2 = 32;
+      const afterFirstUserTutorDelay = 700;
+      const afterTutor2PanelDelay = 1700;
+      const afterPanelSpeakDelay = 1300;
+      const loopTailMs = 6200;
+      const charMs3 = 32;
+
+      schedule(() => {
+        if (demoAbort) return;
+        setProgress(0, total);
+        pushChat(tutorHtml(EXCHANGES[0].french, EXCHANGES[0].english));
+      }, startDelayMs);
+
+      schedule(() => {
+        if (demoAbort) return;
+        setProgress(1, total);
+        showRespondPanel(EXCHANGES[1]);
+        renderBottom('ready', 'Get ready to speak...');
+      }, startDelayMs + 900);
+
+      schedule(() => {
+        if (demoAbort) return;
+        runPronunciationSeries(FIRST_USER_ATTEMPTS, charMs, () => {
+          if (demoAbort) return;
+          schedule(() => {
+            if (demoAbort) return;
+            setProgress(2, total);
+            pushChat(tutorHtml(EXCHANGES[2].french, EXCHANGES[2].english));
+          }, afterFirstUserTutorDelay);
+          schedule(() => {
+            if (demoAbort) return;
+            setProgress(3, total);
+            showRespondPanel(EXCHANGES[3]);
+            renderBottom('ready', 'Get ready to speak...');
+          }, afterFirstUserTutorDelay + afterTutor2PanelDelay);
+          schedule(() => {
+            if (demoAbort) return;
+            runPronunciationSeries(SECOND_USER_ATTEMPTS, charMs2, () => {
+              if (demoAbort) return;
+              schedule(() => {
+                if (demoAbort) return;
+                setProgress(4, total);
+                pushChat(tutorHtml(EXCHANGES[4].french, EXCHANGES[4].english));
+              }, afterFirstUserTutorDelay);
+              schedule(() => {
+                if (demoAbort) return;
+                setProgress(5, total);
+                showRespondPanel(EXCHANGES[5]);
+                renderBottom('ready', 'Get ready to speak...');
+              }, afterFirstUserTutorDelay + afterTutor2PanelDelay);
+              schedule(() => {
+                if (demoAbort) return;
+                runPronunciationSeries(THIRD_USER_ATTEMPTS, charMs3, () => {
+                  if (demoAbort) return;
+                  schedule(() => {
+                    if (demoAbort) return;
+                    pushChat(systemHtml('Encore une fois. Écoutez:'));
+                  }, 400);
+                  schedule(() => {
+                    if (demoAbort) return;
+                    renderBottom('ready', 'Get ready to speak...');
+                  }, 1200);
+                  if (loop) {
+                    schedule(() => {
+                      if (demoAbort) return;
+                      resetDemo();
+                      requestAnimationFrame(() => requestAnimationFrame(runStory));
+                    }, loopTailMs);
+                  }
+                });
+              }, afterFirstUserTutorDelay + afterTutor2PanelDelay + afterPanelSpeakDelay);
+            });
+          }, afterFirstUserTutorDelay + afterTutor2PanelDelay + afterPanelSpeakDelay);
+        });
+      }, startDelayMs + 2200);
+    }
+
+    document.getElementById('btnExit')?.addEventListener('click', () => {
+      clearAllTimers();
+      demoAbort = true;
+      resetDemo();
+      if (autoplay) {
+        demoAbort = false;
+        requestAnimationFrame(() => requestAnimationFrame(runStory));
+      }
+    });
+
+    resetDemo();
+    if (autoplay) {
+      requestAnimationFrame(() => requestAnimationFrame(runStory));
+    } else {
+      setProgress(0, EXCHANGES.length);
+      pushChat(tutorHtml(EXCHANGES[0].french, EXCHANGES[0].english));
+      showRespondPanel(EXCHANGES[1]);
+      renderBottom('ready', 'Get ready to speak...');
+    }
+  </script>
+</body>
+</html>

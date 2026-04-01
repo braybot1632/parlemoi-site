@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParleMoi — Word Drop Simulator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#d9d9d9;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:12px}
+body.embed{background:transparent;padding:0}
+body.embed{display:grid;place-items:start center;align-content:start;overflow:hidden;position:relative;width:100vw;height:100vh}
+
+/* ── iPhone Mockup ── */
+.mockup{width:411px;height:915px;background:#000;border-radius:48px;border:14px solid #000;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;position:relative}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:146px;height:34px;background:#000;border-radius:0 0 22px 22px;z-index:100}
+.screen{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;position:relative;background:#FFFDF9}
+.status-bar{height:28px;flex-shrink:0;color:#646464;background:#fffdf9;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:13px;font-weight:600}
+.status-left{display:flex;align-items:center}
+.status-logo{width:56px;height:14px;display:inline-block}
+.status-logo svg{width:100%;height:100%;display:block}
+.status-logo .brand-main{fill:#1b2a4a}
+.status-logo .brand-accent{fill:#e8863a}
+.status-right{letter-spacing:.5px;font-size:12px}
+.app-header{height:58px;background:#fffdf9;display:flex;align-items:center;padding:0 14px;flex-shrink:0}
+/* Matches LessonPlayer.tsx back: Pressable 32×32, ChevronLeft 22, Colors.textSecondary */
+.back-btn{width:32px;height:32px;border-radius:16px;border:none;background:transparent;color:#6B6B6B;display:inline-flex;align-items:center;justify-content:center;margin-right:8px;flex-shrink:0;cursor:pointer;padding:0}
+.back-btn svg{display:block}
+.back-btn:focus-visible{outline:2px solid rgba(232,134,58,0.35);outline-offset:2px}
+.app-title{color:#2c2c2c;font-size:40px;font-weight:700;transform:scale(.38);transform-origin:left center;white-space:nowrap;letter-spacing:0}
+#gc{flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden}
+
+/* ── Ready Screen (GameReadyScreen.tsx + gameStyles.centered) ── */
+.ready{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:32px}
+.ready-icon svg{width:48px;height:48px;color:#E8863A}
+.ready-title{color:#2C2C2C;font-size:28px;font-weight:700;margin-top:16px;margin-bottom:8px}
+.ready-sub{color:#6B6B6B;font-size:15px;text-align:center;line-height:22px;white-space:pre-line}
+.start-btn{margin-top:32px;background:#0F1B33;padding:16px 48px;border-radius:14px;border:none;cursor:pointer}
+.start-btn span{color:#FFF;font-size:17px;font-weight:700}
+
+/* ── Countdown (CountdownIntro.tsx) ── */
+.cd-wrap{flex:1;display:flex;justify-content:center;align-items:center;position:relative;background:#FFFDF9;z-index:100}
+.cd-num{position:absolute;font-size:80px;font-weight:800;color:#2C2C2C;opacity:0;transform:scale(0.5)}
+.cd-go{position:absolute;font-size:64px;font-weight:800;color:#4CAF7D;opacity:0;transform:scale(0.5)}
+
+/* ── Playing Container (WordCatchGame.tsx styles.container) ── */
+.game{flex:1;display:flex;flex-direction:column;position:relative;background:#FFFDF9}
+
+/* ── FeedbackFlash.tsx: 80ms -> 0.35, 300ms -> 0 ── */
+.flash{position:absolute;inset:0;z-index:200;pointer-events:none;opacity:0}
+.flash.go{animation:flashAnim 380ms linear forwards}
+.flash.correct-flash{background:#4CAF7D}
+.flash.incorrect-flash{background:#D35454}
+@keyframes flashAnim{0%{opacity:0}21.05%{opacity:0.35}100%{opacity:0}}
+
+/* ── PointsBadge (shared.tsx): spring approx + 700ms move + fade from 500ms delay ── */
+.pts-badge{position:absolute;right:20px;z-index:150;pointer-events:none;color:#E8863A;font-size:26px;font-weight:800;text-shadow:0 1px 4px rgba(232,134,58,0.4);opacity:0}
+.pts-badge.go{animation:ptsFly 800ms cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes ptsFly{0%{transform:scale(0.5);opacity:1}25%{transform:scale(1);opacity:1}62%{opacity:1;transform:scale(1) translateY(0)}100%{transform:scale(1) translateY(-50px);opacity:0}}
+
+/* ── ComboMilestone.tsx (simplified toast) ── */
+.combo-milestone{position:absolute;left:50%;top:38%;transform:translateX(-50%);z-index:160;pointer-events:none;opacity:0;font-weight:800;text-align:center;padding:8px 16px}
+.combo-milestone.go{animation:milestonePop 1.5s ease forwards}
+@keyframes milestonePop{0%{opacity:0;transform:translateX(-50%) scale(0.5)}15%{opacity:1;transform:translateX(-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) scale(1)}}
+
+/* ── GameHUD.tsx container + ScoreCounter + ComboMeter ── */
+.hud-wrap{padding:0 16px;padding-top:8px;z-index:10;flex-shrink:0}
+.hud-bar{display:flex;align-items:center;padding:10px 16px;background:#FFF;border-radius:14px;margin-bottom:10px}
+.hud-left-slot,.hud-right-slot{flex:1;display:flex;align-items:center;min-height:22px}
+.hud-left-slot{justify-content:flex-start}
+.hud-right-slot{justify-content:flex-end}
+.hud-center-slot{display:flex;align-items:center;justify-content:center;min-width:72px}
+.hud-lives{display:flex;gap:6px;align-items:center}
+.hud-score{font-size:22px;font-weight:800;color:#2C2C2C;font-variant-numeric:tabular-nums}
+.hud-score.bump{animation:scoreBump 0.35s ease}
+@keyframes scoreBump{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+.hud-combo{display:flex;align-items:center;gap:3px;background:rgba(232,134,58,0.2);padding:5px 10px;border-radius:12px;opacity:0;transform:scale(0.8);transition:opacity 0.2s ease,transform 0.2s ease}
+.hud-combo.show{opacity:1;transform:scale(1)}
+.hud-combo.pop{animation:comboPop 0.45s ease}
+@keyframes comboPop{0%{transform:scale(1)}30%{transform:scale(1.35)}100%{transform:scale(1)}}
+.hud-combo.shake{animation:comboShake 0.2s ease}
+@keyframes comboShake{0%{transform:translateX(0)}20%{transform:translateX(8px)}40%{transform:translateX(-8px)}60%{transform:translateX(6px)}80%{transform:translateX(-6px)}100%{transform:translateX(0)}}
+.combo-icon svg{width:14px;height:14px}
+.combo-text{font-size:14px;font-weight:700}
+.combo-fire{font-size:12px;margin-left:2px}
+.combo-mult{font-size:12px;font-weight:700;margin-left:4px;opacity:0.9}
+/* ── Target Strip (WordCatchGame.tsx) ── */
+.target-strip{margin-top:4px;background:#FFF;border:1px solid #E8E3DC;border-radius:12px;padding:8px 12px 10px;display:flex;flex-direction:column;align-items:center}
+.target-strip-meta{display:flex;justify-content:flex-end;width:100%;margin-bottom:2px;min-height:18px}
+.target-round-badge{color:#1B2A4A;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.target-lbl{color:#9B9B9B;font-size:11px;text-transform:uppercase;letter-spacing:0.8px}
+.target-fr{color:#1B2A4A;font-size:20px;font-weight:700;margin-top:2px}
+.target-en{color:#6B6B6B;font-size:13px;margin-top:2px}
+
+/* ── Drop Zone ── */
+.drop-zone{flex:1;position:relative;overflow:hidden}
+#bubbleSlot{position:absolute;inset:0;pointer-events:none;contain:layout paint}
+.amb-orb-1{position:absolute;top:-40px;right:-30px;width:220px;height:220px;border-radius:110px;background:rgba(232,134,58,0.06)}
+.amb-orb-2{position:absolute;bottom:24px;left:-60px;width:180px;height:180px;border-radius:90px;background:rgba(27,42,74,0.05)}
+.lanes{position:absolute;inset:0;display:flex;flex-direction:row;justify-content:space-evenly;padding:0 12px;pointer-events:none}
+.lane{width:1px;background:rgba(27,42,74,0.08)}
+
+/* ── FallingBubble (WordCatchGame.tsx — not WordBubble.tsx; WordBubble is a separate pill primitive for other games) ── */
+.bub-outer{position:absolute;pointer-events:none;will-change:transform;transform:translate3d(0,0,0);backface-visibility:hidden}
+.bub-anim{transition:none;will-change:transform,opacity;transform:translateZ(0)}
+.bub-anim.correct-anim{transition:transform 180ms ease-out,opacity 150ms ease-out 60ms;transform:scale(1.4)!important;opacity:0!important}
+.bub-anim.missed-anim{transition:transform 120ms ease-out,opacity 120ms ease-out;transform:scale(0.5)!important;opacity:0!important}
+.bub-body{display:flex;align-items:center;justify-content:center;padding:0 8px;overflow:hidden;position:relative;background:#FFFDF9;border:2.5px solid #E8863A;box-shadow:0 6px 12px rgba(232,134,58,0.12)}
+.bub-body.correct-bdr{border-color:#4CAF7D;border-width:2px}
+.bub-body.missed-bdr{border-color:#D35454;border-width:2px}
+.bub-sheen{position:absolute;top:6px;left:10px;right:10px;height:35%;border-radius:999px;background:rgba(255,255,255,0.55)}
+.bub-inner{position:absolute;top:4px;left:4px;right:4px;bottom:4px;border-radius:999px;border:1px solid rgba(27,42,74,0.08)}
+.bub-stack{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;z-index:2;position:relative;padding:2px 4px;min-width:min-content}
+.bub-fr{color:#1B2A4A;font-size:17px;font-weight:700;text-align:center;line-height:1.15;white-space:nowrap}
+.bub-pron{color:#6B6B6B;font-size:12px;font-weight:600;text-align:center;line-height:1.2;letter-spacing:0.02em;white-space:nowrap}
+.ring-fx{position:absolute;border:2px solid #4CAF7D;border-radius:50%;opacity:0;pointer-events:none}
+.ring-fx.go{animation:ringFlash 300ms cubic-bezier(.22,1,.36,1) forwards}
+@keyframes ringFlash{0%{opacity:0;transform:scale(1)}17%{opacity:0.5;transform:scale(1.5)}100%{opacity:0;transform:scale(2.5)}}
+
+.floor{height:8px;background:rgba(27,42,74,0.06);border-top:1px solid rgba(27,42,74,0.14);flex-shrink:0}
+
+/* ── MicIndicator.tsx ── */
+.mic-panel{border-top:1px solid rgba(232,227,220,0.9);background:#FFF;flex-shrink:0;padding:8px 0;display:flex;flex-direction:column;align-items:center}
+.mic-status{color:#9B9B9B;font-size:13px;margin-bottom:8px;min-height:22px;display:flex;align-items:center;justify-content:center;max-width:85%;text-align:center}
+.mic-interim{color:#E8863A;font-size:18px;font-weight:600;font-style:italic;margin-bottom:8px;max-width:85%;text-align:center;min-height:22px}
+.mic-row{display:flex;align-items:center;gap:6px}
+.mic-icon{width:36px;height:36px;border-radius:18px;background:rgba(232,134,58,0.1);display:flex;align-items:center;justify-content:center;animation:micPulse 1600ms ease-in-out infinite}
+.mic-icon svg{width:20px;height:20px;color:#4CAF7D}
+@keyframes micPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.mic-dot{width:8px;height:8px;border-radius:4px;background:#4CAF7D;opacity:0.3;transition:opacity 0.1s ease}
+.mic-dot.active{opacity:1}
+.mic-bars{display:flex;align-items:center;gap:2px;height:16px}
+.mic-bar{width:3px;border-radius:1.5px;background:#E8863A;height:4px}
+/* MicIndicator bar loops: 150+150, 200+200, 175+175 ms */
+.mic-bar.anim:nth-child(1){animation:barPulse150 300ms ease-in-out infinite}
+.mic-bar.anim:nth-child(2){animation:barPulse200 400ms ease-in-out infinite}
+.mic-bar.anim:nth-child(3){animation:barPulse175 350ms ease-in-out infinite}
+@keyframes barPulse150{0%,100%{height:4px}50%{height:16px}}
+@keyframes barPulse200{0%,100%{height:4px}50%{height:16px}}
+@keyframes barPulse175{0%,100%{height:4px}50%{height:16px}}
+
+/* ── PracticeSummaryScreen.tsx ── */
+.summary{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:32px}
+.sum-emoji{font-size:48px;margin-bottom:8px}
+.sum-title{font-size:26px;font-weight:700;color:#1B2A4A;margin-bottom:12px;text-align:center}
+.star-row{display:flex;gap:8px;margin-bottom:20px}
+.star-row svg{width:28px;height:28px}
+.stats-card{width:100%;background:#FFF;border-radius:16px;padding:20px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #E8E3DC}
+.stat-row:last-child{border-bottom:none}
+.stat-lbl{color:#6B6B6B;font-size:15px}
+.stat-val{color:#1B2A4A;font-size:17px;font-weight:700}
+.btn-area{width:100%;display:flex;flex-direction:column;align-items:center;gap:12px}
+.play-again{display:flex;align-items:center;justify-content:center;gap:8px;background:#E8863A;border-radius:14px;padding:16px;width:100%;border:none;cursor:pointer}
+.play-again svg{width:18px;height:18px;color:#FFF}
+.play-again span{color:#FFF;font-size:17px;font-weight:700}
+.back-games{width:100%;text-align:center;padding:14px;border-radius:14px;border:1px solid #E8E3DC;background:transparent;cursor:pointer;font-size:16px;font-weight:600;color:#2C2C2C}
+
+svg{stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="mockup">
+  <div class="notch"></div>
+  <div class="screen">
+    <div class="status-bar">
+      <div class="status-left">
+        <span class="status-logo" aria-label="ParleMoi">
+          <svg viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+            <text x="0" y="56" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="48" letter-spacing="-1">
+              <tspan class="brand-main">Parle</tspan><tspan class="brand-accent">Moi</tspan>
+            </text>
+          </svg>
+        </span>
+      </div>
+      <div class="status-right">◌ ⌁ ◔ ◢ 35%</div>
+    </div>
+    <div class="app-header">
+      <button type="button" class="back-btn" aria-label="Go back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <div class="app-title">Word Drop</div>
+    </div>
+    <div id="gc"></div>
+  </div>
+</div>
+
+<script>
+/**
+ * Static sim of WordCatchGame.tsx (Word Drop). Falling UI = FallingBubble inline component.
+ * WordBubble.tsx is NOT used in this game (different pill-shaped primitive for other games).
+ */
+const ICO = {
+  droplets: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/></svg>',
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>',
+  heartFilled: '<svg viewBox="0 0 24 24" fill="#D35454" stroke="#D35454" stroke-width="2"><path d="m12 21-1.45-1.32C5.4 15.02 2 11.93 2 8.14 2 5.05 4.42 2.64 7.5 2.64c1.74 0 3.41.81 4.5 2.09 1.09-1.28 2.76-2.09 4.5-2.09 3.08 0 5.5 2.41 5.5 5.5 0 3.79-3.4 6.88-8.55 11.54z"/></svg>',
+  heartEmpty: '<svg viewBox="0 0 24 24" fill="none" stroke="#E8E3DC" stroke-width="2"><path d="m12 21-1.45-1.32C5.4 15.02 2 11.93 2 8.14 2 5.05 4.42 2.64 7.5 2.64c1.74 0 3.41.81 4.5 2.09 1.09-1.28 2.76-2.09 4.5-2.09 3.08 0 5.5 2.41 5.5 5.5 0 3.79-3.4 6.88-8.55 11.54z"/></svg>',
+  rotateCcw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>',
+  zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>',
+};
+const params = new URLSearchParams(window.location.search);
+const autoplay = params.get('autoplay') === '1';
+const loop = params.get('loop') !== '0';
+const startDelayMs = Number(params.get('delay') || 900);
+if (params.get('embed') === '1') document.body.classList.add('embed');
+
+function fitEmbedMockup() {
+  if (!document.body.classList.contains('embed')) return;
+  const mockup = document.querySelector('.mockup');
+  if (!mockup) return;
+  const pixel6Width = 393;
+  const pixel6Height = 851;
+  const scale = Math.min(window.innerWidth / pixel6Width, window.innerHeight / pixel6Height);
+  mockup.style.position = 'relative';
+  mockup.style.left = 'auto';
+  mockup.style.top = 'auto';
+  mockup.style.width = `${pixel6Width}px`;
+  mockup.style.height = `${pixel6Height}px`;
+  mockup.style.transformOrigin = 'top center';
+  mockup.style.transform = `scale(${scale})`;
+}
+fitEmbedMockup();
+window.addEventListener('resize', fitEmbedMockup);
+
+// WordCatchGame.tsx
+const SPAWN_Y = -100;
+const FALLBACK_BOTTOM_Y = 420;
+const BUBBLE_EDGE_PAD = 20;
+const RESPAWN_DELAY_PRACTICE_MS = 260;
+let mockPlayWidth = 411;
+
+// lib/gameEngine.ts + constants/gamification.ts (levelId default a1)
+const LEVEL_ID = 'a1';
+const GAME_POINTS_BY_LEVEL = { a1: 10, a2: 20, b1: 35, b2: 50 };
+const COMBO_THRESHOLDS = [
+  { combo: 5, multiplier: 1.5 },
+  { combo: 10, multiplier: 2.0 },
+  { combo: 20, multiplier: 3.0 },
+];
+
+/* Pronunciations: learner-friendly approximations aligned with IPA (Wiktionary / Collins / Cambridge).
+   Nasal vowels: bohn/nohn; French /y/ (tu, salut): -loo; /ʁ/: hr- or -r- in the middle. */
+const WORDS = [
+  { fr: 'Bonjour', pron: 'bohn-zhoor',     en: 'Hello',        outcome: 'correct', catchPct: 0.40, pronScore: 0.92 },
+  { fr: 'Merci',   pron: 'mehr-see',       en: 'Thank you',    outcome: 'correct', catchPct: 0.35, pronScore: 0.88 },
+  { fr: 'Oui',     pron: 'wee',            en: 'Yes',          outcome: 'correct', catchPct: 0.25, pronScore: 0.95 },
+  { fr: 'Non',     pron: 'nohn',           en: 'No',           outcome: 'miss',    catchPct: 1,    pronScore: 0 },
+  { fr: 'Salut',   pron: 'sa-loo',         en: 'Hi',           outcome: 'correct', catchPct: 0.45, pronScore: 0.85 },
+  { fr: 'Bonsoir', pron: 'bohn-swahr',     en: 'Good evening', outcome: 'correct', catchPct: 0.60, pronScore: 0.91 },
+  { fr: 'Pardon',  pron: 'pahr-dohn',      en: 'Excuse me',    outcome: 'miss',    catchPct: 1,    pronScore: 0 },
+  { fr: 'Bonne',   pron: 'bon',            en: 'Good',         outcome: 'correct', catchPct: 0.35, pronScore: 0.87 },
+  { fr: 'Bien',    pron: 'byan',           en: 'Well',         outcome: 'correct', catchPct: 0.20, pronScore: 0.96 },
+  { fr: 'Très',    pron: 'treh',           en: 'Very',         outcome: 'miss',    catchPct: 1,    pronScore: 0 },
+];
+
+/**
+ * Circle must fit two horizontal lines (French + pronunciation), each nowrap.
+ * D >= sqrt(W² + H²) where W = max(line widths) + padding, H = stacked line heights + gap + padding.
+ */
+function getBubbleDiameter(w) {
+  const fr = w.fr || '';
+  const pr = w.pron || '';
+  const frCh = 10.2;
+  const prCh = 7.8;
+  const padH = 32;
+  const line1H = 22;
+  const line2H = 16;
+  const gap = 3;
+  const padV = 24;
+  const innerW = Math.max(fr.length * frCh, pr.length * prCh, 36) + padH;
+  const innerH = line1H + gap + line2H + padV;
+  const d = Math.ceil(Math.sqrt(innerW * innerW + innerH * innerH));
+  return Math.max(88, Math.min(d, 210));
+}
+
+function getFallDuration(wordIndex) {
+  if (wordIndex < 5) return 6000;
+  if (wordIndex < 15) return 5000;
+  if (wordIndex < 30) return 4000;
+  if (wordIndex < 50) return 3500;
+  return 3000;
+}
+
+function calcSpeedPoints(elapsedMs, windowMs) {
+  const ratio = Math.min(elapsedMs / windowMs, 1);
+  return Math.round(100 * (2.0 - ratio));
+}
+
+function getComboMultiplier(combo) {
+  const tier = [...COMBO_THRESHOLDS].reverse().find((t) => combo >= t.combo);
+  return tier ? tier.multiplier : 1;
+}
+
+function getRandomX(diameter) {
+  const minX = BUBBLE_EDGE_PAD + diameter / 2;
+  const maxX = mockPlayWidth - BUBBLE_EDGE_PAD - diameter / 2;
+  return minX + Math.random() * (maxX - minX);
+}
+
+/**
+ * Smooth lateral sway: sum of sines (C∞, no piecewise kinks).
+ * Matches a gentle pendulum-style drift while falling.
+ */
+function smoothWobble(elapsedMs, phaseRad) {
+  const t = elapsedMs * 0.001;
+  const p = phaseRad || 0;
+  const k1 = (Math.PI * 2) / 2.45;
+  const k2 = (Math.PI * 2) / 1.58;
+  const w1 = Math.sin(p + t * k1);
+  const w2 = Math.sin(p * 1.31 + t * k2 * 1.04);
+  return 3.6 * w1 + 1.35 * w2;
+}
+
+function getComboColor(combo) {
+  if (combo >= 20) return '#D4A853';
+  if (combo >= 10) return '#D4A853';
+  if (combo >= 5) return '#E8863A';
+  return '#6B6B6B';
+}
+
+function comboFireEmoji(combo) {
+  if (combo >= 10) return '\uD83D\uDD25\uD83D\uDD25\uD83D\uDD25';
+  if (combo >= 5) return '\uD83D\uDD25';
+  return '';
+}
+
+const MILESTONE_VALUES = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+function getMilestoneText(combo) {
+  if (combo >= 20) return { text: 'LEGENDARY', color: '#D4A853', size: '36px' };
+  if (combo >= 15) return { text: 'UNSTOPPABLE', color: '#D4A853', size: '32px' };
+  if (combo >= 10) return { text: 'On fire!', color: '#E8863A', size: '28px' };
+  if (combo >= 5) return { text: 'Nice streak!', color: '#4CAF7D', size: '22px' };
+  return null;
+}
+
+const gc = document.getElementById('gc');
+let phase = 'ready';
+let wordIdx = 0;
+let engineScore = 0;
+let practicePoints = 0;
+let combo = 0;
+let comboMultiplier = 1;
+let prevComboForMilestone = 0;
+let caughtCount = 0;
+let missedCount = 0;
+let bubbleState = 'idle';
+let animFrame = null;
+let bubbleStartTime = 0;
+let bottomY = FALLBACK_BOTTOM_Y;
+let totalSeen = 0;
+let fallDurationThisBubble = 6000;
+let totalSeenAtSpawn = 0;
+let maxLives = 3;
+let lives = 3;
+let interimTimer = null;
+let resolveTimer = null;
+let phaseTimer = null;
+let settleTimer = null;
+let speechTimer = null;
+/** Random phase per bubble so sways don’t sync across the screen */
+let bubbleWobblePhase = 0;
+
+function clearBubbleTimers() {
+  if (interimTimer) { clearTimeout(interimTimer); interimTimer = null; }
+  if (resolveTimer) { clearTimeout(resolveTimer); resolveTimer = null; }
+  if (phaseTimer) { clearTimeout(phaseTimer); phaseTimer = null; }
+  if (settleTimer) { clearTimeout(settleTimer); settleTimer = null; }
+  if (speechTimer) { clearTimeout(speechTimer); speechTimer = null; }
+}
+
+function resetSessionState() {
+  clearBubbleTimers();
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+  wordIdx = 0;
+  engineScore = 0;
+  practicePoints = 0;
+  combo = 0;
+  comboMultiplier = 1;
+  prevComboForMilestone = 0;
+  caughtCount = 0;
+  missedCount = 0;
+  totalSeen = 0;
+  maxLives = 3;
+  lives = 3;
+}
+
+function renderLives() {
+  const el = document.querySelector('.hud-lives');
+  if (!el) return;
+  let markup = '';
+  for (let i = 0; i < maxLives; i += 1) {
+    const active = i < lives;
+    const isLast = lives === 1 && i === 0;
+    const opacity = active ? 1 : 0.2;
+    const scale = active ? (isLast ? 1.06 : 1) : 0.7;
+    markup += `
+      <div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;opacity:${opacity};transform:scale(${scale});transition:transform 150ms ease,opacity 200ms ease">
+        ${active ? ICO.heartFilled : ICO.heartEmpty}
+      </div>`;
+  }
+  el.innerHTML = markup;
+}
+
+/** Restart CSS keyframes without forcing synchronous layout (no offsetWidth). */
+function restartAnimClass(el, cls) {
+  if (!el) return;
+  el.classList.remove(cls);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      el.classList.add(cls);
+    });
+  });
+}
+
+function renderReady() {
+  phase = 'ready';
+  resetSessionState();
+  gc.innerHTML = `
+    <div class="ready">
+      <div class="ready-icon">${ICO.droplets}</div>
+      <div class="ready-title">Word Drop</div>
+      <div class="ready-sub">Bubbles fall from above.\nSay each word before it reaches the bottom!</div>
+      <button type="button" class="start-btn" id="btnStart"><span>Start</span></button>
+    </div>`;
+  document.getElementById('btnStart').onclick = () => startCountdown();
+  if (autoplay) {
+    setTimeout(() => {
+      if (phase === 'ready') startCountdown();
+    }, startDelayMs);
+  }
+}
+
+function startCountdown() {
+  if (phase === 'countdown' || phase === 'playing') return;
+  clearBubbleTimers();
+  phase = 'countdown';
+  gc.innerHTML = '<div class="cd-wrap"><div class="cd-num" id="cd3">3</div><div class="cd-num" id="cd2">2</div><div class="cd-num" id="cd1">1</div><div class="cd-go" id="cdGo">GO!</div></div>';
+
+  const dur = 200;
+  const hold = 400;
+  const gap = hold + dur * 2;
+
+  function animNum(el, delay) {
+    setTimeout(() => {
+      el.style.transition = `opacity ${dur}ms ease-out, transform ${dur}ms cubic-bezier(.34,1.56,.64,1)`;
+      el.style.opacity = '1';
+      el.style.transform = 'scale(1)';
+      setTimeout(() => {
+        el.style.transition = `opacity ${dur}ms ease, transform ${dur}ms ease`;
+        el.style.opacity = '0';
+        el.style.transform = 'scale(0.8)';
+      }, dur + hold);
+    }, delay);
+  }
+
+  animNum(document.getElementById('cd3'), 0);
+  animNum(document.getElementById('cd2'), gap);
+  animNum(document.getElementById('cd1'), gap * 2);
+
+  phaseTimer = setTimeout(() => {
+    const g = document.getElementById('cdGo');
+    if (!g) return;
+    g.style.transition = 'opacity 150ms ease-out, transform 150ms cubic-bezier(.34,1.56,.64,1)';
+    g.style.opacity = '1';
+    g.style.transform = 'scale(1.2)';
+    setTimeout(() => { if (g) g.style.transform = 'scale(1)'; }, 150);
+    setTimeout(() => {
+      if (!g) return;
+      g.style.transition = 'opacity 200ms ease, transform 150ms ease';
+      g.style.opacity = '0';
+      g.style.transform = 'scale(0.8)';
+    }, 550);
+    phaseTimer = null;
+  }, gap * 3);
+
+  const totalDuration = gap * 3 + 750;
+  phaseTimer = setTimeout(() => {
+    phaseTimer = null;
+    startPlaying();
+  }, totalDuration);
+}
+
+function startPlaying() {
+  phase = 'playing';
+  gc.innerHTML = `
+    <div class="game" id="gameArea">
+      <div class="flash" id="flash"></div>
+      <div id="ptsSlot"></div>
+      <div id="milestoneSlot"></div>
+      <div class="hud-wrap">
+        <div class="hud-bar">
+          <div class="hud-left-slot">
+            <div class="hud-lives"></div>
+          </div>
+          <div class="hud-center-slot">
+            <div class="hud-score" id="hudScore">0</div>
+          </div>
+          <div class="hud-right-slot">
+            <div class="hud-combo" id="hudCombo">
+              <span class="combo-icon">${ICO.zap}</span>
+              <span class="combo-text" id="comboText">0x</span>
+              <span class="combo-fire" id="comboFire"></span>
+              <span class="combo-mult" id="comboMult"></span>
+            </div>
+          </div>
+        </div>
+        <div class="target-strip">
+          <div class="target-strip-meta">
+            <span class="target-round-badge" id="pracCounter" aria-label="Words in this round">0/${WORDS.length}</span>
+          </div>
+          <div class="target-lbl">Say this word in French</div>
+          <div class="target-fr" id="targetFr">...</div>
+          <div class="target-en" id="targetEn">Meaning appears here</div>
+        </div>
+      </div>
+      <div class="drop-zone" id="dropZone">
+        <div class="amb-orb-1"></div>
+        <div class="amb-orb-2"></div>
+        <div class="lanes"><div class="lane"></div><div class="lane"></div><div class="lane"></div><div class="lane"></div></div>
+        <div id="bubbleSlot"></div>
+      </div>
+      <div class="floor"></div>
+      <div class="mic-panel">
+        <div id="micText" class="mic-status">Listening...</div>
+        <div class="mic-row">
+          <div class="mic-icon">${ICO.mic}</div>
+          <div class="mic-dot" id="micDot"></div>
+          <div class="mic-bars">
+            <div class="mic-bar anim"></div>
+            <div class="mic-bar anim"></div>
+            <div class="mic-bar anim"></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  phaseTimer = setTimeout(() => {
+    const dz = document.getElementById('dropZone');
+    if (dz) {
+      bottomY = Math.max(180, dz.clientHeight - 8);
+      mockPlayWidth = dz.clientWidth || 411;
+    }
+    renderLives();
+    spawnBubble();
+    phaseTimer = null;
+  }, 100);
+}
+
+function updatePracticeCounter() {
+  const el = document.getElementById('pracCounter');
+  if (!el) return;
+  const inFlight = bubbleState === 'falling' ? 1 : 0;
+  el.textContent = `${Math.min(caughtCount + missedCount + inFlight, WORDS.length)}/${WORDS.length}`;
+}
+
+function maybeShowComboMilestone() {
+  const isMilestone = MILESTONE_VALUES.includes(combo) && combo > prevComboForMilestone;
+  prevComboForMilestone = combo;
+  if (!isMilestone) return;
+  const cfg = getMilestoneText(combo);
+  if (!cfg) return;
+  const slot = document.getElementById('milestoneSlot');
+  if (!slot) return;
+  const el = document.createElement('div');
+  el.className = 'combo-milestone go';
+  el.textContent = cfg.text;
+  el.style.color = cfg.color;
+  el.style.fontSize = cfg.size;
+  slot.appendChild(el);
+  setTimeout(() => el.remove(), 1500);
+}
+
+function spawnBubble() {
+  if (phase !== 'playing' || wordIdx >= WORDS.length) return;
+  clearBubbleTimers();
+
+  totalSeen += 1;
+  totalSeenAtSpawn = totalSeen;
+  fallDurationThisBubble = getFallDuration(totalSeen);
+
+  const w = WORDS[wordIdx];
+  const d = getBubbleDiameter(w);
+  const startX = getRandomX(d);
+  const slot = document.getElementById('bubbleSlot');
+
+  const el_tf = document.getElementById('targetFr');
+  const el_te = document.getElementById('targetEn');
+  if (el_tf) el_tf.textContent = w.fr;
+  if (el_te) el_te.textContent = w.en ? `"${w.en}"` : 'Meaning appears here';
+  clearMicInterim();
+  bubbleState = 'falling';
+  bubbleWobblePhase = Math.random() * Math.PI * 2;
+  updatePracticeCounter();
+
+  if (slot) {
+    slot.innerHTML = `
+    <div class="bub-outer" id="bubOuter" style="left:${startX - d / 2}px;width:${d}px;height:${d}px">
+      <div class="bub-anim" id="bubAnim">
+        <div class="ring-fx" id="ringFx" style="width:${d}px;height:${d}px;top:0;left:0"></div>
+        <div class="bub-body" id="bubBody" style="width:${d}px;height:${d}px;border-radius:${d / 2}px">
+          <div class="bub-sheen"></div>
+          <div class="bub-inner"></div>
+          <div class="bub-stack">
+            <div class="bub-fr">${w.fr}</div>
+            <div class="bub-pron">${w.pron}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const outer = document.getElementById('bubOuter');
+  const outerStyle = outer ? outer.style : null;
+  function tick(now) {
+    if (bubbleState !== 'falling') return;
+    const elapsed = now - bubbleStartTime;
+    const progress = Math.min(elapsed / fallDurationThisBubble, 1);
+    const y = SPAWN_Y + (bottomY - SPAWN_Y) * progress;
+    const wobbleX = smoothWobble(elapsed, bubbleWobblePhase);
+    if (outerStyle) outerStyle.transform = `translate3d(${wobbleX}px, ${y}px, 0)`;
+    if (progress >= 1) {
+      resolveBubble('miss');
+      return;
+    }
+    animFrame = requestAnimationFrame(tick);
+  }
+  animFrame = requestAnimationFrame((now) => {
+    bubbleStartTime = now;
+    tick(now);
+  });
+
+  if (w.outcome === 'correct') {
+    const catchTime = fallDurationThisBubble * w.catchPct;
+    const listeningLeadMs = 680;
+    const speakLeadMs = 360;
+    interimTimer = setTimeout(() => {
+      if (bubbleState === 'falling') clearMicInterim();
+      speechTimer = setTimeout(() => {
+        if (bubbleState === 'falling') showMicInterim(w.fr);
+        speechTimer = null;
+      }, Math.max(0, listeningLeadMs - speakLeadMs));
+      interimTimer = null;
+    }, Math.max(0, catchTime - listeningLeadMs));
+    resolveTimer = setTimeout(() => {
+      if (bubbleState === 'falling') resolveBubble('correct');
+      resolveTimer = null;
+    }, catchTime);
+  }
+}
+
+function resolveBubble(outcome) {
+  if (bubbleState !== 'falling') return;
+  clearBubbleTimers();
+  bubbleState = outcome;
+  if (animFrame) {
+    cancelAnimationFrame(animFrame);
+    animFrame = null;
+  }
+
+  const w = WORDS[wordIdx];
+  const elapsed = performance.now() - bubbleStartTime;
+  const anim = document.getElementById('bubAnim');
+  const body = document.getElementById('bubBody');
+  const ring = document.getElementById('ringFx');
+
+  if (outcome === 'correct') {
+    if (anim) anim.classList.add('correct-anim');
+    if (body) body.classList.add('correct-bdr');
+    if (ring) ring.classList.add('go');
+
+    const earnedPoints = calcSpeedPoints(elapsed, getFallDuration(totalSeenAtSpawn));
+    practicePoints += earnedPoints;
+
+    combo += 1;
+    comboMultiplier = getComboMultiplier(combo);
+    const basePts = GAME_POINTS_BY_LEVEL[LEVEL_ID] ?? 10;
+    engineScore += Math.round(basePts * comboMultiplier);
+
+    caughtCount += 1;
+    updateScore();
+    updateCombo(true, 0);
+    maybeShowComboMilestone();
+    flashFeedback('correct');
+    showPointsBadge(earnedPoints);
+    settleTimer = setTimeout(() => {
+      clearMicInterim();
+      settleTimer = null;
+    }, 500);
+  } else {
+    if (anim) anim.classList.add('missed-anim');
+    if (body) body.classList.add('missed-bdr');
+    missedCount += 1;
+    lives = Math.max(0, lives - 1);
+    renderLives();
+    const comboBeforeMiss = combo;
+    combo = 0;
+    comboMultiplier = 1;
+    prevComboForMilestone = 0;
+    updateCombo(false, comboBeforeMiss);
+    flashFeedback('incorrect');
+    clearMicInterim();
+  }
+
+  wordIdx += 1;
+  updatePracticeCounter();
+
+  if (lives <= 0) {
+    phaseTimer = setTimeout(() => {
+      bubbleState = 'idle';
+      updatePracticeCounter();
+      renderSummary();
+      phaseTimer = null;
+    }, 500);
+    return;
+  }
+
+  if (wordIdx >= WORDS.length) {
+    phaseTimer = setTimeout(() => {
+      bubbleState = 'idle';
+      updatePracticeCounter();
+      checkDone();
+      phaseTimer = null;
+    }, 500);
+  } else {
+    phaseTimer = setTimeout(() => {
+      bubbleState = 'idle';
+      updatePracticeCounter();
+      spawnBubble();
+      phaseTimer = null;
+    }, RESPAWN_DELAY_PRACTICE_MS);
+  }
+}
+
+function updateScore() {
+  const el = document.getElementById('hudScore');
+  if (!el) return;
+  el.textContent = String(engineScore);
+  restartAnimClass(el, 'bump');
+}
+
+/** comboBeforeMiss: previous combo when resolving a miss (ComboMeter shake only if meter was visible) */
+function updateCombo(increased, comboBeforeMiss) {
+  const el = document.getElementById('hudCombo');
+  const txt = document.getElementById('comboText');
+  const fireEl = document.getElementById('comboFire');
+  const multEl = document.getElementById('comboMult');
+  if (!el || !txt) return;
+  const color = getComboColor(combo);
+  const icon = el.querySelector('.combo-icon');
+  if (icon) icon.style.color = color;
+
+  if (combo >= 2) {
+    el.classList.add('show');
+    txt.textContent = `${combo}x`;
+    txt.style.color = color;
+    if (fireEl) fireEl.textContent = comboFireEmoji(combo);
+    if (multEl) multEl.textContent = comboMultiplier > 1 ? `${comboMultiplier}x` : '';
+    if (increased) {
+      restartAnimClass(el, 'pop');
+    }
+  } else if (!increased && combo === 0 && comboBeforeMiss > 0) {
+    if (comboBeforeMiss >= 2) {
+      restartAnimClass(el, 'shake');
+      setTimeout(() => el.classList.remove('show'), 200);
+    } else {
+      el.classList.remove('show');
+    }
+    if (fireEl) fireEl.textContent = '';
+    if (multEl) multEl.textContent = '';
+  } else {
+    el.classList.remove('show');
+    if (fireEl) fireEl.textContent = '';
+    if (multEl) multEl.textContent = '';
+  }
+}
+
+function flashFeedback(type) {
+  const el = document.getElementById('flash');
+  if (!el) return;
+  el.className = 'flash';
+  requestAnimationFrame(() => {
+    el.className = `flash ${type}-flash go`;
+  });
+}
+
+function showPointsBadge(pts) {
+  const slot = document.getElementById('ptsSlot');
+  if (!slot) return;
+  const badge = document.createElement('div');
+  badge.className = 'pts-badge';
+  badge.textContent = `+${pts}`;
+  const gameH = document.getElementById('gameArea')?.clientHeight || 600;
+  badge.style.top = `${Math.round(gameH * 0.4)}px`;
+  slot.appendChild(badge);
+  requestAnimationFrame(() => {
+    badge.classList.add('go');
+  });
+  setTimeout(() => badge.remove(), 800);
+}
+
+function showMicInterim(text) {
+  const el = document.getElementById('micText');
+  if (el) {
+    el.className = 'mic-interim';
+    el.textContent = text;
+  }
+  const dot = document.getElementById('micDot');
+  if (dot) dot.classList.add('active');
+}
+
+function clearMicInterim() {
+  const el = document.getElementById('micText');
+  if (el) {
+    el.className = 'mic-status';
+    el.textContent = 'Listening...';
+  }
+  const dot = document.getElementById('micDot');
+  if (dot) dot.classList.remove('active');
+}
+
+function checkDone() {
+  if (caughtCount + missedCount >= WORDS.length) {
+    setTimeout(renderSummary, 600);
+  }
+}
+
+function renderSummary() {
+  phase = 'done';
+  const total = caughtCount + missedCount;
+  const accuracy = total > 0 ? caughtCount / total : 0;
+  const stars = accuracy >= 0.9 ? 3 : accuracy >= 0.6 ? 2 : 1;
+  const emoji = accuracy >= 0.9 ? '\u{1F31F}' : accuracy >= 0.6 ? '\u{1F44F}' : '\u{1F4AA}';
+
+  function starSvg(filled) {
+    return filled
+      ? '<svg viewBox="0 0 24 24" fill="#D4A853" stroke="#D4A853" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="#E8E3DC" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+  }
+
+  gc.innerHTML = `
+    <div class="summary">
+      <div class="sum-emoji">${emoji}</div>
+      <div class="sum-title">Nice work!</div>
+      <div class="star-row">${starSvg(stars >= 1)}${starSvg(stars >= 2)}${starSvg(stars >= 3)}</div>
+      <div class="stats-card">
+        <div class="stat-row"><span class="stat-lbl">Caught</span><span class="stat-val">${caughtCount}/${total}</span></div>
+        <div class="stat-row"><span class="stat-lbl">Missed</span><span class="stat-val">${missedCount}</span></div>
+        <div class="stat-row"><span class="stat-lbl">Points</span><span class="stat-val">${practicePoints}</span></div>
+      </div>
+      <div class="btn-area">
+        <button type="button" class="play-again" id="btnAgain">${ICO.rotateCcw}<span>Play Again</span></button>
+        <button type="button" class="back-games" id="btnBack">Back to Games</button>
+      </div>
+    </div>`;
+
+  document.getElementById('btnAgain').onclick = () => renderReady();
+  document.getElementById('btnBack').onclick = () => renderReady();
+  if (autoplay && loop) {
+    setTimeout(() => {
+      if (phase === 'done') renderReady();
+    }, 1700);
+  }
+}
+
+renderReady();
+document.querySelector('.back-btn')?.addEventListener('click', () => {
+  renderReady();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ParleMoi — Telephone Practice Simulator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+      background: #d9d9d9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    body.embed {
+      background: transparent;
+      padding: 0;
+    }
+    body.embed {
+      display: grid;
+      place-items: start center;
+      align-content: start;
+      overflow: hidden;
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+    .iphone-frame {
+      width: 411px;
+      height: 915px;
+      border: 14px solid #252525;
+      border-radius: 44px;
+      background: #111;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .status-bar {
+      height: 28px;
+      color: #646464;
+      background: #fffdf9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .status-left {
+      display: flex;
+      align-items: center;
+    }
+    .status-logo {
+      width: 56px;
+      height: 14px;
+      display: inline-block;
+    }
+    .status-logo svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .status-logo .brand-main { fill: #1b2a4a; }
+    .status-logo .brand-accent { fill: #e8863a; }
+    .status-right { letter-spacing: 0.5px; font-size: 12px; }
+    .app-header {
+      height: 58px;
+      background: #fffdf9;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+    }
+    /* Matches LessonPlayer.tsx back: 32×32 hit target, ChevronLeft 22, textSecondary */
+    .back-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      border: none;
+      background: transparent;
+      color: #6b6b6b;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      flex-shrink: 0;
+      cursor: pointer;
+      padding: 0;
+    }
+    .back-btn svg { display: block; }
+    .back-btn:focus-visible {
+      outline: 2px solid rgba(232, 134, 58, 0.35);
+      outline-offset: 2px;
+    }
+    .app-title {
+      color: #2c2c2c;
+      font-size: 40px;
+      font-weight: 700;
+      transform: scale(0.38);
+      transform-origin: left center;
+      white-space: nowrap;
+      letter-spacing: 0;
+    }
+    .game-container {
+      flex: 1;
+      background: #fbf9f5;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .centered {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 32px;
+      text-align: center;
+    }
+    .ready-icon {
+      width: 64px;
+      height: 64px;
+      color: #e8863a;
+      margin-bottom: 8px;
+    }
+    .ready-title {
+      color: #2c2c2c;
+      font-size: 28px;
+      font-weight: 700;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+    .ready-subtitle {
+      color: #6b6b6b;
+      font-size: 15px;
+      line-height: 22px;
+      white-space: pre-line;
+    }
+    .start-btn {
+      margin-top: 32px;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 48px;
+      background: #0f1b33;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .countdown-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: #fffdf9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2c2c2c;
+      font-size: 80px;
+      font-weight: 800;
+    }
+    .countdown-go { color: #4caf7d; font-size: 64px; }
+
+    .hud-wrapper { padding: 10px 18px 0; z-index: 3; }
+    .hud {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 10px 16px;
+      min-height: 52px;
+      background: #fff;
+      border-radius: 14px;
+      margin-bottom: 6px;
+    }
+    .hud-left {
+      min-width: 96px;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-self: start;
+    }
+    .hud-right {
+      min-width: 90px;
+      min-height: 24px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      justify-self: end;
+    }
+    .hud-score {
+      color: #2c2c2c;
+      font-size: 38px;
+      transform: scale(0.56);
+      transform-origin: center;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      justify-self: center;
+    }
+    .heart {
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 140ms ease, transform 140ms ease;
+    }
+    .heart svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: #d35454;
+      stroke: #d35454;
+    }
+    .heart.lost {
+      opacity: 0.2;
+      transform: scale(0.7);
+    }
+    .heart.lost svg {
+      fill: transparent;
+      stroke: #e8e3dc;
+    }
+    /* Matches React ComboMeter.tsx (no "Combo" label — Zap + Nx + optional fire + multiplier) */
+    .combo-meter {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(232, 134, 58, 0.2);
+      border-radius: 12px;
+      padding: 5px 10px;
+      color: #6b6b6b;
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      min-height: 24px;
+    }
+    .combo-meter .combo-zap {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .combo-meter .combo-fire {
+      font-size: 12px;
+      margin-left: 1px;
+      line-height: 1;
+    }
+    .combo-meter .combo-mult {
+      color: #d4a853;
+      font-size: 11px;
+      font-weight: 800;
+      margin-left: 2px;
+    }
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 0 20px 8px;
+    }
+    .instruction {
+      margin: 0 auto 18px;
+      padding: 10px 18px;
+      width: fit-content;
+      max-width: 100%;
+      box-sizing: border-box;
+      background: #fff;
+      border: 1px solid #e8e3dc;
+      border-radius: 14px;
+      box-shadow: 0 1px 3px rgba(27, 42, 74, 0.05);
+      color: #5a6270;
+      font-size: clamp(13px, 3.4vw, 15px);
+      font-weight: 600;
+      line-height: 1.35;
+      text-align: center;
+      letter-spacing: -0.01em;
+    }
+    .phone-card {
+      width: 100%;
+      background: #fff;
+      border: 1px solid #e8e3dc;
+      border-radius: 22px;
+      padding: 10px 22px 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: box-shadow 180ms ease, border-color 180ms ease;
+    }
+    .phone-card-meta {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      margin-bottom: 4px;
+      min-height: 18px;
+    }
+    .phone-round-badge {
+      color: #1b2a4a;
+      font-size: 12px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+    .phone-card.recording {
+      border-color: rgba(232, 134, 58, 0.5);
+      box-shadow: 0 6px 18px rgba(232, 134, 58, 0.15);
+    }
+    .phone-number {
+      color: #1b2a4a;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 12px;
+      text-align: center;
+      white-space: nowrap;
+      font-size: clamp(23px, 6.8vw, 30px);
+      letter-spacing: 1.6px;
+    }
+    .say-it-label {
+      color: #9b9b9b;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+    .transcript-text {
+      font-size: 16px;
+      font-weight: 600;
+      font-style: italic;
+      line-height: 22px;
+      text-align: center;
+      min-height: 22px;
+      width: 100%;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: unset;
+    }
+    .transcript-slot {
+      min-height: 44px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .transcript-placeholder {
+      color: #9b9b9b;
+      font-size: 14px;
+      font-style: italic;
+      text-align: center;
+      min-height: 22px;
+      width: 100%;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: unset;
+    }
+    .score-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 40px;
+    }
+    .score-badge {
+      padding: 8px 20px;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .score-label { font-size: 15px; font-weight: 600; }
+    .attempt-text {
+      color: #9b9b9b;
+      font-size: 13px;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+    }
+    .result-slot {
+      min-height: 40px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .result-placeholder {
+      min-height: 40px;
+      visibility: hidden;
+    }
+    .hint-card {
+      width: 100%;
+      border-radius: 14px;
+      padding: 16px;
+      background: rgba(232, 134, 58, 0.1);
+      border: 1px solid rgba(232, 134, 58, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hint-slot {
+      min-height: 92px;
+      width: 100%;
+      margin-top: 16px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .hint-placeholder {
+      min-height: 92px;
+      visibility: hidden;
+    }
+    .hint-label {
+      color: #9b9b9b;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .hint-text {
+      color: #e8863a;
+      font-size: 14px;
+      font-weight: 500;
+      font-style: italic;
+      line-height: 20px;
+      text-align: center;
+    }
+    .mic-area {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      padding: 14px 20px 22px;
+    }
+    .mic-button {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid #e8863a;
+      background: #1b2a4a;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      touch-action: none;
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease, border-color 140ms ease;
+      box-shadow: 0 4px 12px rgba(27, 42, 74, 0.25);
+    }
+    .mic-button:hover { transform: scale(1.02); }
+    .mic-button.recording {
+      background: #e8863a;
+      border-color: #f4a261;
+      box-shadow: 0 8px 20px rgba(232, 134, 58, 0.35);
+    }
+    .mic-icon { width: 28px; height: 28px; }
+    .mic-hint {
+      margin-top: 10px;
+      min-height: 18px;
+      color: #9b9b9b;
+      font-size: 12px;
+      line-height: 18px;
+      text-align: center;
+    }
+
+    .summary-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      text-align: center;
+    }
+    .summary-tier {
+      margin-bottom: 10px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      border: 1px solid #e8e3dc;
+      background: #ffffff;
+      color: #6b6b6b;
+    }
+    .summary-title {
+      color: #1b2a4a;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .rating-dots {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .rating-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+      background: #e8e3dc;
+    }
+    .rating-dot.active {
+      background: #e8863a;
+    }
+    .stats-card {
+      width: 100%;
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #e8e3dc;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: #6b6b6b; font-size: 15px; }
+    .stat-value { color: #1b2a4a; font-size: 17px; font-weight: 700; }
+    .play-again {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      background: #e8863a;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 0;
+      cursor: pointer;
+      transition: background 120ms ease;
+    }
+    .play-again:hover { background: #d6762e; }
+  </style>
+</head>
+<body>
+  <div class="iphone-frame">
+    <div class="status-bar">
+      <div class="status-left">
+        <span class="status-logo" aria-label="ParleMoi">
+          <svg viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+            <text x="0" y="56" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="48" letter-spacing="-1">
+              <tspan class="brand-main">Parle</tspan><tspan class="brand-accent">Moi</tspan>
+            </text>
+          </svg>
+        </span>
+      </div>
+      <div class="status-right">◌ ⌁ ◔ ◢ 35%</div>
+    </div>
+    <div class="app-header">
+      <button type="button" class="back-btn" aria-label="Go back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <div class="app-title">Telephone Practice</div>
+    </div>
+    <div id="gameContainer" class="game-container"></div>
+  </div>
+
+  <script>
+    const Colors = {
+      success: "#4CAF7D",
+      partial: "#D4A853",
+      error: "#D35454",
+      textMuted: "#9B9B9B"
+    };
+
+    const DIGIT_FRENCH = {
+      "0": "zéro",
+      "1": "un",
+      "2": "deux",
+      "3": "trois",
+      "4": "quatre",
+      "5": "cinq",
+      "6": "six",
+      "7": "sept",
+      "8": "huit",
+      "9": "neuf"
+    };
+
+    const PRACTICE_ROUNDS = 5;
+    const MAX_ATTEMPTS = 3;
+    const PASS_THRESHOLD = 0.35;
+    const PERFECT_THRESHOLD = 0.85;
+
+    const timers = [];
+    const params = new URLSearchParams(window.location.search);
+    const autoplay = params.get("autoplay") === "1";
+    const loop = params.get("loop") !== "0";
+    const startDelayMs = Number(params.get("delay") || 900);
+    if (params.get("embed") === "1") document.body.classList.add("embed");
+
+    function fitEmbedMockup() {
+      if (!document.body.classList.contains("embed")) return;
+      const mockup = document.querySelector(".iphone-frame");
+      if (!mockup) return;
+      const pixel6Width = 393;
+      const pixel6Height = 851;
+      const scale = Math.min(window.innerWidth / pixel6Width, window.innerHeight / pixel6Height);
+      mockup.style.position = "relative";
+      mockup.style.left = "auto";
+      mockup.style.top = "auto";
+      mockup.style.width = `${pixel6Width}px`;
+      mockup.style.height = `${pixel6Height}px`;
+      mockup.style.transformOrigin = "top center";
+      mockup.style.transform = `scale(${scale})`;
+    }
+    fitEmbedMockup();
+    window.addEventListener("resize", fitEmbedMockup);
+
+    const state = {
+      phase: "ready", // ready | countdown | playing | done
+      currentPhone: null,
+      roundIndex: 0,
+      isRecording: false,
+      transcript: "",
+      lastScore: null,
+      attempts: 0,
+      showResult: false,
+      correctCount: 0,
+      totalPoints: 0,
+      simulatedSpeechWords: [],
+      simulatedSpeechIndex: 0,
+      mode: "practice",
+      engine: {
+        lives: 3,
+        maxLives: 3,
+        score: 0,
+        combo: 0,
+        comboMultiplier: 1
+      }
+    };
+
+    function rand3() {
+      const n = 200 + Math.floor(Math.random() * 800);
+      return String(n);
+    }
+
+    function rand4() {
+      const n = Math.floor(Math.random() * 10000);
+      return String(n).padStart(4, "0");
+    }
+
+    function generatePhoneNumber() {
+      const area = rand3();
+      const exchange = rand3();
+      const subscriber = rand4();
+      const digits = `1${area}${exchange}${subscriber}`;
+      const display = `1  ${area}  ${exchange}  ${subscriber}`;
+      const expectedFrench = digits.split("").map((d) => DIGIT_FRENCH[d] || d).join(" ");
+      return { display, digits, expectedFrench };
+    }
+
+    function evaluateScore({ score, attempts, maxAttempts, perfectThreshold, passThreshold }) {
+      if (score >= perfectThreshold) {
+        return { outcome: "perfect", shouldAdvance: true };
+      }
+      if (attempts >= maxAttempts) {
+        return {
+          outcome: score >= passThreshold ? "pass" : "fail",
+          shouldAdvance: true
+        };
+      }
+      return { outcome: "retry", shouldAdvance: false };
+    }
+
+    function scoreColor(score) {
+      if (score === null) return Colors.textMuted;
+      if (score >= PERFECT_THRESHOLD) return Colors.success;
+      if (score >= PASS_THRESHOLD) return Colors.partial;
+      return Colors.error;
+    }
+
+    function scoreLabel(score) {
+      if (score === null) return "";
+      if (score >= PERFECT_THRESHOLD) return "Excellent!";
+      if (score >= PASS_THRESHOLD) return "Good";
+      return "Try again";
+    }
+
+    function fitSingleLine(selector, maxPx, minPx) {
+      const els = document.querySelectorAll(selector);
+      els.forEach((el) => {
+        if (!(el instanceof HTMLElement)) return;
+        el.style.fontSize = `${maxPx}px`;
+        let size = maxPx;
+        while (el.scrollWidth > el.clientWidth && size > minPx) {
+          size -= 0.5;
+          el.style.fontSize = `${size}px`;
+        }
+      });
+    }
+
+    function applyResponsiveTextFit() {
+      fitSingleLine(".phone-number", 30, 18);
+      fitSingleLine(".transcript-text", 14.5, 9);
+      fitSingleLine(".transcript-placeholder", 14, 10);
+    }
+
+    function schedule(fn, ms) {
+      const id = setTimeout(fn, ms);
+      timers.push(id);
+      return id;
+    }
+
+    function clearAllTimers() {
+      while (timers.length > 0) clearTimeout(timers.pop());
+    }
+
+    function engineOnCorrect() {
+      state.engine.combo += 1;
+      state.engine.comboMultiplier = state.engine.combo >= 20 ? 3 : state.engine.combo >= 10 ? 2 : state.engine.combo >= 5 ? 1.5 : 1;
+      state.engine.score += Math.round(10 * state.engine.comboMultiplier);
+    }
+
+    function engineOnIncorrect() {
+      state.engine.lives = Math.max(0, state.engine.lives - 1);
+      state.engine.combo = 0;
+      state.engine.comboMultiplier = 1;
+    }
+
+    function nextRound() {
+      const nextIndex = state.roundIndex + 1;
+      if (state.mode === "practice" && nextIndex >= PRACTICE_ROUNDS) {
+        state.phase = "done";
+        render();
+        return;
+      }
+
+      state.roundIndex = nextIndex;
+      state.currentPhone = generatePhoneNumber();
+      state.attempts = 0;
+      state.transcript = "";
+      state.lastScore = null;
+      state.showResult = false;
+      render();
+
+      schedule(() => autoSimulatePress(), 450);
+    }
+
+    function getSimulatedTokens(expectedFrench, attemptNumber) {
+      const words = expectedFrench.split(" ");
+      const chancePerfect = attemptNumber >= 2 ? 0.75 : 0.55;
+      const chanceMostlyRight = attemptNumber >= 2 ? 0.2 : 0.3;
+      const roll = Math.random();
+
+      if (roll <= chancePerfect) return [...words];
+
+      if (roll <= chancePerfect + chanceMostlyRight) {
+        return words.map((w, idx) => {
+          if (idx > 0 && Math.random() < 0.15) {
+            const options = Object.values(DIGIT_FRENCH);
+            return options[Math.floor(Math.random() * options.length)];
+          }
+          return w;
+        });
+      }
+
+      return words.map((w, idx) => {
+        if (idx % 2 === 0 || Math.random() < 0.55) {
+          const options = Object.values(DIGIT_FRENCH);
+          return options[Math.floor(Math.random() * options.length)];
+        }
+        return w;
+      });
+    }
+
+    function simpleTokenScore(spokenText, expectedText) {
+      const a = spokenText.trim().toLowerCase().split(/\s+/);
+      const b = expectedText.trim().toLowerCase().split(/\s+/);
+      const maxLen = Math.max(a.length, b.length) || 1;
+      let exactMatches = 0;
+      for (let i = 0; i < Math.min(a.length, b.length); i += 1) {
+        if (a[i] === b[i]) exactMatches += 1;
+      }
+      return exactMatches / maxLen;
+    }
+
+    function buildRevealSchedule(words) {
+      // Mimic telephone cadence: 1 | 3 | 3 | 4 digits with pauses between groups.
+      const batchBreakpoints = [1, 4, 7];
+      const stepDurations = [];
+      for (let i = 0; i < words.length; i += 1) {
+        stepDurations.push(130);
+        if (batchBreakpoints.includes(i + 1)) {
+          stepDurations.push(320);
+        }
+      }
+      return stepDurations;
+    }
+
+    function startGame() {
+      clearAllTimers();
+      state.currentPhone = generatePhoneNumber();
+      state.roundIndex = 0;
+      state.attempts = 0;
+      state.transcript = "";
+      state.lastScore = null;
+      state.showResult = false;
+      state.correctCount = 0;
+      state.totalPoints = 0;
+      state.engine.lives = state.engine.maxLives;
+      state.engine.score = 0;
+      state.engine.combo = 0;
+      state.engine.comboMultiplier = 1;
+      state.phase = "playing";
+      render();
+      schedule(() => autoSimulatePress(), 650);
+    }
+
+    function beginRecording() {
+      if (state.phase !== "playing" || state.isRecording) return;
+      state.isRecording = true;
+      state.showResult = false;
+      state.transcript = "";
+      state.lastScore = null;
+      state.simulatedSpeechIndex = 0;
+      state.simulatedSpeechWords = getSimulatedTokens(
+        state.currentPhone.expectedFrench,
+        state.attempts + 1
+      );
+      render();
+
+      const revealSchedule = buildRevealSchedule(state.simulatedSpeechWords);
+      let elapsed = 0;
+      for (let i = 0; i < state.simulatedSpeechWords.length; i += 1) {
+        elapsed += revealSchedule[i * 2] || 130;
+        schedule(() => {
+          if (!state.isRecording) return;
+          state.simulatedSpeechIndex = i + 1;
+          const nextWords = state.simulatedSpeechWords.slice(0, state.simulatedSpeechIndex);
+          state.transcript = nextWords.join(" ");
+          render();
+        }, elapsed);
+        elapsed += revealSchedule[(i * 2) + 1] || 0;
+      }
+    }
+
+    function endRecording() {
+      if (!state.isRecording) return;
+      state.isRecording = false;
+
+      const finalText = state.transcript.trim();
+      if (!finalText) {
+        state.transcript = "";
+        render();
+        return;
+      }
+
+      const score = simpleTokenScore(finalText, state.currentPhone.expectedFrench);
+      handleScoreResult(score, finalText);
+    }
+
+    function handleScoreResult(score, spokenText) {
+      state.lastScore = score;
+      state.transcript = spokenText;
+      state.showResult = true;
+      state.attempts += 1;
+      render();
+
+      const evaluation = evaluateScore({
+        score,
+        attempts: state.attempts,
+        maxAttempts: MAX_ATTEMPTS,
+        perfectThreshold: PERFECT_THRESHOLD,
+        passThreshold: PASS_THRESHOLD
+      });
+
+      if (evaluation.outcome === "perfect" || evaluation.outcome === "pass") {
+        const points = Math.round(score * 100);
+        state.totalPoints += points;
+        state.correctCount += 1;
+        engineOnCorrect();
+        render();
+        schedule(() => nextRound(), 1500);
+        return;
+      }
+
+      if (evaluation.outcome === "fail") {
+        engineOnIncorrect();
+        render();
+        schedule(() => nextRound(), 2000);
+        return;
+      }
+
+      engineOnIncorrect();
+      render();
+      schedule(() => autoSimulatePress(), 550);
+    }
+
+    function startCountdown() {
+      state.phase = "countdown";
+      render();
+      const steps = ["3", "2", "1", "GO!"];
+      let idx = 0;
+      const tick = () => {
+        const el = document.getElementById("countdownValue");
+        if (!el) return;
+        el.textContent = steps[idx];
+        if (steps[idx] === "GO!") el.classList.add("countdown-go");
+        else el.classList.remove("countdown-go");
+        idx += 1;
+        if (idx >= steps.length) {
+          schedule(() => startGame(), 350);
+          return;
+        }
+        schedule(tick, 750);
+      };
+      tick();
+    }
+
+    function handlePlayAgain() {
+      clearAllTimers();
+      state.phase = "ready";
+      render();
+    }
+
+    function getComboColor(combo) {
+      if (combo >= 20) return "#D4A853";
+      if (combo >= 10) return "#D4A853";
+      if (combo >= 5) return "#E8863A";
+      return "#6B6B6B";
+    }
+
+    function comboFireEmoji(combo) {
+      if (combo >= 10) return "\uD83D\uDD25\uD83D\uDD25\uD83D\uDD25";
+      if (combo >= 5) return "\uD83D\uDD25";
+      return "";
+    }
+
+    const COMBO_ZAP_SVG =
+      '<svg class="combo-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>';
+
+    function comboMarkup() {
+      const c = state.engine.combo;
+      if (c < 2) return "";
+      const color = getComboColor(c);
+      const fire = comboFireEmoji(c);
+      const mult =
+        state.engine.comboMultiplier > 1
+          ? `<span class="combo-mult">${state.engine.comboMultiplier}x</span>`
+          : "";
+      return `<div class="combo-meter" style="color:${color}">${COMBO_ZAP_SVG}<span>${c}x</span>${fire ? `<span class="combo-fire">${fire}</span>` : ""}${mult}</div>`;
+    }
+
+    function heartsMarkup() {
+      let html = "";
+      for (let i = 0; i < state.engine.maxLives; i += 1) {
+        const lostClass = i >= state.engine.lives ? "lost" : "";
+        html += `<span class="heart ${lostClass}">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+          </svg>
+        </span>`;
+      }
+      return html;
+    }
+
+    function renderReady() {
+      return `
+        <div class="centered">
+          <svg class="ready-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.12.89.34 1.76.64 2.6a2 2 0 0 1-.45 2.11L8 9.68a16 16 0 0 0 6.32 6.32l1.25-1.25a2 2 0 0 1 2.11-.45c.84.3 1.71.52 2.6.64A2 2 0 0 1 22 16.92Z" fill="currentColor"></path>
+          </svg>
+          <div class="ready-title">Telephone Practice</div>
+          <div class="ready-subtitle">A phone number appears on screen.\nSay each digit in French!</div>
+          <button class="start-btn" id="startBtn">Start</button>
+        </div>
+      `;
+    }
+
+    function renderCountdown() {
+      return `<div class="countdown-screen"><div id="countdownValue">3</div></div>`;
+    }
+
+    function renderPlaying() {
+      const c = scoreColor(state.lastScore);
+      const label = scoreLabel(state.lastScore);
+      return `
+        <div class="hud-wrapper">
+          <div class="hud">
+            <div class="hud-left">${heartsMarkup()}</div>
+            <div class="hud-score">${state.engine.score.toLocaleString()}</div>
+            <div class="hud-right">${comboMarkup()}</div>
+          </div>
+        </div>
+
+        <div class="content">
+          <p class="instruction">Practice your phone number pronunciation</p>
+          <div class="phone-card ${state.isRecording ? "recording" : ""}">
+            <div class="phone-card-meta">
+              <span class="phone-round-badge" aria-label="Round in this practice">${state.roundIndex + 1}/${PRACTICE_ROUNDS}</span>
+            </div>
+            <div class="phone-number">${state.currentPhone.display}</div>
+            <div class="say-it-label">Repeat back in French</div>
+            <div class="transcript-slot">
+              ${
+                state.transcript
+                  ? `<div class="transcript-text" style="color:${c}">"${state.transcript}"</div>`
+                  : `<div class="transcript-placeholder">Hold the mic and say each digit...</div>`
+              }
+            </div>
+          </div>
+          <div class="result-slot">
+            ${
+              state.showResult && state.lastScore !== null
+                ? `<div class="score-badge-row">
+                    <div class="score-badge" style="background:${state.lastScore >= PASS_THRESHOLD ? Colors.success : Colors.error}">
+                      ${Math.round(state.lastScore * 100)}%
+                    </div>
+                    <div class="score-label" style="color:${c}">${label}</div>
+                  </div>`
+                : state.attempts > 0
+                  ? `<div class="attempt-text">Attempt ${state.attempts}/${MAX_ATTEMPTS}</div>`
+                  : `<div class="result-placeholder">.</div>`
+            }
+          </div>
+          <div class="hint-slot">
+            ${
+              state.showResult && state.lastScore !== null && state.lastScore < PASS_THRESHOLD
+                ? `<div class="hint-card">
+                    <div class="hint-label">Expected:</div>
+                    <div class="hint-text">${state.currentPhone.expectedFrench}</div>
+                  </div>`
+                : `<div class="hint-placeholder">.</div>`
+            }
+          </div>
+        </div>
+        <div class="mic-area">
+          <div class="mic-button ${state.isRecording ? "recording" : ""}" id="micBtn" role="button" tabindex="0" aria-label="Hold to speak">
+            <svg class="mic-icon" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" fill="currentColor"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <line x1="12" x2="12" y1="19" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+            </svg>
+          </div>
+          <div class="mic-hint">${state.isRecording ? "Listening..." : "Hold until word appears, then let go"}</div>
+        </div>
+      `;
+    }
+
+    function renderDone() {
+      const accuracy = PRACTICE_ROUNDS > 0 ? Math.round((state.correctCount / PRACTICE_ROUNDS) * 100) : 0;
+      const stars = accuracy >= 90 ? 3 : accuracy >= 60 ? 2 : 1;
+      const tier = accuracy >= 90 ? "Outstanding" : accuracy >= 60 ? "Strong" : "Keep Practicing";
+      return `
+        <div class="summary-screen">
+          <div class="summary-tier">${tier}</div>
+          <div class="summary-title">Great practice!</div>
+          <div class="rating-dots">
+            ${[1, 2, 3].map((n) => `<div class="rating-dot ${n <= stars ? "active" : ""}"></div>`).join("")}
+          </div>
+          <div class="stats-card">
+            <div class="stat-row"><div class="stat-label">Correct</div><div class="stat-value">${state.correctCount}/${PRACTICE_ROUNDS}</div></div>
+            <div class="stat-row"><div class="stat-label">Points</div><div class="stat-value">${state.totalPoints}</div></div>
+            <div class="stat-row"><div class="stat-label">Accuracy</div><div class="stat-value">${accuracy}%</div></div>
+          </div>
+          <button class="play-again" id="playAgainBtn">Play Again</button>
+        </div>
+      `;
+    }
+
+    function wirePlayingEvents() {
+      const micBtn = document.getElementById("micBtn");
+      if (!micBtn) return;
+      micBtn.addEventListener("mousedown", beginRecording);
+      micBtn.addEventListener("mouseup", endRecording);
+      micBtn.addEventListener("mouseleave", endRecording);
+      micBtn.addEventListener("touchstart", (e) => { e.preventDefault(); beginRecording(); }, { passive: false });
+      micBtn.addEventListener("touchend", (e) => { e.preventDefault(); endRecording(); }, { passive: false });
+      micBtn.addEventListener("keydown", (e) => {
+        if (e.code === "Space" || e.code === "Enter") {
+          e.preventDefault();
+          beginRecording();
+        }
+      });
+      micBtn.addEventListener("keyup", (e) => {
+        if (e.code === "Space" || e.code === "Enter") {
+          e.preventDefault();
+          endRecording();
+        }
+      });
+    }
+
+    function autoSimulatePress() {
+      if (state.phase !== "playing" || state.isRecording) return;
+      beginRecording();
+      const holdMs = 2800 + Math.floor(Math.random() * 900);
+      schedule(() => endRecording(), holdMs);
+    }
+
+    function render() {
+      const container = document.getElementById("gameContainer");
+      if (!container) return;
+
+      if (state.phase === "ready") {
+        container.innerHTML = renderReady();
+        const startBtn = document.getElementById("startBtn");
+        if (startBtn) startBtn.addEventListener("click", startCountdown);
+        if (autoplay) {
+          schedule(() => {
+            if (state.phase === "ready") startCountdown();
+          }, startDelayMs);
+        }
+        return;
+      }
+
+      if (state.phase === "countdown") {
+        container.innerHTML = renderCountdown();
+        return;
+      }
+
+      if (state.phase === "playing") {
+        container.innerHTML = renderPlaying();
+        wirePlayingEvents();
+        applyResponsiveTextFit();
+        return;
+      }
+
+      container.innerHTML = renderDone();
+      const playAgainBtn = document.getElementById("playAgainBtn");
+      if (playAgainBtn) playAgainBtn.addEventListener("click", handlePlayAgain);
+      if (autoplay && loop) {
+        schedule(() => {
+          if (state.phase !== "done") return;
+          handlePlayAgain();
+          schedule(() => {
+            if (state.phase === "ready") startCountdown();
+          }, 450);
+        }, 1400);
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
