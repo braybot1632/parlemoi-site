@@ -1,1866 +1,1762 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parlemoi Lesson Flow Simulator</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #1B2A4A;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        body.embed {
-            background: transparent;
-            padding: 0;
-        }
-        body.embed {
-            display: grid;
-            place-items: start center;
-            align-content: start;
-            overflow: hidden;
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-        }
-        .mockup {
-            width: 411px;
-            height: 915px;
-            background: #000;
-            border-radius: 48px;
-            border: 14px solid #000;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-            position: relative;
-        }
-        .notch {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 146px;
-            height: 34px;
-            background: #000;
-            border-radius: 0 0 22px 22px;
-            z-index: 100;
-        }
-        .screen {
-            width: 100%;
-            height: 100%;
-            background: #FBF5EF;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .status-bar { height: 44px; flex-shrink: 0; }
-        .lesson-header { padding: 4px 16px; flex-shrink: 0; }
-        .header-row { display: flex; align-items: center; height: 32px; position: relative; }
-        /* LessonPlayer.tsx: Pressable backButton + ChevronLeft 22, textSecondary */
-        .back-btn {
-            width: 32px; height: 32px; border-radius: 16px; background: transparent; border: none;
-            display: flex; align-items: center; justify-content: center; color: #6B6B6B;
-            position: absolute; left: 0; z-index: 1; cursor: pointer; padding: 0;
-        }
-        .back-btn:focus-visible {
-            outline: 2px solid rgba(232, 134, 58, 0.35);
-            outline-offset: 2px;
-        }
-        .lesson-title { flex: 1; text-align: center; color: #2C2C2C; font-size: 15px; font-weight: 600; }
-        .sim-tag { text-align: center; font-size: 11px; color: #9B9B9B; margin-top: 2px; padding: 0 24px; min-height: 14px; }
-        .progress-wrap { padding: 0 20px; transition: opacity 0.2s ease; }
-        .progress-track { height: 4px; background: #E8E3DC; border-radius: 2px; overflow: hidden; }
-        .progress-fill { height: 4px; background: #1B2A4A; border-radius: 2px; width: 0%; transition: width 0.3s ease; }
-        .progress-label { font-size: 12px; color: #9B9B9B; text-align: right; margin-top: 4px; min-height: 16px; }
-        .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson UI sim — LessonPlayer · LessonProgressBar · LessonResults</title>
+  <!--
+    Flow: (1) Narrate-only → (2) Speak card (mic, retry, score) → (3) Narrate + speak on one screen →
+    (4) Dialogue UI matching dev/sim-scenario.html (tutor bubbles, dashed respond panel, listening row) →
+    (5) Lesson results.
 
-        .scroll-area { flex: 1; overflow-y: auto; padding: 24px 24px 150px; }
-        .center-content { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 48px 32px 0; }
+    This app is React Native (View/Text/StyleSheet), not DOM — there is no HTML to copy from components.
+    What we do here: mirror each StyleSheet rule as CSS, and use the SAME Lucide paths as lucide-react-native.
+    Icon paths below are copied from lucide-static@0.577.0 (matches package.json lucide-react-native ^0.577).
 
-        .narration-block {
-            border-left: 3px solid rgba(232,134,58,0.4);
-            padding: 8px 0 8px 14px;
-            animation: fadeInUp 0.28s ease;
-        }
-        .narration-text { color: #2C2C2C; font-size: 17px; line-height: 26px; letter-spacing: 0.15px; }
-        .french-hl { color: #E8863A; font-weight: 700; }
-        .translation-hl { color: #6B6B6B; font-style: italic; }
+    SpeakCard.tsx          → .speak-card, .speak-card__iconBtn, .speak-card__textArea, .speak-card__resultSlot
+    TranscriptResult.tsx   → .transcript-result
+    ScoreResult.tsx        → .score-result__pill
+    RetryPrompt.tsx        → .retry-prompt
+    LessonMicButton.tsx    → .lesson-mic, .lesson-mic__wrap
+    SpeakPage.tsx          → .speak-page__content, .speak-page__bottom
+    NarratePage.tsx        → .pg-scroll, .pg-narration*, .pg-vocab*
+    LessonPlayer.tsx       → .lp-*
+    LessonProgressBar.tsx  → .lpb-*
+    LessonResults.tsx      → .lr-*
+  -->
+  <style>
+    /* ═══ constants/Colors.ts (subset used here) ═══ */
+    :root {
+      --color-cream: #FBF5EF;
+      --color-navy: #1B2A4A;
+      --color-text: #2C2C2C;
+      --color-text-secondary: #6B6B6B;
+      --color-text-muted: #9B9B9B;
+      --color-orange: #E8863A;
+      --color-orange-alpha-10: rgba(232, 134, 58, 0.10);
+      --color-white: #FFFFFF;
+      --color-border: #E8E3DC;
+      --color-gold: #D4A853;
+      --color-incorrect: #D35454;
+      --color-correct: #4CAF7D;
+      --color-error: #D35454;
+      --color-warning: #D4A853;
+      --color-progress-track: #E8E3DC;
+      --color-orange-on-btn: rgba(232, 134, 58, 0.07); /* withOpacity(Colors.orange, 0.07) */
+    }
 
-        .vocab-section { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
-        .vocab-card {
-            display: flex; align-items: center; background: #FFF; border-radius: 12px; padding: 14px;
-            border: 1px solid #E8E3DC; border-left: 3px solid #E8863A; gap: 12px;
-            animation: slideIn 0.35s ease forwards; opacity: 0;
-        }
-        .vocab-play {
-            width: 36px; height: 36px; border-radius: 18px; background: rgba(232,134,58,0.1);
-            display: flex; align-items: center; justify-content: center; color: #E8863A; border: none;
-        }
-        .vocab-play svg { width: 16px; height: 16px; }
-        .vocab-fr { color: #E8863A; font-size: 17px; font-weight: 600; }
-        .vocab-en { color: #6B6B6B; font-size: 14px; margin-top: 2px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .card {
-            background: #FFF; border-radius: 16px; padding: 20px; width: 100%; min-height: 150px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 2px solid transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.08); position: relative;
-        }
-        .card.pass { border-color: #4CAF7D; animation: bubblePulse 0.24s ease; }
-        .card.fail { border-color: #D35454; animation: bubblePulse 0.24s ease; }
-        .icon-btn {
-            position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 16px;
-            background: rgba(232,134,58,0.08); display: flex; align-items: center; justify-content: center;
-            color: #E8863A; border: none; z-index: 1; cursor: pointer;
-        }
-        .icon-btn.pass { background: rgba(76,175,80,0.1); color: #4CAF7D; }
-        .icon-btn.fail { background: rgba(211,84,84,0.1); color: #D35454; }
-        .text-area { width: 100%; text-align: center; padding: 0 40px; }
-        .french-text {
-            color: #E8863A; font-size: 28px; font-weight: 700; font-family: Georgia, serif;
-            text-align: center; line-height: 1.25;
-        }
-        .english-hint { color: #9B9B9B; font-size: 14px; margin-top: 4px; text-align: center; }
-        .result-slot {
-            min-height: 64px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-        }
-        .prompt-label {
-            color: #9B9B9B; font-size: 13px; font-weight: 600; letter-spacing: 1.2px; margin-top: 16px; text-align: center;
-        }
-        .transcript {
-            color: #6B6B6B; font-size: 18px; line-height: 24px; font-style: italic; text-align: center;
-            margin-top: 4px; width: 100%; animation: fadeIn 0.18s ease;
-        }
-        .transcript.pass { color: #4CAF7D; }
-        .transcript.fail { color: #D35454; }
-        .score-pill {
-            display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 100px;
-            background: rgba(76,175,80,0.1); padding: 4px 12px; border-radius: 999px; margin-top: 6px;
-            animation: pillPop 0.3s cubic-bezier(0.34,1.56,0.64,1);
-        }
-        .score-pill.warn { background: rgba(232,134,58,0.1); border: 1px solid rgba(232,134,58,0.2); }
-        .score-pct { color: #4CAF7D; font-size: 14px; font-weight: 700; }
-        .score-lbl { color: #4CAF7D; font-size: 12px; font-weight: 500; }
-        .score-pct.warn, .score-lbl.warn { color: #D4A853; }
-        .feedback-stack { width: 100%; margin-top: 14px; }
-        .retry-area { text-align: center; margin-top: 8px; }
-        .retry-score-big { color: #D35454; font-size: 24px; font-weight: 700; }
-        .retry-lbl { color: #6B6B6B; font-size: 15px; margin-top: 8px; margin-bottom: 8px; }
-        .listen-btn-sm {
-            display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 10px;
-            background: rgba(232,134,58,0.1); color: #E8863A; font-size: 14px; font-weight: 500; border: none; cursor: pointer;
-        }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--color-navy);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    body.embed-lesson {
+      background: transparent;
+      padding: 0;
+      display: grid;
+      place-items: start center;
+      align-content: start;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
 
-        .bottom-abs {
-            position: absolute; bottom: 0; left: 0; right: 0; background: #FBF5EF;
-            padding: 20px 24px 28px; display: flex; flex-direction: column; align-items: center; gap: 10px;
-        }
-        .bottom-area {
-            padding: 0 24px 28px; display: flex; flex-direction: column; align-items: center;
-            min-height: 130px; flex-shrink: 0;
-        }
-        .mic-btn {
-            width: 120px; height: 120px; border-radius: 60px;
-            background: #1B2A4A; border: 4px solid #E8863A;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s ease;
-            user-select: none; -webkit-user-select: none;
-        }
-        .mic-btn svg { width: 36px; height: 36px; color: #FFF; pointer-events: none; }
-        .mic-btn.recording { background: #E8863A; border-color: #F4A261; }
-        .mic-btn.pulse { animation: micPulse 1.2s ease-in-out infinite; }
-        .mic-btn:disabled { opacity: 0.5; cursor: default; }
-        .mic-hint {
-            color: #9B9B9B; font-size: 13px; line-height: 18px; margin-top: 10px; text-align: center; min-height: 18px;
-        }
-        .btn-primary {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: #1B2A4A; border-radius: 14px; padding: 16px 48px;
-            color: #FFF; font-size: 17px; font-weight: 700; border: none; cursor: pointer;
-        }
-        .btn-primary svg { width: 18px; height: 18px; color: #FFF; }
-        .retry-button {
-            display: flex; align-items: center; gap: 6px; margin-top: 14px;
-            padding: 10px 20px; border-radius: 10px; border: 1.5px solid #1B2A4A;
-            background: transparent; color: #1B2A4A; font-size: 15px; font-weight: 600; cursor: pointer;
-        }
-        .retry-button svg { width: 14px; height: 14px; color: #1B2A4A; }
+    /* Device chrome only — not in RN */
+    .device-frame {
+      width: 375px;
+      height: 812px;
+      background: #000;
+      border-radius: 40px;
+      border: 12px solid #000;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .device-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: var(--color-cream);
+    }
 
-        .start-wrap { flex: 1; overflow-y: auto; padding: 20px 24px 28px; }
-        .start-title { color: #2C2C2C; font-size: 24px; font-weight: 700; margin-top: 8px; }
-        .start-sub { color: #6B6B6B; font-size: 14px; line-height: 21px; margin-top: 8px; }
-        .lesson-list { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .lesson-card {
-            width: 100%; text-align: left; background: #FFF; border: 1px solid #E8E3DC; border-radius: 14px;
-            padding: 14px; display: flex; flex-direction: column; gap: 5px;
-        }
-        .launcher-title { color: #2C2C2C; font-size: 24px; font-weight: 700; margin-top: 8px; }
-        .launcher-sub { color: #6B6B6B; font-size: 14px; line-height: 21px; margin-top: 8px; }
-        .lesson-chip { color: #1B2A4A; font-size: 11px; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase; }
-        .lesson-name { color: #2C2C2C; font-size: 18px; font-weight: 700; }
-        .lesson-desc { color: #6B6B6B; font-size: 13px; line-height: 18px; }
+    /* ═══ LessonPlayer.tsx — styles.container ═══ */
+    .lp-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background-color: var(--color-cream);
+    }
 
-        .results-wrap { flex: 1; overflow-y: auto; padding: 24px 24px 155px; }
-        .stars-row { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
-        .star { width: 28px; height: 28px; color: #DCD3C6; }
-        .fill .star { color: #F0C84B; }
-        .results-title { text-align: center; color: #2C2C2C; font-size: 28px; font-weight: 700; margin-top: 16px; }
-        .xp-badge {
-            margin: 12px auto 0; width: fit-content; background: rgba(232,134,58,0.1); color: #E8863A;
-            font-size: 18px; font-weight: 700; padding: 6px 16px; border-radius: 12px;
-        }
-        .score-grid { margin-top: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .score-card {
-            background: #FFF; border: 1px solid #E8E3DC; border-radius: 12px; padding: 12px 8px; text-align: center;
-        }
-        .score-value { color: #1B2A4A; font-size: 22px; font-weight: 700; }
-        .score-label { color: #9B9B9B; font-size: 11px; margin-top: 3px; }
-        .section-title { color: #2C2C2C; font-size: 17px; font-weight: 600; margin-top: 22px; margin-bottom: 10px; }
-        .vocab-row {
-            display: flex; align-items: center; gap: 10px; background: #FFF; border: 1px solid #E8E3DC; border-radius: 10px;
-            padding: 11px; margin-bottom: 6px;
-        }
-        .vocab-row .vocab-fr { font-size: 15px; }
-        .vocab-row .vocab-en { margin-left: auto; font-size: 14px; text-align: right; }
-        .game-btn {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; background: #E8863A; color: #FFF; border: none; border-radius: 14px;
-            padding: 15px 12px; font-size: 17px; font-weight: 700;
-        }
-        .results-bottom {
-            position: absolute; bottom: 0; left: 0; right: 0; background: #FBF5EF;
-            padding: 20px 20px 36px; display: flex; flex-direction: column; align-items: center; gap: 10px;
-        }
-        .back-lessons {
-            border: none; background: transparent; color: #1B2A4A; font-size: 14px; font-weight: 500; display: flex; gap: 6px; align-items: center;
-        }
+    /* ═══ LessonPlayer.tsx — styles.header ═══ */
+    .lp-header {
+      padding-left: 16px;
+      padding-right: 16px;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      background-color: var(--color-cream);
+    }
 
-        .game-sim {
-            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; padding: 24px;
-        }
-        .game-badge {
-            background: rgba(27,42,74,0.08); color: #1B2A4A; border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700;
-            letter-spacing: 0.5px; text-transform: uppercase;
-        }
-        .game-title { color: #2C2C2C; font-size: 24px; font-weight: 700; margin-top: 16px; }
-        .game-sub { color: #6B6B6B; font-size: 14px; margin-top: 8px; line-height: 20px; max-width: 290px; }
-        .ghost-btn {
-            margin-top: 16px; border: 1.5px solid #1B2A4A; border-radius: 12px; background: transparent;
-            color: #1B2A4A; font-size: 15px; font-weight: 600; padding: 10px 18px;
-        }
-        .dialogue-card-shell {
-            width: 100%; text-align: left; background: #FFF; border: 1px solid #E8E3DC; border-radius: 14px;
-            padding: 14px; display: flex; flex-direction: column; gap: 5px;
-        }
-        .lesson-actions { display: flex; gap: 8px; margin-top: 8px; }
-        .lesson-action {
-            border: none; border-radius: 10px; font-weight: 700; font-size: 13px; padding: 9px 10px; cursor: pointer;
-        }
-        .lesson-action.primary { background: #1B2A4A; color: #FFF; }
-        .lesson-action.secondary { background: rgba(27,42,74,0.08); color: #1B2A4A; }
+    /* ═══ LessonPlayer.tsx — styles.headerRow ═══ */
+    .lp-headerRow {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      height: 32px;
+      position: relative;
+    }
 
-        .dialogue-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .dialogue-header {
-            color: #6B6B6B; font-size: 15px; font-weight: 500; padding: 12px 24px 8px;
-        }
-        .chat-area { flex: 1; overflow-y: auto; }
-        .chat-content { padding: 16px 24px 32px; display: flex; flex-direction: column; gap: 10px; }
-        .bubble {
-            max-width: 80%;
-            border-radius: 14px;
-            padding: 14px;
-            animation: fadeInUp 0.2s ease;
-        }
-        .tutor-bubble {
-            align-self: flex-start; background: #FFF; border: 1px solid #E8E3DC; border-bottom-left-radius: 4px;
-        }
-        .user-bubble {
-            align-self: flex-end; background: rgba(27,42,74,0.06); border-bottom-right-radius: 4px;
-        }
-        .bubble-speaker {
-            color: #9B9B9B; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
-        }
-        .bubble-fr {
-            font-size: 16px; font-weight: 600; line-height: 22px;
-        }
-        .bubble-fr.tutor { color: #2C2C2C; }
-        .bubble-fr.user { color: #1B2A4A; }
-        .bubble-en {
-            color: #9B9B9B; font-size: 13px; margin-top: 4px;
-        }
-        .current-speak-card {
-            width: 100%; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-top: 4px;
-        }
-        .current-user-bubble {
-            max-width: 80%;
-            padding-top: 16px;
-            padding-right: 48px;
-            position: relative;
-            border: 1.5px solid transparent;
-        }
-        .current-user-bubble.pass { border-color: rgba(76,175,80,0.7); }
-        .current-user-bubble.fail { border-color: rgba(211,84,84,0.6); }
-        .current-audio-btn {
-            position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 16px;
-            background: rgba(232,134,58,0.08); color: #E8863A; border: none;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .dialogue-bottom {
-            padding: 0 24px 28px; display: flex; flex-direction: column; align-items: center; min-height: 130px;
-        }
-        .lesson-start-screen { flex: 1; overflow-y: auto; padding: 60px 28px; }
-        .start-head { text-align: center; }
-        .cefr-badge {
-            display: inline-block; background: #1B2A4A; color: #FFF; border-radius: 8px;
-            padding: 6px 14px; margin-bottom: 20px; font-size: 14px; font-weight: 700; letter-spacing: 1px;
-        }
-        .start-main-title { color: #2C2C2C; font-size: 28px; font-weight: 700; line-height: 34px; }
-        .start-fr-title { color: #E8863A; font-size: 18px; font-style: italic; margin-top: 6px; }
-        .start-meta { display: flex; justify-content: center; gap: 24px; margin-top: 20px; color: #9B9B9B; font-size: 14px; }
-        .overview-card {
-            width: 100%; background: #FFF; border-radius: 16px; padding: 20px; margin-top: 28px; border: 1px solid #E8E3DC;
-        }
-        .overview-title { color: #2C2C2C; font-size: 17px; font-weight: 600; }
-        .overview-sub { color: #6B6B6B; font-size: 14px; line-height: 20px; margin-top: 6px; }
-        .topic-label {
-            color: #9B9B9B; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 16px; margin-bottom: 10px;
-        }
-        .topic-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-        .topic-chip {
-            width: calc(50% - 4px); background: #FBF5EF; border-radius: 10px; padding: 8px 10px;
-        }
-        .topic-chip .topic-fr { color: #E8863A; font-size: 14px; font-weight: 600; }
-        .topic-chip .topic-en { color: #9B9B9B; font-size: 12px; margin-top: 2px; }
-        .activity-row {
-            display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #E8E3DC;
-        }
-        .activity-chip {
-            background: #FBF5EF; border-radius: 8px; color: #1B2A4A; font-size: 13px; font-weight: 500;
-            padding: 6px 10px;
-        }
-        .start-actions { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-        .back-link { border: none; background: transparent; color: #6B6B6B; font-size: 15px; font-weight: 500; }
-        .test-screen { flex: 1; display: flex; flex-direction: column; }
-        .test-header {
-            display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;
-        }
-        .test-header-text { color: #6B6B6B; font-size: 14px; font-weight: 500; }
-        .test-exit {
-            border: none; background: transparent; color: #6B6B6B; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
-        }
-        .test-progress { padding: 0 20px; }
-        .test-track { height: 4px; background: #E8E3DC; border-radius: 2px; overflow: hidden; }
-        .test-fill { height: 4px; background: #1B2A4A; border-radius: 2px; }
-        .test-label { font-size: 12px; color: #9B9B9B; text-align: right; margin-top: 4px; }
+    /* ═══ LessonPlayer.tsx — styles.backButton ═══ */
+    .lp-backButton {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      left: 0;
+      z-index: 1;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      color: var(--color-text-secondary);
+    }
 
-        svg { stroke-linecap: round; stroke-linejoin: round; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes micPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
-        @keyframes bubblePulse { 0% { transform: scale(1); } 45% { transform: scale(1.012); } 100% { transform: scale(1); } }
-        @keyframes pillPop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    </style>
+    /* ═══ LessonPlayer.tsx — styles.lessonTitle ═══ */
+    .lp-lessonTitle {
+      flex: 1;
+      color: var(--color-text);
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 0 40px;
+    }
+
+    /* ═══ LessonPlayer.tsx — styles.centeredContainer, loadingText, errorText, exitButton (loading/error UI) ═══ */
+    .lp-centeredContainer {
+      flex: 1;
+      background-color: var(--color-cream);
+      justify-content: center;
+      align-items: center;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+    }
+    .lp-loadingText {
+      color: var(--color-text-secondary);
+      font-size: 16px;
+    }
+    .lp-errorText {
+      color: var(--color-incorrect);
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+    .lp-loadExitButton {
+      background-color: var(--color-navy);
+      border-radius: 14px;
+      padding-top: 14px;
+      padding-bottom: 14px;
+      padding-left: 32px;
+      padding-right: 32px;
+      margin-top: 16px;
+      border: none;
+      cursor: pointer;
+    }
+    .lp-loadExitButtonText {
+      color: var(--color-white);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* ═══ LessonProgressBar.tsx — styles.wrapper ═══ */
+    .lpb-wrapper {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    /* ═══ LessonProgressBar.tsx — styles.track ═══ */
+    .lpb-track {
+      height: 4px;
+      background-color: var(--color-progress-track);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    /* ═══ LessonProgressBar.tsx — styles.fill ═══ */
+    .lpb-fill {
+      height: 4px;
+      background-color: var(--color-navy);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* ═══ LessonProgressBar.tsx — styles.label (optional prop; lesson pages omit) ═══ */
+    .lpb-label {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    /* Page slot — flex child under header (RN: second child of container) */
+    .lp-body {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ═══ LessonResults.tsx — styles.container ═══ */
+    .lr-container {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background-color: var(--color-cream);
+    }
+
+    /* ScrollView body */
+    .lr-scrollViewport {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ═══ LessonResults.tsx — styles.scrollContent ═══ */
+    .lr-scrollContent {
+      padding: 24px;
+      padding-bottom: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ═══ LessonResults.tsx — styles.starsRow ═══ */
+    .lr-starsRow {
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+      margin-top: 32px;
+      margin-bottom: 16px;
+    }
+    .lr-starsRow .lr-star {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+
+    /* ═══ LessonResults.tsx — styles.title ═══ */
+    .lr-title {
+      color: var(--color-text);
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    /* ═══ LessonResults.tsx — styles.xpBadge + xpText ═══ */
+    .lr-xpBadge {
+      background-color: var(--color-orange-alpha-10);
+      border-radius: 12px;
+      padding-left: 16px;
+      padding-right: 16px;
+      padding-top: 6px;
+      padding-bottom: 6px;
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+    .lr-xpText {
+      color: var(--color-orange);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    /* ═══ LessonResults.tsx — styles.scoreGrid ═══ */
+    .lr-scoreGrid {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      width: 100%;
+    }
+
+    /* ═══ LessonResults.tsx — styles.scoreCard ═══ */
+    .lr-scoreCard {
+      flex: 1;
+      background-color: var(--color-white);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-width: 1px;
+      border-style: solid;
+      border-color: var(--color-border);
+    }
+
+    /* ═══ LessonResults.tsx — styles.scoreValue ═══ */
+    .lr-scoreValue {
+      color: var(--color-navy);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    /* ═══ LessonResults.tsx — styles.scoreLabel ═══ */
+    .lr-scoreLabel {
+      color: var(--color-text-muted);
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    /* ═══ LessonResults.tsx — styles.vocabSection ═══ */
+    .lr-vocabSection {
+      width: 100%;
+      margin-top: 28px;
+    }
+
+    /* ═══ LessonResults.tsx — styles.sectionTitle ═══ */
+    .lr-sectionTitle {
+      color: var(--color-text);
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    /* ═══ LessonResults.tsx — styles.vocabRow ═══ */
+    .lr-vocabRow {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background-color: var(--color-white);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 6px;
+      border-width: 1px;
+      border-style: solid;
+      border-color: var(--color-border);
+      gap: 10px;
+    }
+
+    /* ═══ LessonResults.tsx — styles.vocabPlayBtn ═══ */
+    .lr-vocabPlayBtn {
+      width: 30px;
+      height: 30px;
+      border-radius: 15px;
+      background-color: var(--color-orange-on-btn);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      color: var(--color-orange);
+    }
+    .lr-vocabPlayBtn svg { width: 14px; height: 14px; }
+
+    /* ═══ LessonResults.tsx — styles.vocabFrench ═══ */
+    .lr-vocabFrench {
+      color: var(--color-orange);
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    /* ═══ LessonResults.tsx — styles.vocabEnglish ═══ */
+    .lr-vocabEnglish {
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      flex: 1;
+      text-align: right;
+    }
+
+    /* ═══ LessonResults.tsx — styles.gamesSection ═══ */
+    .lr-gamesSection {
+      width: 100%;
+      margin-top: 28px;
+    }
+
+    /* ═══ LessonResults.tsx — styles.playGameButton ═══ */
+    .lr-playGameButton {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background-color: var(--color-orange);
+      border-radius: 14px;
+      padding-top: 16px;
+      padding-bottom: 16px;
+      width: 100%;
+      border: none;
+      cursor: pointer;
+      color: var(--color-white);
+    }
+
+    /* ═══ LessonResults.tsx — styles.playGameText ═══ */
+    .lr-playGameText {
+      color: var(--color-white);
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    /* ═══ LessonResults.tsx — styles.bottomArea ═══ */
+    .lr-bottomArea {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      padding-bottom: 36px;
+      background-color: var(--color-cream);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ═══ LessonResults.tsx — styles.nextButton ═══ */
+    .lr-nextButton {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--color-navy);
+      border-radius: 14px;
+      padding-top: 16px;
+      padding-bottom: 16px;
+      width: 100%;
+      border: none;
+      cursor: pointer;
+    }
+    .lr-nextButton svg { width: 18px; height: 18px; color: var(--color-white); }
+
+    /* ═══ LessonResults.tsx — styles.nextButtonText ═══ */
+    .lr-nextButtonText {
+      color: var(--color-white);
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    /* ═══ LessonResults.tsx — styles.exitButton (results) ═══ */
+    .lr-exitButton {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+    .lr-exitButton svg { width: 14px; height: 14px; color: var(--color-navy); }
+
+    /* ═══ LessonResults.tsx — styles.exitButtonText ═══ */
+    .lr-exitButtonText {
+      color: var(--color-navy);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    [hidden] { display: none !important; }
+
+    /* ── NarratePage / SpeakPage / shared lesson UI (not in LessonPlayer) ── */
+    .pg-scroll { flex: 1; overflow-y: auto; padding: 24px 24px 140px; }
+    .pg-narrationBlock { border-left: 3px solid rgba(232,134,58,0.4); padding: 8px 0 8px 14px; }
+    .pg-narrationText { color: var(--color-text); font-size: 17px; line-height: 26px; letter-spacing: 0.15px; }
+    .pg-frenchHl { color: var(--color-orange); font-weight: 700; }
+    .pg-transHl { color: var(--color-text-secondary); font-style: italic; }
+    .pg-vocabSection { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .pg-vocabCard {
+      display: flex; align-items: center; background: var(--color-white); border-radius: 12px; padding: 14px;
+      border: 1px solid var(--color-border); border-left: 3px solid var(--color-orange); gap: 12px;
+    }
+    .pg-vocabPlay { width: 36px; height: 36px; border-radius: 18px; background: var(--color-orange-alpha-10); border: none; display: flex; align-items: center; justify-content: center; color: var(--color-orange); cursor: pointer; }
+    .pg-vocabPlay svg { width: 16px; height: 16px; }
+    .pg-vocabFr { color: var(--color-orange); font-size: 17px; font-weight: 600; }
+    .pg-vocabEn { color: var(--color-text-secondary); font-size: 14px; margin-top: 2px; }
+    .pg-bottomAbs {
+      position: absolute; bottom: 0; left: 0; right: 0; background: var(--color-cream);
+      padding: 20px 24px 28px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    /* NarratePage continueButton + SpeakPage continue — LESSON_UI.ctaButton */
+    .pg-continueBtn {
+      display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px;
+      background-color: var(--color-navy); border-radius: 14px;
+      padding-top: 16px; padding-bottom: 16px; padding-left: 48px; padding-right: 48px;
+      border: none; cursor: pointer; color: var(--color-white); font-size: 17px; font-weight: 700;
+    }
+    .pg-continueBtn svg { width: 18px; height: 18px; color: var(--color-white); }
+
+    /* SpeakPage.tsx — styles.content */
+    .speak-page__content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 32px 0; /* LESSON_UI.content.paddingTop / paddingHorizontal */
+    }
+
+    /*
+     * SpeakCard.tsx — styles.card
+     *   backgroundColor: Colors.white, borderRadius: 16, padding: 20, width 100%, minHeight: 150,
+     *   alignItems: center, justifyContent: center, overflow: hidden, borderWidth: 2,
+     *   shadowColor: Colors.shadow, shadowOffset {0,2}, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3
+     */
+    .speak-card {
+      background-color: var(--color-white);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 100%;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 2px solid transparent;
+      box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.04);
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+    }
+    .speak-card--pass { border-color: var(--color-correct); }
+    .speak-card--fail { border-color: var(--color-error); }
+
+    /* SpeakCard.tsx — styles.iconButton + Volume2 size={20} / Check,X size={20} */
+    .speak-card__iconBtn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      background-color: rgba(232, 134, 58, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      color: var(--color-orange);
+      z-index: 1;
+      padding: 0;
+    }
+    .speak-card__iconBtn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .speak-card__iconBtn--pass { background-color: rgba(76, 175, 80, 0.1); color: var(--color-correct); }
+    .speak-card__iconBtn--fail { background-color: rgba(211, 84, 84, 0.1); color: var(--color-error); }
+
+    /* SpeakCard.tsx — styles.textArea, targetFrench, targetEnglish */
+    .speak-card__textArea {
+      width: 100%;
+      padding: 0 40px;
+      text-align: center;
+    }
+    .speak-card__targetFr {
+      color: var(--color-orange);
+      font-size: 28px;
+      font-weight: 700;
+      font-family: Georgia, 'Times New Roman', serif;
+      text-align: center;
+      line-height: 1.25;
+    }
+    .speak-card__targetEn {
+      color: var(--color-text-muted);
+      font-size: 14px;
+      margin-top: 4px; /* LESSON_UI.cardContent.subtitleTopGap */
+      text-align: center;
+    }
+
+    /* SpeakCard.tsx — styles.resultSlot, promptLabel */
+    .speak-card__resultSlot {
+      min-height: 64px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .speak-card__prompt {
+      color: var(--color-text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    /* TranscriptResult.tsx — styles.container + text */
+    .transcript-result {
+      color: var(--color-text-secondary);
+      font-size: 18px;
+      line-height: 24px;
+      font-style: italic;
+      text-align: center;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .transcript-result--pass { color: var(--color-correct); }
+    .transcript-result--fail { color: var(--color-error); }
+
+    /* ScoreResult.tsx — styles.container, pill, score, label (+ warning) */
+    .score-result {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+    .score-result__pill {
+      flex-direction: row;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-width: 100px;
+      background-color: rgba(76, 175, 80, 0.1);
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+    .score-result__pill--warn {
+      background-color: var(--color-orange-alpha-10);
+      border: 1px solid rgba(232, 134, 58, 0.2);
+    }
+    .score-result__score {
+      color: var(--color-correct);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .score-result__label {
+      color: var(--color-correct);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .score-result__pill--warn .score-result__score,
+    .score-result__pill--warn .score-result__label {
+      color: var(--color-warning);
+    }
+
+    /* SpeakPage.tsx — styles.bottomArea */
+    .speak-page__bottom {
+      padding: 0 24px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 130px;
+    }
+
+    /* LessonMicButton.tsx — lg: wh 120, icon 36, border 4; pulse on Animated.View wrapper */
+    .lesson-mic__wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .lesson-mic__wrap--pulse {
+      animation: micPulseWrap 1.2s ease-in-out infinite;
+    }
+    .lesson-mic {
+      width: 120px;
+      height: 120px;
+      border-radius: 60px;
+      background-color: var(--color-navy);
+      border: 4px solid var(--color-orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+    }
+    .lesson-mic svg {
+      width: 36px;
+      height: 36px;
+      color: var(--color-white);
+    }
+    .lesson-mic--recording {
+      background-color: var(--color-orange);
+      border-color: #F4A261;
+    }
+    .lesson-mic__hint {
+      color: var(--color-text-muted);
+      font-size: 13px;
+      line-height: 18px;
+      margin-top: 10px;
+      text-align: center;
+      min-height: 18px;
+    }
+
+    /* SpeakPage.tsx — styles.retryButton (+ RotateCcw size={16}) */
+    .speak-page__retry {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 1.5px solid var(--color-navy);
+      background: transparent;
+      color: var(--color-navy);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .speak-page__retry svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* RetryPrompt.tsx — styles.retryArea, retryScore, retryLabel, listenBtn (+ Volume2 size={16}) */
+    /* SpeakPage feedbackStack — no margin; RetryPrompt brings marginTop 24 */
+    .speak-page__feedback {
+      width: 100%;
+    }
+    .retry-prompt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      margin-top: 24px;
+      text-align: center;
+    }
+    .retry-prompt__score {
+      color: var(--color-incorrect);
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .retry-prompt__label {
+      color: var(--color-text-secondary);
+      font-size: 15px;
+      margin: 8px 0;
+    }
+    .retry-prompt__listen {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background-color: var(--color-orange-alpha-10);
+      color: var(--color-orange);
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+    .retry-prompt__listen svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    @keyframes micPulseWrap { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    svg.lucide { stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── Guided dialogue (aligned with dev/sim-scenario.html) ── */
+    .ls-host {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: var(--color-cream);
+    }
+    .ls-progress-bar {
+      height: 4px;
+      background: var(--color-border);
+      flex-shrink: 0;
+    }
+    .ls-progress-fill {
+      height: 4px;
+      background: var(--color-orange);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .ls-chat-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .ls-tutor-row {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 12px;
+    }
+    .ls-tutor-bubble {
+      background: var(--color-white);
+      border-radius: 16px;
+      border-top-left-radius: 4px;
+      padding: 14px;
+      max-width: 80%;
+      border: 1px solid var(--color-border);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    .ls-tutor-fr {
+      color: var(--color-text);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 22px;
+    }
+    .ls-tutor-en {
+      color: var(--color-text-muted);
+      font-size: 13px;
+      margin-top: 4px;
+      line-height: 18px;
+    }
+    .ls-user-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+    .ls-user-bubble {
+      background: var(--color-orange);
+      border-radius: 16px;
+      border-bottom-right-radius: 4px;
+      padding: 14px;
+      max-width: 85%;
+      box-shadow: 0 1px 3px rgba(232, 134, 58, 0.25);
+    }
+    .ls-user-text {
+      color: var(--color-white);
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 22px;
+    }
+    .ls-response-column {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 16px 16px;
+      background: var(--color-cream);
+      border-top: 1px solid rgba(232, 227, 220, 0.85);
+    }
+    .ls-respond-panel {
+      background: var(--color-white);
+      border-radius: 14px;
+      padding: 14px 14px 12px;
+      border: 1.5px dashed rgba(232, 134, 58, 0.45);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    }
+    .ls-respond-panel.is-hidden { display: none; }
+    .ls-respond-label {
+      color: var(--color-orange);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .ls-respond-target {
+      color: var(--color-text);
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 24px;
+    }
+    .ls-respond-target .ls-q { color: var(--color-text-secondary); font-weight: 600; }
+    .ls-respond-en {
+      color: var(--color-text-muted);
+      font-size: 13px;
+      margin-top: 6px;
+      line-height: 18px;
+    }
+    .ls-respond-feedback {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-border);
+    }
+    .ls-respond-feedback.is-hidden { display: none; }
+    .ls-respond-feedback.ls-correct {
+      background: rgba(76, 175, 125, 0.06);
+      margin-left: -14px;
+      margin-right: -14px;
+      margin-bottom: -12px;
+      padding: 12px 14px;
+      border-radius: 0 0 12px 12px;
+      border-top: 1px solid rgba(76, 175, 125, 0.2);
+    }
+    .ls-feedback-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+    .ls-feedback-row svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .ls-feedback-pct { font-size: 17px; font-weight: 800; color: var(--color-correct); }
+    .ls-feedback-transcript {
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      font-style: italic;
+      margin-top: 6px;
+      line-height: 18px;
+    }
+    .ls-bottom-area { flex-shrink: 0; min-height: 52px; }
+    .ls-listening {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      background: var(--color-white);
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid var(--color-border);
+    }
+    .ls-listen-text {
+      color: var(--color-text-secondary);
+      font-size: 15px;
+      font-style: italic;
+    }
+    .ls-listen-live {
+      color: var(--color-text);
+      font-weight: 500;
+      text-align: left;
+      flex: 1;
+      min-width: 0;
+      line-height: 1.35;
+    }
+    .ls-listen-pulse { animation: lsListenFade 1.2s ease-in-out infinite; }
+    @keyframes lsListenFade {
+      0%, 100% { opacity: 0.45; }
+      50% { opacity: 1; }
+    }
+    .ls-spinner {
+      width: 22px;
+      height: 22px;
+      border: 2.5px solid rgba(232, 134, 58, 0.25);
+      border-top-color: var(--color-orange);
+      border-radius: 50%;
+      animation: lsSpin 0.7s linear infinite;
+    }
+    @keyframes lsSpin { to { transform: rotate(360deg); } }
+
+    .narrate-speak-stack {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .narrate-speak-stack .pg-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+  </style>
 </head>
 <body>
-    <div class="mockup">
-        <div class="notch"></div>
-        <div class="screen">
-            <div class="status-bar"></div>
-            <div class="lesson-header">
-                <div class="header-row">
-                    <button type="button" class="back-btn" id="backBtn" aria-label="Go back">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-                    </button>
-                    <div class="lesson-title" id="lessonTitle">Lesson Simulator</div>
-                </div>
-                <div class="sim-tag" id="simTag">Mirror sim for LessonPlayer / Narrate / Speak / Results</div>
-                <div class="progress-wrap" id="progressWrap">
-                    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-                    <div class="progress-label" id="progressLabel"></div>
-                </div>
+  <div class="device-frame" id="deviceFrame">
+    <div class="device-screen" id="deviceScreen">
+      <!-- LessonPlayer.tsx — pages phase -->
+      <div class="lp-container" id="lessonPlayerRoot">
+        <header class="lp-header">
+          <div class="lp-headerRow">
+            <button type="button" class="lp-backButton" aria-label="Go back" id="lpBack">
+              <!-- LessonPlayer: ChevronLeft size={22} — lucide-static@0.577 chevron-left -->
+              <svg class="lucide" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <div class="lp-lessonTitle" id="lpTitle">At the Cafe</div>
+          </div>
+          <!-- LessonProgressBar.tsx — no label prop (same as LessonPlayer pages) -->
+          <div class="lpb-wrapper">
+            <div class="lpb-track"><div class="lpb-fill" id="lpbFill"></div></div>
+          </div>
+        </header>
+        <main class="lp-body" id="lessonPageContent"></main>
+      </div>
+
+      <!-- LessonResults.tsx — full screen (replaces player in app) -->
+      <div class="lr-container" id="lessonResultsRoot" hidden>
+        <div class="lr-scrollViewport">
+          <div class="lr-scrollContent">
+            <div class="lr-starsRow" id="lrStars"></div>
+            <h1 class="lr-title" id="lrTitle">Excellent!</h1>
+            <div class="lr-xpBadge"><span class="lr-xpText" id="lrXp">+100 XP</span></div>
+            <div class="lr-scoreGrid">
+              <div class="lr-scoreCard"><span class="lr-scoreValue" id="lrTest">0%</span><span class="lr-scoreLabel">Test Score</span></div>
+              <div class="lr-scoreCard"><span class="lr-scoreValue" id="lrPron">0%</span><span class="lr-scoreLabel">Pronunciation</span></div>
+              <div class="lr-scoreCard"><span class="lr-scoreValue" id="lrSpoken">0%</span><span class="lr-scoreLabel">Spoken Answers</span></div>
             </div>
-            <div class="content" id="content"></div>
+            <div class="lr-vocabSection" id="lrVocabSection"></div>
+            <div class="lr-gamesSection">
+              <div class="lr-sectionTitle">Practice What You Learned</div>
+              <!-- LessonResults: Gamepad2 size={20} -->
+              <button type="button" class="lr-playGameButton" id="lrPlayGame">
+                <!-- LessonResults: Gamepad2 size={20} — lucide-static@0.577 gamepad-2 -->
+                <svg class="lucide" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>
+                <span class="lr-playGameText">Play Word Catch</span>
+              </button>
+            </div>
+          </div>
         </div>
+        <div class="lr-bottomArea">
+          <button type="button" class="lr-nextButton" id="lrNext">
+            <span class="lr-nextButtonText">Next Lesson</span>
+            <svg class="lucide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+          <button type="button" class="lr-exitButton" id="lrExit">
+            <svg class="lucide" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            <span class="lr-exitButtonText">Back to Lessons</span>
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
 
 <script>
-const ICO = {
-    volume2: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>',
-    mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>',
-    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>',
-    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
-    arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
-    rotateCcw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>',
-    star: '<svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.8l2.87 5.82 6.42.94-4.64 4.52 1.1 6.4L12 17.45l-5.75 3.03 1.1-6.4-4.64-4.52 6.42-.94L12 2.8z"/></svg>',
-};
+(function () {
+  /* lucide-static@0.577.0 paths — must match lucide-react-native in package.json */
+  const LUCIDE_PATHS = {
+    volume2:
+      '<path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>',
+    mic:
+      '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>',
+    check: '<path d="M20 6 9 17l-5-5"/>',
+    x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    arrowRight: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+    rotateCcw: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+    star:
+      'M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z',
+  };
 
-const LESSONS = {
-    a1_lesson_01: {
-        id: "a1_lesson_01",
-        cefrLevel: "A1",
-        title: "First Words",
-        titleFr: "Premiers mots",
-        subtitle: "Learn to say hello, goodbye, please, and thank you",
-        estimatedMinutes: 5,
-        dialogueCharacterName: "Barista",
-        dialogueExchanges: [
-            { speaker: "tutor", french: "Bonjour!", english: "Hello!" },
-            { speaker: "user", french: "Bonjour! Un café, s'il vous plaît.", english: "Hello! A coffee, please." },
-            { speaker: "tutor", french: "Voilà. Bonne journée!", english: "Here you go. Have a nice day!" },
-            { speaker: "user", french: "Merci. Au revoir!", english: "Thank you. Goodbye!" }
-        ],
-        pages: [
-            {
-                id: "a1_01_p0",
-                type: "narrate",
-                narration: "Hey, welcome to your first lesson. Learning a new language takes time, and French is no different. But you have to start somewhere. Today we're starting with the words French speakers use most -- the basics you'll hear in every conversation. By the end of this lesson, you'll use them together in a short exchange. You walk into a café:",
-                vocab: [{ french: "Bonjour", english: "Hello / Good day" }],
-                speakPrompt: "Let's try it. Say it back:",
-                speakTarget: "Bonjour",
-                speakTargetEnglish: "Hello / Good day",
-                wrongTranscript: "bonsoir"
-            },
-            {
-                id: "a1_01_p1",
-                type: "narrate",
-                narration: "Good. \"Bonjour\" is the most common word in French. It means \"Hello\" or \"Good day\", and skipping it is considered rude. You say it when you walk into a shop, greet a colleague, or meet anyone for the first time. Later in the evening, you'll switch to:",
-                vocab: [{ french: "Bonjour", english: "Hello / Good day" }, { french: "Bonsoir", english: "Good evening" }],
-                speakPrompt: "Say the evening greeting:",
-                speakTarget: "Bonsoir",
-                speakTargetEnglish: "Good evening",
-                wrongTranscript: "bonjour"
-            },
-            {
-                id: "a1_01_p2",
-                type: "narrate",
-                narration: "Notice something? Both words start with \"Bon\", which means \"good\". \"Jour\" means \"day\". \"Soir\" means \"evening\". French is full of patterns like this. The barista hands you your coffee. What do you say?",
-                vocab: [{ french: "Bon", english: "Good" }, { french: "Jour", english: "Day" }, { french: "Soir", english: "Evening" }],
-                speakPrompt: "She hands you the coffee. Say \"Thank you\":",
-                speakTarget: "Merci",
-                speakTargetEnglish: "Thank you",
-                wrongTranscript: "au revoir"
-            },
-            {
-                id: "a1_01_p3",
-                type: "narrate",
-                narration: "\"Merci\" means \"Thank you\". You'll say this one constantly. If you want to be extra polite, add \"beaucoup\" after it. \"Merci beaucoup\" means \"Thank you very much\". Two more words before we move on. \"S'il vous plaît\" means \"Please\", and when you leave somewhere, you say \"Au revoir\". That's \"Goodbye\".",
-                vocab: [
-                    { french: "Merci", english: "Thank you" },
-                    { french: "Merci beaucoup", english: "Thank you very much" },
-                    { french: "S'il vous plaît", english: "Please" },
-                    { french: "Au revoir", english: "Goodbye" }
-                ]
-            },
-            {
-                id: "a1_01_p4",
-                type: "respond",
-                respondQuestion: "How do you say \"Please\" in French?",
-                respondCorrectAnswer: "S'il vous plaît",
-                respondCorrectSpoken: "S'il vous plaît",
-                respondExplanation: "S'il vous plaît = Please. Literally: if it pleases you.",
-                respondOptions: [
-                    { text: "Merci", is_correct: false },
-                    { text: "S'il vous plaît", is_correct: true },
-                    { text: "Au revoir", is_correct: false }
-                ]
-            },
-            {
-                id: "a1_01_p5",
-                type: "narrate",
-                narration: "Hey, look at that, you already know the five words that will carry you through any interaction: Bonjour, Bonsoir, Merci, S'il vous plaît, and Au revoir. Now let's put them together.",
-                vocab: []
-            },
-            {
-                id: "a1_01_p6",
-                type: "dialogue"
-            }
-        ],
-        testQuestions: [
-            { type: "speak", speakPrompt: "How do you say 'Hello' in French?", speakTarget: "Bonjour" },
-            { type: "respond", respondQuestion: "How do you say 'Thank you' in French?", respondCorrectAnswer: "Merci", respondOptions: [] },
-            { type: "respond", respondQuestion: "It's 8 PM. How do you greet someone?", respondCorrectAnswer: "Bonsoir", respondOptions: [{ text: "Bonjour", is_correct: false }, { text: "Bonsoir", is_correct: true }, { text: "Salut", is_correct: false }] },
-            { type: "respond", respondQuestion: "How do you say 'Please' in French?", respondCorrectAnswer: "S'il vous plaît", respondOptions: [{ text: "Bonjour", is_correct: false }, { text: "Merci", is_correct: false }, { text: "S'il vous plaît", is_correct: true }] },
-            { type: "speak", speakPrompt: "You're leaving the café. Say goodbye:", speakTarget: "Au revoir" }
-        ]
-    },
-    a1_lesson_02: {
-        id: "a1_lesson_02",
-        cefrLevel: "A1",
-        title: "At the Cafe",
-        titleFr: "Au café",
-        subtitle: "Order drinks and ask for the bill like a local",
-        estimatedMinutes: 6,
-        dialogueCharacterName: "Serveur",
-        dialogueExchanges: [
-            { speaker: "tutor", french: "Bonjour! Qu'est-ce que vous désirez?", english: "Hello! What would you like?" },
-            { speaker: "user", french: "Je voudrais un café et un croissant, s'il vous plaît.", english: "I would like a coffee and a croissant, please." },
-            { speaker: "tutor", french: "Très bien. Voilà!", english: "Very good. Here you go!" },
-            { speaker: "user", french: "Merci. L'addition, s'il vous plaît.", english: "Thank you. The bill, please." },
-            { speaker: "tutor", french: "C'est trois euros cinquante.", english: "That's three euros fifty." },
-            { speaker: "user", french: "Merci. Au revoir!", english: "Thank you. Goodbye!" }
-        ],
-        pages: [
-            {
-                id: "a1_02_p0",
-                type: "narrate",
-                narration: "You're back at the café. Last time you learned how to greet people and say thanks. This time, you're ordering. In French, you don't just point at the menu. There's a polite phrase that works for asking for anything you want:",
-                vocab: [{ french: "Je voudrais", english: "I would like" }, { french: "Un café", english: "A coffee" }]
-            },
-            {
-                id: "a1_02_p1",
-                type: "speak",
-                speakPrompt: "Say the polite way to ask for something:",
-                speakTarget: "Je voudrais",
-                speakTargetEnglish: "I would like",
-                wrongTranscript: "bonjour"
-            },
-            {
-                id: "a1_02_p2",
-                type: "narrate",
-                narration: "\"Je voudrais\" works the same way everywhere. Cafés, restaurants, shops. It's the polite way to ask for what you want, and French speakers notice when you use it. Now let's learn what to put after it:",
-                vocab: [{ french: "Un café", english: "A coffee" }, { french: "Un thé", english: "A tea" }, { french: "Un croissant", english: "A croissant" }, { french: "De l'eau", english: "Some water" }]
-            },
-            {
-                id: "a1_02_p3",
-                type: "respond",
-                respondQuestion: "How do you say \"I would like a coffee\"?",
-                respondCorrectAnswer: "Je voudrais un café",
-                respondCorrectSpoken: "Je voudrais un café",
-                respondExplanation: "\"Je voudrais\" + the item is the standard polite order.",
-                respondOptions: [
-                    { text: "Un café, merci", is_correct: false },
-                    { text: "Je voudrais un café", is_correct: true },
-                    { text: "Café, s'il vous plaît", is_correct: false }
-                ]
-            },
-            {
-                id: "a1_02_p4",
-                type: "narrate",
-                narration: "Good. Now, when you're done eating or drinking, you'll need to ask for the bill. In France, the waiter won't bring it automatically. That's not rude, it's just the custom. You have to ask:",
-                vocab: [{ french: "L'addition", english: "The bill / check" }, { french: "Combien", english: "How much" }]
-            },
-            {
-                id: "a1_02_p5",
-                type: "speak",
-                speakPrompt: "Ask for the bill politely:",
-                speakTarget: "L'addition, s'il vous plaît",
-                speakTargetEnglish: "The bill, please",
-                wrongTranscript: "bonjour"
-            },
-            {
-                id: "a1_02_p6",
-                type: "narrate",
-                narration: "Quick recap. You order with \"Je voudrais\", ask for the bill with \"L'addition, s'il vous plaît\", and check the price with \"Combien?\" Three phrases, and you can handle most of a café visit. Let's see how much you remember.",
-                vocab: []
-            },
-            {
-                id: "a1_02_p7",
-                type: "respond",
-                respondQuestion: "How do you say \"How much?\" in French?",
-                respondCorrectAnswer: "Combien",
-                respondCorrectSpoken: "Combien",
-                respondExplanation: "\"Combien\" means \"How much\", useful for prices, quantities, and time.",
-                respondOptions: [
-                    { text: "Combien", is_correct: true },
-                    { text: "L'addition", is_correct: false },
-                    { text: "Un café", is_correct: false }
-                ]
-            },
-            {
-                id: "a1_02_p8",
-                type: "narrate",
-                narration: "You can now walk into any café, order what you want, and leave without awkward pointing at the menu. Let's put it all together in a short conversation.",
-                vocab: []
-            },
-            {
-                id: "a1_02_p9",
-                type: "dialogue"
-            }
-        ],
-        testQuestions: [
-            { type: "speak", speakPrompt: "How do you politely order something in French?", speakTarget: "Je voudrais" },
-            { type: "respond", respondQuestion: "How do you say 'A coffee' in French?", respondCorrectAnswer: "un café", respondOptions: [] },
-            { type: "speak", speakPrompt: "Ask for the bill politely:", speakTarget: "L'addition, s'il vous plaît" },
-            { type: "respond", respondQuestion: "How do you say 'How much' in French?", respondCorrectAnswer: "Combien", respondOptions: [] },
-            { type: "speak", speakPrompt: "Order a tea politely:", speakTarget: "Je voudrais un thé" }
-        ]
-    },
-    a1_lesson_03: {
-        id: "a1_lesson_03",
-        cefrLevel: "A1",
-        title: "Numbers 1-10",
-        titleFr: "Les chiffres",
-        subtitle: "Count from one to ten and use numbers in context",
-        estimatedMinutes: 6,
-        dialogueCharacterName: "Vendeur",
-        dialogueExchanges: [
-            { speaker: "tutor", french: "Bonjour! Combien de croissants?", english: "Hello! How many croissants?" },
-            { speaker: "user", french: "Trois croissants, s'il vous plaît.", english: "Three croissants, please." },
-            { speaker: "tutor", french: "C'est quatre euros cinquante.", english: "That's four euros fifty." },
-            { speaker: "user", french: "Merci beaucoup!", english: "Thank you very much!" }
-        ],
-        pages: [
-            {
-                id: "a1_03_p0",
-                type: "narrate",
-                narration: "Welcome back! In this lesson, we're going to learn to count from one to ten in French. Numbers are everywhere, prices, addresses, phone numbers, time. Let's start with one through five. Listen carefully to the rhythm:",
-                vocab: [{ french: "Un", english: "One (1)" }, { french: "Deux", english: "Two (2)" }, { french: "Trois", english: "Three (3)" }, { french: "Quatre", english: "Four (4)" }, { french: "Cinq", english: "Five (5)" }]
-            },
-            {
-                id: "a1_03_p1",
-                type: "speak",
-                speakPrompt: "Say the number three:",
-                speakTarget: "Trois",
-                speakTargetEnglish: "Three",
-                wrongTranscript: "deux"
-            },
-            {
-                id: "a1_03_p2",
-                type: "narrate",
-                narration: "Good. Now the second half. Notice that \"sept\" sounds like the English word \"set,\" and \"dix\" rhymes with \"peace\":",
-                vocab: [{ french: "Six", english: "Six (6)" }, { french: "Sept", english: "Seven (7)" }, { french: "Huit", english: "Eight (8)" }, { french: "Neuf", english: "Nine (9)" }, { french: "Dix", english: "Ten (10)" }]
-            },
-            {
-                id: "a1_03_p3",
-                type: "speak",
-                speakPrompt: "Say the number seven:",
-                speakTarget: "Sept",
-                speakTargetEnglish: "Seven",
-                wrongTranscript: "six"
-            },
-            {
-                id: "a1_03_p4",
-                type: "narrate",
-                narration: "Let's use numbers in real situations. At the cafe, you might order \"deux cafés\" (two coffees) or hear \"c'est cinq euros\" (that's five euros). The number goes BEFORE the thing you're counting, just like English.",
-                vocab: [{ french: "Deux cafés", english: "Two coffees" }, { french: "Cinq euros", english: "Five euros" }]
-            },
-            {
-                id: "a1_03_p5",
-                type: "speak",
-                speakPrompt: "Order two coffees:",
-                speakTarget: "Deux cafés",
-                speakTargetEnglish: "Two coffees",
-                wrongTranscript: "un café"
-            },
-            {
-                id: "a1_03_p6",
-                type: "narrate",
-                narration: "Here's a pattern: \"quatre\" (4) and \"quatorze\" (14) share the same root. \"Cinq\" (5) becomes \"cinquante\" (50). French numbers are built on patterns, once you know 1-10, the rest gets much easier.",
-                vocab: []
-            },
-            {
-                id: "a1_03_p7",
-                type: "respond",
-                respondQuestion: "What number is \"Huit\"?",
-                respondCorrectAnswer: "Eight",
-                respondCorrectSpoken: "Eight",
-                respondExplanation: "\"Huit\" = Eight. The \"h\" is silent in French.",
-                respondOptions: [
-                    { text: "Six", is_correct: false },
-                    { text: "Eight", is_correct: true },
-                    { text: "Ten", is_correct: false }
-                ]
-            },
-            {
-                id: "a1_03_p8",
-                type: "narrate",
-                narration: "You now know all ten numbers. You can count, order quantities, and understand prices. Let's put them to use in a quick conversation.",
-                vocab: []
-            },
-            {
-                id: "a1_03_p9",
-                type: "dialogue"
-            }
-        ],
-        testQuestions: [
-            { type: "speak", speakPrompt: "Say the number five in French:", speakTarget: "Cinq" },
-            { type: "respond", respondQuestion: "How do you say 'Nine' in French?", respondCorrectAnswer: "Neuf", respondOptions: [] },
-            { type: "speak", speakPrompt: "Say the number eight:", speakTarget: "Huit" },
-            { type: "respond", respondQuestion: "How do you say 'Two coffees'?", respondCorrectAnswer: "Deux cafés", respondOptions: [] },
-            { type: "speak", speakPrompt: "Count from one to three:", speakTarget: "Un, deux, trois" }
-        ]
+  function lucide(paths, w, h) {
+    const W = w == null ? 24 : w;
+    const H = h == null ? 24 : h;
+    return (
+      '<svg class="lucide" width="' +
+      W +
+      '" height="' +
+      H +
+      '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+      paths +
+      '</svg>'
+    );
+  }
+
+  const ICO = {
+    vol14: lucide(LUCIDE_PATHS.volume2, 14, 14),
+    vol16: lucide(LUCIDE_PATHS.volume2, 16, 16),
+    vol20: lucide(LUCIDE_PATHS.volume2, 20, 20),
+    mic: lucide(LUCIDE_PATHS.mic, 36, 36),
+    check: lucide(LUCIDE_PATHS.check, 20, 20),
+    x: lucide(LUCIDE_PATHS.x, 20, 20),
+    arrow: lucide(LUCIDE_PATHS.arrowRight, 18, 18),
+    rotate: lucide(LUCIDE_PATHS.rotateCcw, 16, 16),
+  };
+
+  const STAR_FILLED = '#D4A853';
+  const STAR_EMPTY_STROKE = '#E8E3DC';
+
+  const PAGE0 = {
+    text: "You're back at the café. Last time you learned how to greet people and say thanks. This time, you're ordering. In French, you don't just point at the menu. There's a polite phrase that works for asking for anything you want:",
+    vocab: [{ french: 'Je voudrais', english: 'I would like' }, { french: 'Un café', english: 'A coffee' }],
+  };
+  const SPEAK = {
+    prompt: 'Say the polite way to ask for something:',
+    target: 'Je voudrais',
+    targetEnglish: 'I would like',
+    wrongTranscript: 'bonjour',
+  };
+  const SPEAK2 = {
+    prompt: "You're ready to order. Say the full phrase:",
+    target: "Je voudrais un café, s'il vous plaît",
+    targetEnglish: 'I would like a coffee, please',
+    wrongTranscript: 'un café',
+  };
+  const PAGE2 = {
+    text: '"Je voudrais" works the same way everywhere. Cafés, restaurants, shops. It\'s the polite way to ask for what you want, and French speakers notice when you use it. Now let\'s learn what to put after it:',
+    vocab: [
+      { french: 'Un café', english: 'A coffee' },
+      { french: 'Un thé', english: 'A tea' },
+      { french: 'Un croissant', english: 'A croissant' },
+      { french: "De l'eau", english: 'Some water' },
+    ],
+  };
+
+  const FR_TERMS = [];
+  (function buildTerms() {
+    const s = new Set();
+    const add = (t) => { const k = (t || '').toLowerCase(); if (k && !s.has(k)) { s.add(k); FR_TERMS.push(t); } };
+    [...PAGE0.vocab, ...PAGE2.vocab].forEach(v => add(v.french));
+    add(SPEAK.target);
+    add(SPEAK2.target);
+    FR_TERMS.sort((a, b) => b.length - a.length);
+  })();
+
+  /** Café dialogue — same bubble + respond-panel pattern as sim-scenario.html */
+  const LS_EXCHANGES = [
+    { speaker: 'tutor', french: 'Bonjour! Qu\'est-ce que vous désirez?', english: 'Hello! What would you like?' },
+    { speaker: 'user', french: "Je voudrais un café, s'il vous plaît.", english: 'I would like a coffee, please.' },
+    { speaker: 'tutor', french: 'Très bien. Voilà!', english: 'Very good. Here you go!' },
+    { speaker: 'user', french: 'Merci!', english: 'Thank you!' },
+  ];
+  const LS_U1 = [{ text: "Je voudrais un café, s'il vous plaît.", pct: 100 }];
+  const LS_U2 = [{ text: 'Merci!', pct: 100 }];
+  const LS_LISTEN_MS = 420;
+  const LS_FEEDBACK_MS = 600;
+  const LS_HIDE_MS = 500;
+
+  const TOTAL_PAGES = 4;
+  const lessonTitle = 'At the Cafe';
+  let pageIdx = 0;
+  let speakTimers = [];
+  let dialogueTimers = [];
+
+  function esc(t) {
+    const d = document.createElement('div');
+    d.textContent = t;
+    return d.innerHTML;
+  }
+
+  function highlightNarration(text) {
+    if (!text) return '';
+    const escaped = FR_TERMS.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const quotedCapture = '(["\u201C]([A-Za-z\u00C0-\u024F\u2019\u0027/ -]+?)["\u201D])';
+    const regex = new RegExp('(' + escaped.join('|') + ')|' + quotedCapture, 'gi');
+    let result = '', last = 0, m;
+    while ((m = regex.exec(text)) !== null) {
+      if (m.index > last) result += esc(text.slice(last, m.index));
+      if (m[1]) {
+        result += '<span class="pg-frenchHl">' + esc(m[1]) + '</span>';
+        last = m.index + m[1].length;
+      } else {
+        const full = m[2];
+        const inner = m[3];
+        const isFr = FR_TERMS.some(ft => ft.toLowerCase() === inner.toLowerCase());
+        result += '<span class="' + (isFr ? 'pg-frenchHl' : 'pg-transHl') + '">' + esc(full) + '</span>';
+        last = m.index + full.length;
+      }
     }
-};
+    if (last < text.length) result += esc(text.slice(last));
+    return result;
+  }
 
-const GAME_NAME = {
-    "word-catch": "Word Catch",
-    "speed-say": "Speed Say",
-    "echo-game": "Echo Game",
-    "translation-sprint": "Translation Sprint"
-};
+  function displayTranscript(raw) {
+    const cap = raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : '';
+    return '"' + esc(cap) + '"';
+  }
 
-const state = {
-    phase: "start",
-    selectedLessonId: null,
-    pageIdx: 0,
-    testIdx: 0,
-    timers: [],
-    recordingStart: 0,
-    currentSpeak: null,
-    pageScores: [],
-    pageScoreEntries: [],
-    testScores: [],
-    learnedWords: new Set(),
-    lastRecommendedGame: null,
-    dialogue: null,
-    dialogueStandalone: false
-};
-
-function recordPageScoreEntry(type, score, method) {
-    state.pageScores.push(score);
-    state.pageScoreEntries.push({ type, score, method: method || null });
-}
-
-const els = {
-    title: document.getElementById("lessonTitle"),
-    tag: document.getElementById("simTag"),
-    progressWrap: document.getElementById("progressWrap"),
-    progressFill: document.getElementById("progressFill"),
-    progressLabel: document.getElementById("progressLabel"),
-    content: document.getElementById("content"),
-    backBtn: document.getElementById("backBtn"),
-    lessonHeader: document.querySelector(".lesson-header")
-};
-const params = new URLSearchParams(window.location.search);
-const autoplay = params.get("autoplay") === "1";
-const loop = params.get("loop") !== "0";
-const autoplayStepMs = Number(params.get("step") || 1400);
-if (params.get("embed") === "1") document.body.classList.add("embed");
-
-function fitEmbedMockup() {
-    if (!document.body.classList.contains("embed")) return;
-    const mockup = document.querySelector(".mockup");
-    if (!mockup) return;
-    const pixel6Width = 393;
-    const pixel6Height = 851;
-    const scale = Math.min(window.innerWidth / pixel6Width, window.innerHeight / pixel6Height);
-    mockup.style.position = "relative";
-    mockup.style.left = "auto";
-    mockup.style.top = "auto";
-    mockup.style.width = `${pixel6Width}px`;
-    mockup.style.height = `${pixel6Height}px`;
-    mockup.style.transformOrigin = "top center";
-    mockup.style.transform = `scale(${scale})`;
-}
-fitEmbedMockup();
-window.addEventListener("resize", fitEmbedMockup);
-
-function esc(text) {
-    const div = document.createElement("div");
-    div.textContent = text == null ? "" : String(text);
-    return div.innerHTML;
-}
-
-function clearTimers() {
-    state.timers.forEach(clearTimeout);
-    state.timers = [];
-}
-
-function addTimer(fn, ms) {
-    const id = setTimeout(fn, ms);
-    state.timers.push(id);
-    return id;
-}
-
-function currentLesson() {
-    return state.selectedLessonId ? LESSONS[state.selectedLessonId] : null;
-}
-
-function currentPage() {
-    const lesson = currentLesson();
-    if (!lesson) return null;
-    return lesson.pages[state.pageIdx] || null;
-}
-
-function formatTranscript(raw) {
-    if (!raw) return "";
-    return '"' + esc(raw.charAt(0).toUpperCase() + raw.slice(1)) + '"';
-}
-
-function buildFrenchTerms(page, lesson) {
-    const set = new Set();
-    lesson.pages.forEach((p) => {
-        (p.vocab || []).forEach((w) => set.add(w.french.toLowerCase()));
-        if (p.speakTarget) set.add(p.speakTarget.toLowerCase());
-    });
-    (page.vocab || []).forEach((w) => set.add(w.french.toLowerCase()));
-    if (page.speakTarget) set.add(page.speakTarget.toLowerCase());
-    return [...set].sort((a, b) => b.length - a.length);
-}
-
-function highlightNarration(page, lesson) {
-    const text = page.narration || "";
-    if (!text) return "";
-    const terms = buildFrenchTerms(page, lesson).map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-    const vocabAlt = terms.join("|");
-    const quotedCapture = '(["\\u201C]([A-Za-z\\u00C0-\\u024F\\u2019\\u0027/ -]+?)["\\u201D])';
-    const regex = new RegExp(vocabAlt ? `(${vocabAlt})|${quotedCapture}` : quotedCapture, "gi");
-
-    let out = "";
-    let last = 0;
-    let match;
-    while ((match = regex.exec(text)) !== null) {
-        if (match.index > last) out += esc(text.slice(last, match.index));
-        if (vocabAlt && match[1]) {
-            out += '<span class="french-hl">' + esc(match[1]) + "</span>";
-            last = match.index + match[1].length;
-        } else {
-            const fullQuoted = vocabAlt ? match[2] : match[1];
-            const innerText = vocabAlt ? match[3] : match[2];
-            const isFrenchQuote = buildFrenchTerms(page, lesson).includes(innerText.toLowerCase());
-            out += '<span class="' + (isFrenchQuote ? "french-hl" : "translation-hl") + '">' + esc(fullQuoted) + "</span>";
-            last = match.index + fullQuoted.length;
-        }
-    }
-    if (last < text.length) out += esc(text.slice(last));
-    return out;
-}
-
-function fitFrench(el) {
+  function fitFrench(el) {
     if (!el) return;
     let fs = 28;
-    el.style.fontSize = fs + "px";
-    el.style.whiteSpace = "nowrap";
-    while (el.scrollWidth > el.clientWidth && fs > 18) {
-        fs -= 1;
-        el.style.fontSize = fs + "px";
-    }
-    if (el.scrollWidth > el.clientWidth) el.style.whiteSpace = "";
-}
+    el.style.fontSize = fs + 'px';
+    el.style.whiteSpace = 'nowrap';
+    while (el.scrollWidth > el.clientWidth && fs > 18) { fs--; el.style.fontSize = fs + 'px'; }
+    if (el.scrollWidth > el.clientWidth) el.style.whiteSpace = '';
+  }
 
-function setHeader() {
-    const lesson = currentLesson();
-    const headerVisible = state.phase === "pages";
-    els.lessonHeader.style.display = headerVisible ? "block" : "none";
-    if (!headerVisible) return;
-    if (state.phase === "start") {
-        els.title.textContent = "Lesson Simulator";
-        els.tag.textContent = "Mirror sim for LessonPlayer / Narrate / Speak / Results";
-        els.progressWrap.style.opacity = "0";
-        els.progressLabel.textContent = "";
-        els.progressFill.style.width = "0%";
-        return;
-    }
-    if (state.phase === "game") {
-        els.title.textContent = "Practice Game";
-        els.tag.textContent = "Recommended from LessonResults";
-        els.progressWrap.style.opacity = "0";
-        return;
-    }
-    if (!lesson) return;
-    els.title.textContent = lesson.title;
-    els.tag.textContent = lesson.id.replaceAll("_", " ").toUpperCase() + " · Full flow simulation";
-    if (state.phase === "results") {
-        els.progressWrap.style.opacity = "0";
-        return;
-    }
-    if (state.phase === "test") {
-        els.progressWrap.style.opacity = "1";
-        const total = (lesson.testQuestions || []).length || 1;
-        const pct = ((state.testIdx + 1) / total) * 100;
-        els.progressFill.style.width = pct + "%";
-        els.progressLabel.textContent = "Test: " + (state.testIdx + 1) + " of " + total;
-        els.tag.textContent = "Mini-Test simulation";
-        return;
-    }
-    if (state.phase === "dialogue") {
-        els.progressWrap.style.opacity = "0";
-        els.tag.textContent = "Dialogue capstone simulation";
-        return;
-    }
-    els.progressWrap.style.opacity = "1";
-    const total = lesson.pages.length;
-    const pct = ((state.pageIdx + 1) / total) * 100;
-    els.progressFill.style.width = pct + "%";
-    els.progressLabel.textContent = "Page " + (state.pageIdx + 1) + " of " + total;
-}
+  function setLpbFill() {
+    const pct = TOTAL_PAGES ? ((pageIdx + 1) / TOTAL_PAGES) * 100 : 0;
+    document.getElementById('lpbFill').style.width = pct + '%';
+  }
 
-function collectWordsFromLesson(lesson) {
+  function clearSpeakTimers() {
+    speakTimers.forEach(clearTimeout);
+    speakTimers = [];
+  }
+
+  function clearDialogueTimers() {
+    dialogueTimers.forEach(clearTimeout);
+    dialogueTimers = [];
+  }
+
+  function lsSchedule(fn, ms) {
+    const id = setTimeout(fn, ms);
+    dialogueTimers.push(id);
+  }
+
+  function lsEsc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function showPlayer() {
+    clearDialogueTimers();
+    document.getElementById('lessonPlayerRoot').hidden = false;
+    document.getElementById('lessonResultsRoot').hidden = true;
+  }
+
+  function showResults() {
+    clearDialogueTimers();
+    document.getElementById('lessonPlayerRoot').hidden = true;
+    document.getElementById('lessonResultsRoot').hidden = false;
+    buildResultsStars();
+    buildResultsVocab();
+    runResultsCountUp();
+  }
+
+  function resultsTitleForStars(m) {
+    if (m >= 5) return 'Perfect!';
+    if (m >= 4) return 'Excellent!';
+    if (m >= 3) return 'Great Job!';
+    if (m >= 2) return 'Well Done!';
+    return 'Lesson Complete';
+  }
+
+  function buildResultsStars() {
+    const masteryStars = 4;
+    const row = document.getElementById('lrStars');
+    row.innerHTML = [1, 2, 3, 4, 5].map(i => {
+      const filled = i <= masteryStars;
+      return (
+        '<svg class="lucide lr-star" viewBox="0 0 24 24" width="32" height="32" fill="' +
+        (filled ? STAR_FILLED : 'none') +
+        '" stroke="' +
+        (filled ? STAR_FILLED : STAR_EMPTY_STROKE) +
+        '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' +
+        LUCIDE_PATHS.star +
+        '"/></svg>'
+      );
+    }).join('');
+    document.getElementById('lrTitle').textContent = resultsTitleForStars(masteryStars);
+    document.getElementById('lrXp').textContent = '+' + (masteryStars >= 5 ? '200' : '100') + ' XP';
+  }
+
+  function buildResultsVocab() {
     const seen = new Set();
-    const out = [];
-    lesson.pages.forEach((p) => {
-        (p.vocab || []).forEach((w) => {
-            if (!seen.has(w.french.toLowerCase())) {
-                seen.add(w.french.toLowerCase());
-                out.push(w);
-            }
-        });
-        if (p.speakTarget && !seen.has(p.speakTarget.toLowerCase())) {
-            seen.add(p.speakTarget.toLowerCase());
-            out.push({ french: p.speakTarget, english: p.speakTargetEnglish || "" });
-        }
+    const list = [];
+    [...PAGE0.vocab, ...PAGE2.vocab].forEach(v => {
+      const k = v.french.toLowerCase();
+      if (seen.has(k)) return;
+      seen.add(k);
+      list.push(v);
     });
-    return out;
-}
+    const sec = document.getElementById('lrVocabSection');
+    if (!list.length) { sec.innerHTML = ''; return; }
+    sec.innerHTML = '<div class="lr-sectionTitle">Words Learned (' + list.length + ')</div>' +
+      list.map(v => '<div class="lr-vocabRow"><button type="button" class="lr-vocabPlayBtn" aria-label="Play">' + ICO.vol14 + '</button><span class="lr-vocabFrench">' + esc(v.french) + '</span><span class="lr-vocabEnglish">' + esc(v.english) + '</span></div>').join('');
+  }
 
-function getGameRecommendations(pages) {
-    const hasDialogue = pages.some((p) => p.type === "dialogue");
-    const speakPages = pages.filter((p) => p.type === "speak" || !!p.speakTarget);
-    const hasPhrases = speakPages.some((p) => ((p.speakTarget || "").split(" ").length > 2));
-    const games = ["word-catch"];
-    games.push(hasPhrases ? "speed-say" : "echo-game");
-    games.push(hasDialogue ? "echo-game" : "translation-sprint");
-    const unique = [...new Set(games)];
-    const fallbacks = ["translation-sprint", "echo-game", "speed-say", "word-catch"];
-    for (const fb of fallbacks) {
-        if (unique.length >= 3) break;
-        if (!unique.includes(fb)) unique.push(fb);
+  function runResultsCountUp() {
+    const testPercent = 88;
+    const pronPercent = 85;
+    const spokenPercent = 80;
+    const duration = 1200;
+    const steps = 30;
+    const interval = duration / steps;
+    let step = 0;
+    const elT = document.getElementById('lrTest');
+    const elP = document.getElementById('lrPron');
+    const elS = document.getElementById('lrSpoken');
+    const id = setInterval(() => {
+      step++;
+      const p = step / steps;
+      const eased = 1 - Math.pow(1 - p, 3);
+      elT.textContent = Math.round(testPercent * eased) + '%';
+      elP.textContent = Math.round(pronPercent * eased) + '%';
+      elS.textContent = Math.round(spokenPercent * eased) + '%';
+      if (step >= steps) clearInterval(id);
+    }, interval);
+  }
+
+  function nextPage() {
+    clearSpeakTimers();
+    clearDialogueTimers();
+    pageIdx++;
+    if (pageIdx >= TOTAL_PAGES) return;
+    renderPage();
+  }
+
+  function renderNarrate(data) {
+    const c = document.getElementById('lessonPageContent');
+    const vocabHtml = data.vocab.length
+      ? '<div class="pg-vocabSection">' + data.vocab.map(v =>
+          '<div class="pg-vocabCard"><button type="button" class="pg-vocabPlay">' + ICO.vol16 + '</button><div><div class="pg-vocabFr">' + esc(v.french) + '</div><div class="pg-vocabEn">' + esc(v.english) + '</div></div></div>').join('') + '</div>'
+      : '';
+
+    c.innerHTML =
+      '<div class="pg-scroll"><div class="pg-narrationBlock"><div class="pg-narrationText">' + highlightNarration(data.text) + '</div></div>' + vocabHtml + '</div>' +
+      '<div class="pg-bottomAbs"><button type="button" class="pg-continueBtn" id="btnCont">Continue ' + ICO.arrow + '</button></div>';
+
+    document.getElementById('btnCont').onclick = () => nextPage();
+  }
+
+  /**
+   * Full speak-card + mic interaction (no autoplay — user holds mic).
+   * onPassContinue: after a successful pronunciation.
+   */
+  function mountSpeakPage(p, onPassContinue, idSuffix) {
+    const suf = idSuffix || 'Main';
+    const c = document.getElementById('lessonPageContent');
+    c.innerHTML =
+      '<div class="speak-page__content">' +
+      '<div class="speak-card" id="card' + suf + '">' +
+      '<button type="button" class="speak-card__iconBtn" id="iconBtn' + suf + '">' +
+      ICO.vol20 +
+      '</button>' +
+      '<div class="speak-card__textArea">' +
+      '<div class="speak-card__targetFr" id="frText' + suf + '">"' +
+      esc(p.target) +
+      '"</div>' +
+      '<div class="speak-card__targetEn">' +
+      esc(p.targetEnglish) +
+      '</div>' +
+      '</div>' +
+      '<div class="speak-card__resultSlot" id="resultSlot' + suf + '">' +
+      '<div class="speak-card__prompt">' +
+      esc(p.prompt) +
+      '</div>' +
+      '</div>' +
+      '</div>' +
+      '<div class="speak-page__feedback" id="feedbackStack' + suf + '"></div>' +
+      '</div>' +
+      '<div class="speak-page__bottom" id="bottomArea' + suf + '">' +
+      '<div class="lesson-mic__wrap lesson-mic__wrap--pulse" id="micWrap' + suf + '">' +
+      '<button type="button" class="lesson-mic" id="micBtn' + suf + '">' +
+      ICO.mic +
+      '</button>' +
+      '</div>' +
+      '<div class="lesson-mic__hint" id="micHint' + suf + '">Hold until word appears, then let go</div>' +
+      '</div>';
+
+    fitFrench(document.getElementById('frText' + suf));
+    const card = document.getElementById('card' + suf);
+    const iconBtn = document.getElementById('iconBtn' + suf);
+    const resultSlot = document.getElementById('resultSlot' + suf);
+    const feedbackStack = document.getElementById('feedbackStack' + suf);
+    const bottomArea = document.getElementById('bottomArea' + suf);
+    let phase = 'idle';
+    let nextSimulatedOutcome = 'wrong';
+
+    function mountBottom(pulseWrap, showTryAgain) {
+      bottomArea.innerHTML =
+        '<div class="lesson-mic__wrap' +
+        (pulseWrap ? ' lesson-mic__wrap--pulse' : '') +
+        '" id="micWrap' + suf + '"><button type="button" class="lesson-mic" id="micBtn' + suf + '">' +
+        ICO.mic +
+        '</button></div>' +
+        '<div class="lesson-mic__hint" id="micHint' + suf + '">Hold until word appears, then let go</div>' +
+        '<button type="button" class="speak-page__retry" id="tryAgainBtn' + suf + '" style="' +
+        (showTryAgain ? '' : 'display:none') +
+        '">' +
+        ICO.rotate +
+        ' Try again</button>';
+      document.getElementById('micBtn' + suf).onclick = onMicPress;
+      document.getElementById('tryAgainBtn' + suf).onclick = onTryAgain;
     }
-    return unique.slice(0, 3);
-}
 
-function startLesson(lessonId) {
-    clearTimers();
-    state.selectedLessonId = lessonId;
-    state.phase = "lesson_start";
-    state.pageIdx = 0;
-    state.testIdx = 0;
-    state.currentSpeak = null;
-    state.pageScores = [];
-    state.pageScoreEntries = [];
-    state.testScores = [];
-    state.learnedWords = new Set();
-    state.dialogue = null;
-    state.dialogueStandalone = false;
-    render();
-}
-
-function startDialogue(lessonId) {
-    clearTimers();
-    state.selectedLessonId = lessonId;
-    state.phase = "dialogue";
-    state.dialogue = null;
-    state.dialogueStandalone = true;
-    render();
-}
-
-function beginLessonPages() {
-    state.phase = "pages";
-    state.pageIdx = 0;
-    render();
-}
-
-function goNextPage() {
-    const lesson = currentLesson();
-    if (!lesson) return;
-    clearTimers();
-    state.currentSpeak = null;
-    state.pageIdx += 1;
-    if (state.pageIdx >= lesson.pages.length) {
-        state.phase = "test";
-        state.testIdx = 0;
-        render();
-        return;
+    function onTryAgain() {
+      if (phase !== 'retry') return;
+      phase = 'idle';
+      card.classList.remove('speak-card--fail', 'speak-card--pass');
+      iconBtn.classList.remove('speak-card__iconBtn--fail', 'speak-card__iconBtn--pass');
+      iconBtn.innerHTML = ICO.vol20;
+      resultSlot.innerHTML = '<div class="speak-card__prompt">' + esc(p.prompt) + '</div>';
+      feedbackStack.innerHTML = '';
+      mountBottom(true, false);
     }
-    render();
-}
 
-function renderStart() {
-    els.content.innerHTML = `
-        <div class="start-wrap">
-            <div class="launcher-title">Choose a lesson</div>
-            <div class="launcher-sub">Launcher for the full LessonPlayer simulation. Select a lesson to open its real start screen, or jump to dialogue-only simulation.</div>
-            <div class="lesson-list">
-                ${Object.values(LESSONS).map((lesson) => `
-                    <div class="dialogue-card-shell">
-                        <div class="lesson-chip">${lesson.id.replaceAll("_", " ")}</div>
-                        <div class="lesson-name">${esc(lesson.title)}</div>
-                        <div class="lesson-desc">${esc(lesson.subtitle)}</div>
-                        <div class="lesson-actions">
-                            <button class="lesson-action primary" data-lesson="${lesson.id}" type="button">Start lesson flow</button>
-                            <button class="lesson-action secondary" data-dialogue="${lesson.id}" type="button">Dialogue simulator</button>
-                        </div>
-                    </div>
-                `).join("")}
-            </div>
-        </div>
-    `;
-    els.content.querySelectorAll("[data-lesson]").forEach((btn) => {
-        btn.addEventListener("click", () => startLesson(btn.getAttribute("data-lesson")));
-    });
-    els.content.querySelectorAll("[data-dialogue]").forEach((btn) => {
-        btn.addEventListener("click", () => startDialogue(btn.getAttribute("data-dialogue")));
-    });
-}
+    function showFail() {
+      phase = 'retry';
+      card.classList.add('speak-card--fail');
+      iconBtn.classList.add('speak-card__iconBtn--fail');
+      iconBtn.innerHTML = ICO.x;
+      resultSlot.innerHTML =
+        '<div class="transcript-result transcript-result--fail">' +
+        displayTranscript(p.wrongTranscript) +
+        '</div>' +
+        '<div class="score-result"><div class="score-result__pill score-result__pill--warn">' +
+        '<span class="score-result__score">38%</span><span class="score-result__label">Try again</span></div></div>';
+      feedbackStack.innerHTML =
+        '<div class="retry-prompt">' +
+        '<div class="retry-prompt__score">38%</div>' +
+        '<div class="retry-prompt__label">Listen again:</div>' +
+        '<button type="button" class="retry-prompt__listen">' +
+        ICO.vol16 +
+        ' Hear it again</button></div>';
+      mountBottom(false, true);
+      nextSimulatedOutcome = 'right';
+    }
 
-function renderLessonStartScreen() {
-    const lesson = currentLesson();
-    if (!lesson) return renderStart();
-    const topics = collectWordsFromLesson(lesson).slice(0, 6);
-    const summary = {
-        speaking: lesson.pages.filter((p) => p.type === "speak" || (p.type === "narrate" && p.speakTarget)).length,
-        listening: lesson.pages.filter((p) => p.type === "narrate").length,
-        responding: lesson.pages.filter((p) => p.type === "respond").length,
-        dialogue: lesson.pages.filter((p) => p.type === "dialogue").length
-    };
-    els.content.innerHTML = `
-        <div class="lesson-start-screen">
-            <div class="start-head">
-                <div class="cefr-badge">${esc(lesson.cefrLevel || "A1")}</div>
-                <div class="start-main-title">${esc(lesson.title)}</div>
-                <div class="start-fr-title">${esc(lesson.titleFr || "")}</div>
-                <div class="start-meta">
-                    <div>${lesson.pages.length} pages</div>
-                    <div>~${lesson.estimatedMinutes || 6} min</div>
-                </div>
-            </div>
-            <div class="overview-card">
-                <div class="overview-title">Today's lesson</div>
-                <div class="overview-sub">${esc(lesson.subtitle || "")}</div>
-                ${topics.length ? `
-                    <div class="topic-label">You'll learn:</div>
-                    <div class="topic-grid">
-                        ${topics.map((t) => `<div class="topic-chip"><div class="topic-fr">${esc(t.french)}</div><div class="topic-en">${esc(t.english || "")}</div></div>`).join("")}
-                    </div>
-                ` : ""}
-                <div class="activity-row">
-                    ${summary.listening ? `<div class="activity-chip">Listen</div>` : ""}
-                    ${summary.speaking ? `<div class="activity-chip">Speak</div>` : ""}
-                    ${summary.responding ? `<div class="activity-chip">Quiz</div>` : ""}
-                    ${summary.dialogue ? `<div class="activity-chip">Dialogue</div>` : ""}
-                </div>
-            </div>
-            <div class="start-actions">
-                <button type="button" class="btn-primary" id="beginLessonBtn">Start ${ICO.arrowRight}</button>
-                <button type="button" class="back-link" id="backLauncherBtn">Go back</button>
-            </div>
-        </div>
-    `;
-    els.content.querySelector("#beginLessonBtn").addEventListener("click", beginLessonPages);
-    els.content.querySelector("#backLauncherBtn").addEventListener("click", () => {
-        state.phase = "start";
-        state.selectedLessonId = null;
-        render();
-    });
-}
+    function showPass() {
+      phase = 'done';
+      card.classList.remove('speak-card--fail');
+      card.classList.add('speak-card--pass');
+      iconBtn.classList.remove('speak-card__iconBtn--fail');
+      iconBtn.classList.add('speak-card__iconBtn--pass');
+      iconBtn.innerHTML = ICO.check;
+      resultSlot.innerHTML =
+        '<div class="transcript-result transcript-result--pass">' +
+        displayTranscript(p.target) +
+        '</div>' +
+        '<div class="score-result"><div class="score-result__pill">' +
+        '<span class="score-result__score">96%</span><span class="score-result__label">Excellent</span></div></div>';
+      feedbackStack.innerHTML = '';
+      bottomArea.innerHTML =
+        '<button type="button" class="pg-continueBtn" id="btnNext' + suf + '">Continue ' + ICO.arrow + '</button>';
+      document.getElementById('btnNext' + suf).onclick = () => onPassContinue();
+    }
 
-function attachMicHandlers(micEl, onStart, onStop) {
-    if (!micEl) return;
-    const begin = (e) => {
-        e.preventDefault();
-        onStart();
-    };
-    const end = (e) => {
-        e.preventDefault();
-        onStop();
-    };
-    micEl.addEventListener("mousedown", begin);
-    micEl.addEventListener("touchstart", begin, { passive: false });
-    window.addEventListener("mouseup", end, { once: true });
-    window.addEventListener("touchend", end, { once: true });
-}
+    function onMicPress() {
+      if (phase === 'recording' || phase === 'done' || phase === 'retry') return;
+      const mic = document.getElementById('micBtn' + suf);
+      const wrap = document.getElementById('micWrap' + suf);
+      const hint = document.getElementById('micHint' + suf);
+      if (!mic) return;
+      phase = 'recording';
+      if (wrap) wrap.classList.remove('lesson-mic__wrap--pulse');
+      mic.classList.add('lesson-mic--recording');
+      if (hint) hint.textContent = 'Listening...';
+      speakTimers.push(setTimeout(() => {
+        const m = document.getElementById('micBtn' + suf);
+        const h = document.getElementById('micHint' + suf);
+        if (m) m.classList.remove('lesson-mic--recording');
+        if (h) h.textContent = '';
+        if (nextSimulatedOutcome === 'wrong') showFail(); else showPass();
+      }, 1600));
+    }
 
-function renderSpeakBlock({ parent, prompt, target, targetEnglish, wrongTranscript, onComplete, trackToPageScores = true }) {
-    parent.innerHTML = `
-        <div class="card" id="speakCard">
-            <button type="button" class="icon-btn" id="speakIcon">${ICO.volume2}</button>
-            <div class="text-area">
-                <div class="french-text" id="speakTarget">"${esc(target)}"</div>
-                <div class="english-hint">${esc(targetEnglish || "")}</div>
-            </div>
-            <div class="result-slot" id="speakResult"><div class="prompt-label">${esc(prompt || "Say it back")}</div></div>
-        </div>
-        <div class="feedback-stack" id="speakFeedback"></div>
-        <div class="bottom-area" id="speakBottom"></div>
-    `;
-    fitFrench(parent.querySelector("#speakTarget"));
+    mountBottom(true, false);
+  }
 
-    const speak = {
-        phase: "ready",
-        nextOutcome: "wrong",
-        attempts: 0
-    };
-    state.currentSpeak = speak;
+  function renderNarrateSpeak(data, speakCfg) {
+    const c = document.getElementById('lessonPageContent');
+    const vocabHtml = data.vocab.length
+      ? '<div class="pg-vocabSection">' + data.vocab.map(v =>
+          '<div class="pg-vocabCard"><button type="button" class="pg-vocabPlay">' + ICO.vol16 + '</button><div><div class="pg-vocabFr">' + esc(v.french) + '</div><div class="pg-vocabEn">' + esc(v.english) + '</div></div></div>').join('') + '</div>'
+      : '';
+    c.innerHTML =
+      '<div class="narrate-speak-stack">' +
+      '<div class="pg-scroll"><div class="pg-narrationBlock"><div class="pg-narrationText">' + highlightNarration(data.text) + '</div></div>' + vocabHtml + '</div>' +
+      '<div class="speak-page__content" style="padding-top:12px;padding-bottom:0;">' +
+      '<div class="speak-card" id="cardB">' +
+      '<button type="button" class="speak-card__iconBtn" id="iconBtnB">' + ICO.vol20 + '</button>' +
+      '<div class="speak-card__textArea">' +
+      '<div class="speak-card__targetFr" id="frTextB">"' + esc(speakCfg.target) + '"</div>' +
+      '<div class="speak-card__targetEn">' + esc(speakCfg.targetEnglish) + '</div>' +
+      '</div>' +
+      '<div class="speak-card__resultSlot" id="resultSlotB">' +
+      '<div class="speak-card__prompt">' + esc(speakCfg.prompt) + '</div>' +
+      '</div></div>' +
+      '<div class="speak-page__feedback" id="feedbackStackB"></div>' +
+      '</div>' +
+      '<div class="speak-page__bottom" id="bottomAreaB"></div>' +
+      '</div>';
 
-    const card = parent.querySelector("#speakCard");
-    const icon = parent.querySelector("#speakIcon");
-    const result = parent.querySelector("#speakResult");
-    const feedback = parent.querySelector("#speakFeedback");
-    const bottom = parent.querySelector("#speakBottom");
+    fitFrench(document.getElementById('frTextB'));
+    const p = speakCfg;
+    const card = document.getElementById('cardB');
+    const iconBtn = document.getElementById('iconBtnB');
+    const resultSlot = document.getElementById('resultSlotB');
+    const feedbackStack = document.getElementById('feedbackStackB');
+    const bottomArea = document.getElementById('bottomAreaB');
+    let phase = 'idle';
+    let nextSimulatedOutcome = 'wrong';
 
-    function mountBottom() {
-        const showTry = speak.phase === "retry";
-        const showMic = speak.phase !== "done";
-        bottom.innerHTML = `
-            ${showMic ? `<button type="button" class="mic-btn ${speak.phase === "ready" ? "pulse" : ""}" id="micBtn">${ICO.mic}</button><div class="mic-hint" id="micHint">${speak.phase === "recording" ? "Listening..." : "Hold until word appears, then let go"}</div>` : ""}
-            ${showTry ? `<button type="button" class="retry-button" id="retryBtn">${ICO.rotateCcw} Try again</button>` : ""}
-            ${speak.phase === "done" ? `<button type="button" class="btn-primary" id="continueBtn">Continue ${ICO.arrowRight}</button>` : ""}
-        `;
-        if (showMic) {
-            const mic = bottom.querySelector("#micBtn");
-            const hint = bottom.querySelector("#micHint");
-            attachMicHandlers(
-                mic,
-                () => {
-                    if (speak.phase !== "ready") return;
-                    speak.phase = "recording";
-                    state.recordingStart = Date.now();
-                    mic.classList.remove("pulse");
-                    mic.classList.add("recording");
-                    hint.textContent = "Listening...";
-                },
-                () => {
-                    if (speak.phase !== "recording") return;
-                    const heldMs = Date.now() - state.recordingStart;
-                    if (heldMs < 400) return;
-                    mic.classList.remove("recording");
-                    hint.textContent = "";
-                    resolveAttempt();
-                }
-            );
+    function mountBottom(pulseWrap, showTryAgain) {
+      bottomArea.innerHTML =
+        '<div class="lesson-mic__wrap' + (pulseWrap ? ' lesson-mic__wrap--pulse' : '') + '" id="micWrapB">' +
+        '<button type="button" class="lesson-mic" id="micBtnB">' + ICO.mic + '</button></div>' +
+        '<div class="lesson-mic__hint" id="micHintB">Hold until word appears, then let go</div>' +
+        '<button type="button" class="speak-page__retry" id="tryAgainBtnB" style="' + (showTryAgain ? '' : 'display:none') + '">' +
+        ICO.rotate + ' Try again</button>';
+      document.getElementById('micBtnB').onclick = onMicPress;
+      document.getElementById('tryAgainBtnB').onclick = onTryAgain;
+    }
+
+    function onTryAgain() {
+      if (phase !== 'retry') return;
+      phase = 'idle';
+      card.classList.remove('speak-card--fail', 'speak-card--pass');
+      iconBtn.classList.remove('speak-card__iconBtn--fail', 'speak-card__iconBtn--pass');
+      iconBtn.innerHTML = ICO.vol20;
+      resultSlot.innerHTML = '<div class="speak-card__prompt">' + esc(p.prompt) + '</div>';
+      feedbackStack.innerHTML = '';
+      mountBottom(true, false);
+    }
+
+    function showFail() {
+      phase = 'retry';
+      card.classList.add('speak-card--fail');
+      iconBtn.classList.add('speak-card__iconBtn--fail');
+      iconBtn.innerHTML = ICO.x;
+      resultSlot.innerHTML =
+        '<div class="transcript-result transcript-result--fail">' + displayTranscript(p.wrongTranscript) + '</div>' +
+        '<div class="score-result"><div class="score-result__pill score-result__pill--warn">' +
+        '<span class="score-result__score">38%</span><span class="score-result__label">Try again</span></div></div>';
+      feedbackStack.innerHTML =
+        '<div class="retry-prompt"><div class="retry-prompt__score">38%</div>' +
+        '<div class="retry-prompt__label">Listen again:</div>' +
+        '<button type="button" class="retry-prompt__listen">' + ICO.vol16 + ' Hear it again</button></div>';
+      mountBottom(false, true);
+      nextSimulatedOutcome = 'right';
+    }
+
+    function showPass() {
+      phase = 'done';
+      card.classList.remove('speak-card--fail');
+      card.classList.add('speak-card--pass');
+      iconBtn.classList.remove('speak-card__iconBtn--fail');
+      iconBtn.classList.add('speak-card__iconBtn--pass');
+      iconBtn.innerHTML = ICO.check;
+      resultSlot.innerHTML =
+        '<div class="transcript-result transcript-result--pass">' + displayTranscript(p.target) + '</div>' +
+        '<div class="score-result"><div class="score-result__pill">' +
+        '<span class="score-result__score">96%</span><span class="score-result__label">Excellent</span></div></div>';
+      feedbackStack.innerHTML = '';
+      bottomArea.innerHTML =
+        '<button type="button" class="pg-continueBtn" id="btnNextB">Continue ' + ICO.arrow + '</button>';
+      document.getElementById('btnNextB').onclick = () => nextPage();
+    }
+
+    function onMicPress() {
+      if (phase === 'recording' || phase === 'done' || phase === 'retry') return;
+      const mic = document.getElementById('micBtnB');
+      const wrap = document.getElementById('micWrapB');
+      const hint = document.getElementById('micHintB');
+      if (!mic) return;
+      phase = 'recording';
+      if (wrap) wrap.classList.remove('lesson-mic__wrap--pulse');
+      mic.classList.add('lesson-mic--recording');
+      if (hint) hint.textContent = 'Listening...';
+      speakTimers.push(setTimeout(() => {
+        const m = document.getElementById('micBtnB');
+        const h = document.getElementById('micHintB');
+        if (m) m.classList.remove('lesson-mic--recording');
+        if (h) h.textContent = '';
+        if (nextSimulatedOutcome === 'wrong') showFail(); else showPass();
+      }, 1600));
+    }
+
+    mountBottom(true, false);
+  }
+
+  function lsTutorHtml(fr, en) {
+    return (
+      '<div class="ls-tutor-row"><div class="ls-tutor-bubble">' +
+      '<div class="ls-tutor-fr">' + lsEsc(fr) + '</div>' +
+      '<div class="ls-tutor-en">' + lsEsc(en) + '</div></div></div>'
+    );
+  }
+
+  function lsUserHtml(text) {
+    return (
+      '<div class="ls-user-row"><div class="ls-user-bubble">' +
+      '<div class="ls-user-text">' + lsEsc(text) + '</div></div></div>'
+    );
+  }
+
+  function lsSetProgress(idx, total) {
+    const el = document.getElementById('lsProgFill');
+    if (el) el.style.width = total > 0 ? Math.round((idx / total) * 100) + '%' : '0%';
+  }
+
+  function lsRenderBottom(mode, text) {
+    const bottom = document.getElementById('lsBottomArea');
+    if (!bottom) return;
+    if (mode === 'none') {
+      bottom.innerHTML = '';
+      return;
+    }
+    if (mode === 'listen') {
+      const body =
+        text && text.length
+          ? '<span class="ls-listen-text ls-listen-live">' + lsEsc(text) + '</span>'
+          : '<span class="ls-listen-text ls-listen-pulse">Listening...</span>';
+      bottom.innerHTML =
+        '<div class="ls-listening"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8863A" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>' +
+        body +
+        '</div>';
+      return;
+    }
+    if (mode === 'ready') {
+      bottom.innerHTML =
+        '<div class="ls-listening"><div class="ls-spinner" aria-hidden="true"></div>' +
+        '<span class="ls-listen-text">' + lsEsc(text || 'Get ready to speak...') + '</span></div>';
+    }
+  }
+
+  function lsShowPanel(ex) {
+    const panel = document.getElementById('lsRespondPanel');
+    const fr = document.getElementById('lsTargetFr');
+    const en = document.getElementById('lsTargetEn');
+    const fb = document.getElementById('lsRespondFb');
+    if (!panel || !fr || !en || !fb) return;
+    fb.classList.add('is-hidden');
+    fb.innerHTML = '';
+    fr.innerHTML =
+      '<span class="ls-q">"</span>' + lsEsc(ex.french) + '<span class="ls-q">"</span>';
+    en.textContent = ex.english;
+    panel.classList.remove('is-hidden');
+  }
+
+  function lsHidePanel() {
+    document.getElementById('lsRespondPanel')?.classList.add('is-hidden');
+    const fb = document.getElementById('lsRespondFb');
+    if (fb) {
+      fb.classList.add('is-hidden');
+      fb.innerHTML = '';
+    }
+  }
+
+  function lsShowFeedback(pct, transcript) {
+    const fb = document.getElementById('lsRespondFb');
+    if (!fb) return;
+    const iconOk =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="#4CAF7D" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 12 2 2 4-4"/></svg>';
+    fb.className = 'ls-respond-feedback ls-correct';
+    fb.innerHTML =
+      '<div class="ls-feedback-row">' +
+      iconOk +
+      '<span class="ls-feedback-pct">' +
+      pct +
+      '%</span></div>' +
+      '<div class="ls-feedback-transcript">You said: &ldquo;' +
+      lsEsc(transcript) +
+      '&rdquo;</div>';
+    fb.classList.remove('is-hidden');
+  }
+
+  function lsPushChat(html) {
+    const scroll = document.getElementById('lsChatScroll');
+    if (!scroll) return;
+    scroll.insertAdjacentHTML('beforeend', html);
+    scroll.scrollTop = scroll.scrollHeight;
+  }
+
+  function renderDialogue() {
+    clearDialogueTimers();
+    const c = document.getElementById('lessonPageContent');
+    document.getElementById('lpTitle').textContent = 'Au café';
+    c.innerHTML =
+      '<div class="ls-host">' +
+      '<div class="ls-progress-bar"><div class="ls-progress-fill" id="lsProgFill" style="width:0%"></div></div>' +
+      '<div class="ls-chat-scroll" id="lsChatScroll"></div>' +
+      '<div class="ls-response-column">' +
+      '<div class="ls-respond-panel is-hidden" id="lsRespondPanel">' +
+      '<div class="ls-respond-label">Respond with</div>' +
+      '<div class="ls-respond-target" id="lsTargetFr"></div>' +
+      '<div class="ls-respond-en" id="lsTargetEn"></div>' +
+      '<div class="ls-respond-feedback is-hidden" id="lsRespondFb"></div>' +
+      '</div>' +
+      '<div class="ls-bottom-area" id="lsBottomArea"></div>' +
+      '</div></div>';
+
+    const total = LS_EXCHANGES.length;
+
+    function runTyping(full, charMs, onDone) {
+      lsRenderBottom('listen', '');
+      lsSchedule(() => {
+        let i = 0;
+        function tick() {
+          i += 1;
+          lsRenderBottom('listen', full.slice(0, i));
+          if (i < full.length) lsSchedule(tick, charMs);
+          else onDone();
         }
-        const retryBtn = bottom.querySelector("#retryBtn");
-        if (retryBtn) {
-            retryBtn.addEventListener("click", () => {
-                speak.phase = "ready";
-                card.classList.remove("fail");
-                icon.classList.remove("fail");
-                icon.innerHTML = ICO.volume2;
-                result.innerHTML = '<div class="prompt-label">' + esc(prompt || "Say it back") + "</div>";
-                feedback.innerHTML = "";
-                mountBottom();
-            });
+        tick();
+      }, LS_LISTEN_MS);
+    }
+
+    function afterUserBubble(attempts, charMs, thenFn) {
+      const a = attempts[0];
+      runTyping(a.text, charMs, () => {
+        lsRenderBottom('none', '');
+        lsShowFeedback(a.pct, a.text);
+        lsSchedule(() => {
+          lsPushChat(lsUserHtml(a.text));
+          lsHidePanel();
+          lsRenderBottom('none', '');
+          lsSchedule(thenFn, 400);
+        }, LS_FEEDBACK_MS + LS_HIDE_MS);
+      });
+    }
+
+    function loopFromTutor(tutorIdx) {
+      lsSetProgress(tutorIdx, total);
+      const ex = LS_EXCHANGES[tutorIdx];
+      if (!ex) {
+        lsSchedule(() => showResults(), 500);
+        return;
+      }
+      if (ex.speaker !== 'tutor') {
+        lsSchedule(() => showResults(), 400);
+        return;
+      }
+      lsPushChat(lsTutorHtml(ex.french, ex.english));
+      lsSchedule(() => {
+        const next = LS_EXCHANGES[tutorIdx + 1];
+        if (next && next.speaker === 'user') {
+          const attempts = tutorIdx === 0 ? LS_U1 : LS_U2;
+          lsShowPanel(next);
+          lsRenderBottom('ready', 'Get ready to speak...');
+          lsSchedule(() => {
+            afterUserBubble(attempts, 32, () => loopFromTutor(tutorIdx + 2));
+          }, 900);
+        } else {
+          lsSchedule(() => showResults(), 600);
         }
-        const continueBtn = bottom.querySelector("#continueBtn");
-        if (continueBtn) continueBtn.addEventListener("click", onComplete);
+      }, 500);
     }
 
-    function setFailUI() {
-        card.classList.remove("pass");
-        card.classList.add("fail");
-        icon.classList.remove("pass");
-        icon.classList.add("fail");
-        icon.innerHTML = ICO.x;
-        result.innerHTML =
-            '<div class="transcript fail">' + formatTranscript(wrongTranscript || "bonjour") + "</div>" +
-            '<div class="score-pill warn"><span class="score-pct warn">38%</span><span class="score-lbl warn">Try again</span></div>';
-        feedback.innerHTML = `
-            <div class="retry-area">
-                <div class="retry-score-big">38%</div>
-                <div class="retry-lbl">Listen again and try:</div>
-                <button type="button" class="listen-btn-sm">${ICO.volume2} Hear it again</button>
-            </div>
-        `;
-        speak.phase = "retry";
-        speak.nextOutcome = "right";
-        mountBottom();
-    }
+    lsSetProgress(0, total);
+    lsSchedule(() => loopFromTutor(0), 400);
+  }
 
-    function setPassUI() {
-        card.classList.remove("fail");
-        card.classList.add("pass");
-        icon.classList.remove("fail");
-        icon.classList.add("pass");
-        icon.innerHTML = ICO.check;
-        result.innerHTML =
-            '<div class="transcript pass">' + formatTranscript(target) + "</div>" +
-            '<div class="score-pill"><span class="score-pct">96%</span><span class="score-lbl">Excellent</span></div>';
-        feedback.innerHTML = "";
-        speak.phase = "done";
-        mountBottom();
-    }
+  function renderPage() {
+    document.getElementById('lpTitle').textContent = lessonTitle;
+    setLpbFill();
+    clearSpeakTimers();
+    clearDialogueTimers();
+    if (pageIdx === 0) renderNarrate(PAGE0);
+    else if (pageIdx === 1) mountSpeakPage(SPEAK, () => nextPage(), 'A');
+    else if (pageIdx === 2) renderNarrateSpeak(PAGE2, SPEAK2);
+    else if (pageIdx === 3) renderDialogue();
+  }
 
-    function resolveAttempt() {
-        speak.attempts += 1;
-        if (speak.nextOutcome === "wrong") {
-            if (trackToPageScores) recordPageScoreEntry("speak", 0.38, "speak");
-            setFailUI();
-            return;
-        }
-        if (trackToPageScores) recordPageScoreEntry("speak", 0.96, "speak");
-        state.learnedWords.add(target.toLowerCase());
-        setPassUI();
-    }
+  document.getElementById('lpBack').onclick = () => alert('Exit lesson? (simulated)');
+  document.getElementById('lrPlayGame').onclick = () => alert('router.push /game/... (simulated)');
+  document.getElementById('lrNext').onclick = () => { showPlayer(); pageIdx = 0; renderPage(); };
+  document.getElementById('lrExit').onclick = () => { showPlayer(); pageIdx = 0; renderPage(); };
 
-    mountBottom();
-}
+  showPlayer();
+  renderPage();
 
-function renderNarratePage(page, lesson) {
-    (page.vocab || []).forEach((w) => state.learnedWords.add(w.french.toLowerCase()));
-    const hasInlineSpeak = !!(page.speakTarget && page.speakTarget.trim());
-    const vocabHtml = (page.vocab || []).length > 0 ? `
-        <div class="vocab-section">
-            ${(page.vocab || []).map((v, i) => `
-                <div class="vocab-card" style="animation-delay:${(0.1 + i * 0.1).toFixed(2)}s">
-                    <button type="button" class="vocab-play">${ICO.volume2}</button>
-                    <div><div class="vocab-fr">${esc(v.french)}</div><div class="vocab-en">${esc(v.english)}</div></div>
-                </div>
-            `).join("")}
-        </div>
-    ` : "";
-
-    if (!hasInlineSpeak) {
-        els.content.innerHTML = `
-            <div class="scroll-area">
-                <div class="narration-block"><div class="narration-text">${highlightNarration(page, lesson)}</div></div>
-                ${vocabHtml}
-            </div>
-            <div class="bottom-abs">
-                <button type="button" class="btn-primary" id="continueBtn">Continue ${ICO.arrowRight}</button>
-            </div>
-        `;
-        const btn = els.content.querySelector("#continueBtn");
-        btn.addEventListener("click", goNextPage);
-        return;
-    }
-
-    els.content.innerHTML = `
-        <div class="scroll-area" id="narrateScroll">
-            <div class="narration-block"><div class="narration-text">${highlightNarration(page, lesson)}</div></div>
-            ${vocabHtml}
-            <div class="center-content" style="padding: 22px 8px 0;">
-                <div id="inlineSpeakMount"></div>
-            </div>
-        </div>
-    `;
-    const mount = els.content.querySelector("#inlineSpeakMount");
-    renderSpeakBlock({
-        parent: mount,
-        prompt: page.speakPrompt || "Say it back",
-        target: page.speakTarget,
-        targetEnglish: page.speakTargetEnglish || "",
-        wrongTranscript: page.wrongTranscript || "bonjour",
-        onComplete: goNextPage
-    });
-}
-
-function renderSpeakPage(page) {
-    els.content.innerHTML = '<div class="center-content"><div id="speakMount" style="width:100%"></div></div>';
-    const mount = els.content.querySelector("#speakMount");
-    renderSpeakBlock({
-        parent: mount,
-        prompt: page.speakPrompt || "Say it back",
-        target: page.speakTarget,
-        targetEnglish: page.speakTargetEnglish || "",
-        wrongTranscript: page.wrongTranscript || "bonjour",
-        onComplete: goNextPage
-    });
-}
-
-function renderRespondPage(page) {
-    const options = page.respondOptions || [];
-    const correct = page.respondCorrectAnswer || "";
-    let phase = "ready";
-    let recordingStart = 0;
-    let liveTranscript = "";
-    let score = 0;
-
-    els.content.innerHTML = `
-        <div class="center-content" style="padding-top:40px;">
-            <div class="card" id="respondCard">
-                <div class="text-area" style="padding:0 10px">
-                    <div class="french-text" style="font-size:22px;color:#2C2C2C;font-family:inherit;line-height:1.35;">${esc(page.respondQuestion || "")}</div>
-                </div>
-                <div class="result-slot" id="respondResult"><div class="prompt-label">Say it back</div></div>
-            </div>
-            <div class="feedback-stack" id="respondFeedback"></div>
-        </div>
-        <div class="bottom-area" id="respondBottom"></div>
-    `;
-    const card = els.content.querySelector("#respondCard");
-    const resultEl = els.content.querySelector("#respondResult");
-    const feedbackEl = els.content.querySelector("#respondFeedback");
-    const bottomEl = els.content.querySelector("#respondBottom");
-
-    function finalize(isCorrect, method, answer, pct) {
-        phase = "answered";
-        score = isCorrect ? (method === "tap" ? 0.5 : Math.max(0.76, pct / 100)) : (method === "tap" ? 0 : 0.25);
-        recordPageScoreEntry("respond", score, method);
-        resultEl.innerHTML = '<div class="transcript ' + (isCorrect ? "pass" : "fail") + '">' + formatTranscript(answer) + "</div>";
-        feedbackEl.innerHTML = `
-            <div class="retry-area">
-                <div class="retry-score-big">${Math.round(score * 100)}%</div>
-                ${!isCorrect ? `<div class="retry-lbl">Correct: ${esc(correct)}</div>` : ""}
-                ${!isCorrect && page.respondExplanation ? `<div class="retry-lbl" style="font-size:13px">${esc(page.respondExplanation)}</div>` : ""}
-            </div>
-        `;
-        mountBottom();
-    }
-
-    function mountBottom() {
-        if (phase === "answered") {
-            bottomEl.innerHTML = `<button type="button" class="btn-primary" id="respondNext">Continue ${ICO.arrowRight}</button>`;
-            bottomEl.querySelector("#respondNext").addEventListener("click", goNextPage);
-            return;
-        }
-        bottomEl.innerHTML = `
-            <button type="button" class="mic-btn pulse" id="respondMic">${ICO.mic}</button>
-            <div class="mic-hint" id="respondHint">${phase === "recording" ? "Listening..." : "Hold until word appears, then let go"}</div>
-            ${options.length > 0 ? `<div class="retry-lbl" style="margin-top:12px;margin-bottom:6px;">or tap for less points:</div>` : ""}
-            <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px" id="respondOpts">
-                ${options.map((o) => `<button class="retry-button" style="margin-top:0;padding:10px 14px;border-color:#E8E3DC;color:#2C2C2C;" data-opt="${esc(o.text)}">${esc(o.text)}</button>`).join("")}
-            </div>
-        `;
-        const mic = bottomEl.querySelector("#respondMic");
-        const hint = bottomEl.querySelector("#respondHint");
-        attachMicHandlers(
-            mic,
-            () => {
-                if (phase === "answered") return;
-                phase = "recording";
-                recordingStart = Date.now();
-                mic.classList.add("recording");
-                mic.classList.remove("pulse");
-                hint.textContent = "Listening...";
-            },
-            () => {
-                if (phase !== "recording") return;
-                if (Date.now() - recordingStart < 400) return;
-                mic.classList.remove("recording");
-                liveTranscript = (page.respondCorrectSpoken || correct || "").toLowerCase();
-                const pass = Math.random() > 0.25;
-                finalize(pass, "speak", pass ? liveTranscript : "incorrect answer", pass ? 88 : 25);
-            }
-        );
-        bottomEl.querySelectorAll("[data-opt]").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const ans = btn.getAttribute("data-opt");
-                finalize(ans.toLowerCase() === correct.toLowerCase(), "tap", ans, ans.toLowerCase() === correct.toLowerCase() ? 50 : 0);
-            });
-        });
-    }
-    mountBottom();
-}
-
-function renderMiniTest() {
-    const lesson = currentLesson();
-    const q = (lesson.testQuestions || [])[state.testIdx];
-    if (!q) {
-        state.phase = "results";
-        render();
-        return;
-    }
-
-    function completeQuestion(sc) {
-        state.testScores.push(sc);
-        state.testIdx += 1;
-        if (state.testIdx >= (lesson.testQuestions || []).length) {
-            state.phase = "results";
-        }
-        render();
-    }
-
-    if (q.type === "speak") {
-        const total = (lesson.testQuestions || []).length || 1;
-        const pct = ((state.testIdx + 1) / total) * 100;
-        els.content.innerHTML = `
-            <div class="test-screen">
-                <div class="test-header">
-                    <div class="test-header-text">Mini-Test</div>
-                    <button class="test-exit" id="testExitBtn" type="button">${ICO.x}</button>
-                </div>
-                <div class="test-progress">
-                    <div class="test-track"><div class="test-fill" style="width:${pct}%"></div></div>
-                    <div class="test-label">Test: ${state.testIdx + 1} of ${total}</div>
-                </div>
-                <div class="center-content"><div id="testSpeakMount" style="width:100%"></div></div>
-            </div>
-        `;
-        els.content.querySelector("#testExitBtn").addEventListener("click", () => {
-            state.phase = "start";
-            state.selectedLessonId = null;
-            render();
-        });
-        renderSpeakBlock({
-            parent: els.content.querySelector("#testSpeakMount"),
-            prompt: q.speakPrompt || "Say it back",
-            target: q.speakTarget || "",
-            targetEnglish: "",
-            wrongTranscript: "incorrect",
-            onComplete: () => completeQuestion(0.9),
-            trackToPageScores: false
-        });
-        return;
-    }
-
-    const options = q.respondOptions || [];
-    const total = (lesson.testQuestions || []).length || 1;
-    const pct = ((state.testIdx + 1) / total) * 100;
-    els.content.innerHTML = `
-        <div class="test-screen">
-            <div class="test-header">
-                <div class="test-header-text">Mini-Test</div>
-                <button class="test-exit" id="testExitBtn" type="button">${ICO.x}</button>
-            </div>
-            <div class="test-progress">
-                <div class="test-track"><div class="test-fill" style="width:${pct}%"></div></div>
-                <div class="test-label">Test: ${state.testIdx + 1} of ${total}</div>
-            </div>
-            <div class="center-content" style="padding-top:40px;">
-                <div class="card">
-                    <div class="text-area" style="padding:0 10px">
-                        <div class="french-text" style="font-size:22px;color:#2C2C2C;font-family:inherit;line-height:1.35;">${esc(q.respondQuestion || "")}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="bottom-area">
-                <button type="button" class="mic-btn pulse" id="testMic">${ICO.mic}</button>
-                <div class="mic-hint">Hold until word appears, then let go</div>
-                ${options.length ? `<div class="retry-lbl" style="margin-top:12px;margin-bottom:6px;">or tap for less points:</div>` : ""}
-                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;">
-                    ${options.map((o) => `<button class="retry-button" style="margin-top:0;padding:10px 14px;border-color:#E8E3DC;color:#2C2C2C;" data-test-opt="${esc(o.text)}">${esc(o.text)}</button>`).join("")}
-                </div>
-                <button type="button" class="btn-primary" id="testNext" style="margin-top:14px;">Next Question ${ICO.arrowRight}</button>
-            </div>
-        </div>
-    `;
-    els.content.querySelector("#testExitBtn").addEventListener("click", () => {
-        state.phase = "start";
-        state.selectedLessonId = null;
-        render();
-    });
-    els.content.querySelector("#testNext").addEventListener("click", () => completeQuestion(0.8));
-    els.content.querySelectorAll("[data-test-opt]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const picked = btn.getAttribute("data-test-opt");
-            const correct = (q.respondCorrectAnswer || "").toLowerCase();
-            const isCorrect = picked.toLowerCase() === correct;
-            completeQuestion(isCorrect ? 0.5 : 0);
-        });
-    });
-}
-
-function renderResults() {
-    const lesson = currentLesson();
-    if (!lesson) return;
-    const vocab = collectWordsFromLesson(lesson);
-    const recs = getGameRecommendations(lesson.pages);
-    const testAvg = state.testScores.length ? (state.testScores.reduce((a, b) => a + b, 0) / state.testScores.length) : 0;
-    const testScore = Math.round(testAvg * 100);
-    const speakEntries = state.pageScoreEntries.filter((p) => p.type === "speak" || p.type === "dialogue");
-    const pronAvg = speakEntries.length ? (speakEntries.reduce((a, b) => a + b.score, 0) / speakEntries.length) : 0;
-    const pronScore = Math.round(pronAvg * 100);
-    const respondEntries = state.pageScoreEntries.filter((p) => p.type === "respond");
-    const spokenResponds = respondEntries.filter((p) => p.method === "speak");
-    const spokenScore = respondEntries.length ? Math.round((spokenResponds.length / respondEntries.length) * 100) : 0;
-    let stars = 0;
-    if (testAvg >= 0.95) stars = 5;
-    else if (testAvg >= 0.85) stars = 4;
-    else if (testAvg >= 0.70) stars = 3;
-    else if (testAvg >= 0.50) stars = 2;
-    else if (testAvg > 0) stars = 1;
-    const xp = stars >= 5 ? 200 : 100;
-    const title = stars >= 5 ? "Perfect!" : stars >= 4 ? "Excellent!" : stars >= 3 ? "Great Job!" : stars >= 2 ? "Well Done!" : "Lesson Complete";
-
-    els.content.innerHTML = `
-        <div class="results-wrap">
-            <div class="stars-row">${[1,2,3,4,5].map((i) => `<span class="${i <= stars ? "fill" : ""}">${ICO.star}</span>`).join("")}</div>
-            <div class="results-title">${title}</div>
-            <div class="xp-badge">+${xp} XP</div>
-            <div class="score-grid">
-                <div class="score-card"><div class="score-value">${testScore}%</div><div class="score-label">Test Score</div></div>
-                <div class="score-card"><div class="score-value">${pronScore}%</div><div class="score-label">Pronunciation</div></div>
-                <div class="score-card"><div class="score-value">${spokenScore}%</div><div class="score-label">Spoken Answers</div></div>
-            </div>
-
-            <div class="section-title">Words Learned (${vocab.length})</div>
-            ${vocab.map((w) => `
-                <div class="vocab-row">
-                    <button type="button" class="vocab-play">${ICO.volume2}</button>
-                    <div class="vocab-fr">${esc(w.french)}</div>
-                    <div class="vocab-en">${esc(w.english || "")}</div>
-                </div>
-            `).join("")}
-
-            <div class="section-title">Practice What You Learned</div>
-            <button type="button" class="game-btn" id="playGameBtn">Play ${esc(GAME_NAME[recs[0]] || recs[0])}</button>
-        </div>
-        <div class="results-bottom">
-            <button type="button" class="btn-primary" id="nextLessonBtn">Next Lesson ${ICO.arrowRight}</button>
-            <button type="button" class="back-lessons" id="backLessonsBtn">${ICO.rotateCcw} Back to Lessons</button>
-        </div>
-    `;
-    els.content.querySelector("#playGameBtn").addEventListener("click", () => {
-        state.lastRecommendedGame = recs[0];
-        state.phase = "game";
-        render();
-    });
-    els.content.querySelector("#nextLessonBtn").addEventListener("click", () => {
-        const order = Object.keys(LESSONS);
-        const idx = order.indexOf(state.selectedLessonId);
-        const nextId = order[(idx + 1) % order.length];
-        startLesson(nextId);
-    });
-    els.content.querySelector("#backLessonsBtn").addEventListener("click", () => {
-        state.phase = "start";
-        state.selectedLessonId = null;
-        render();
-    });
-}
-
-function renderGamePreview() {
-    const gameId = state.lastRecommendedGame || "word-catch";
-    const gameName = GAME_NAME[gameId] || gameId;
-    els.content.innerHTML = `
-        <div class="game-sim">
-            <div class="game-badge">Game Simulator</div>
-            <div class="game-title">${esc(gameName)}</div>
-            <div class="game-sub">This is a standalone game surface outside lesson pages, matching the LessonResults recommendation handoff.</div>
-            <button type="button" class="btn-primary" id="returnResultsBtn">Return to Results</button>
-            <button type="button" class="ghost-btn" id="toLessonsBtn">Back to lesson list</button>
-        </div>
-    `;
-    els.content.querySelector("#returnResultsBtn").addEventListener("click", () => {
-        state.phase = "results";
-        render();
-    });
-    els.content.querySelector("#toLessonsBtn").addEventListener("click", () => {
-        state.phase = "start";
-        state.selectedLessonId = null;
-        render();
-    });
-}
-
-function renderDialoguePage() {
-    const lesson = currentLesson();
-    if (!lesson || !lesson.dialogueExchanges || lesson.dialogueExchanges.length === 0) {
-        state.phase = "start";
-        render();
-        return;
-    }
-    const exchanges = lesson.dialogueExchanges;
-    const characterName = lesson.dialogueCharacterName || "Tutor";
-    state.dialogue = {
-        currentExchange: 0,
-        exchangeState: "tutor_playing",
-        attempts: 0,
-        score: 0,
-        scores: [],
-        completedExchanges: [],
-        dialogueComplete: false,
-        liveTranscript: "",
-        recordingStart: 0
-    };
-
-    els.content.innerHTML = `
-        <div class="dialogue-wrap">
-            <div class="dialogue-header">Put it all together:</div>
-            <div class="chat-area" id="chatArea"><div class="chat-content" id="chatContent"></div></div>
-            <div class="dialogue-bottom" id="dialogueBottom"></div>
-        </div>
-    `;
-    const chatArea = els.content.querySelector("#chatArea");
-    const chatContent = els.content.querySelector("#chatContent");
-    const dialogueBottom = els.content.querySelector("#dialogueBottom");
-
-    function scorePercent() {
-        return Math.round((state.dialogue.score || 0) * 100);
-    }
-
-    function isPassed() {
-        return (state.dialogue.score || 0) >= 0.75;
-    }
-
-    function renderChat() {
-        const d = state.dialogue;
-        const html = exchanges.map((exchange, idx) => {
-            const visible = idx <= d.currentExchange || d.completedExchanges.includes(idx);
-            if (!visible) return "";
-            const isCurrentUser = idx === d.currentExchange && exchange.speaker === "user";
-            if (isCurrentUser) {
-                const passClass = d.exchangeState === "user_scored" ? (isPassed() ? "pass" : "fail") : (d.exchangeState === "user_retry" ? "fail" : "");
-                return `
-                    <div class="current-speak-card">
-                        <div class="bubble user-bubble current-user-bubble ${passClass}">
-                            <button type="button" class="current-audio-btn">${ICO.volume2}</button>
-                            <div class="bubble-speaker">You</div>
-                            <div class="bubble-fr user">"${esc(exchange.french)}"</div>
-                            ${exchange.english ? `<div class="bubble-en">${esc(exchange.english)}</div>` : ""}
-                        </div>
-                        ${d.liveTranscript ? `<div class="transcript ${d.exchangeState === "user_scored" ? (isPassed() ? "pass" : "fail") : d.exchangeState === "user_retry" ? "fail" : ""}">${formatTranscript(d.liveTranscript)}</div>` : ""}
-                        ${d.liveTranscript && (d.exchangeState === "user_scored" || d.exchangeState === "user_retry") ? `
-                            <div class="score-pill ${isPassed() ? "" : "warn"}">
-                                <span class="score-pct ${isPassed() ? "" : "warn"}">${scorePercent()}%</span>
-                                <span class="score-lbl ${isPassed() ? "" : "warn"}">${isPassed() ? (scorePercent() >= 90 ? "Excellent" : "Good") : "Try again"}</span>
-                            </div>
-                        ` : ""}
-                        ${d.exchangeState === "user_retry" ? `
-                            <div class="retry-area">
-                                <div class="retry-score-big">${scorePercent()}%</div>
-                                <div class="retry-lbl">Listen again and try:</div>
-                                <button type="button" class="listen-btn-sm">${ICO.volume2} Hear it again</button>
-                            </div>
-                        ` : ""}
-                    </div>
-                `;
-            }
-            const tutor = exchange.speaker === "tutor";
-            return `
-                <div class="bubble ${tutor ? "tutor-bubble" : "user-bubble"}">
-                    <div class="bubble-speaker">${tutor ? esc(characterName) : "You"}</div>
-                    <div class="bubble-fr ${tutor ? "tutor" : "user"}">"${esc(exchange.french)}"</div>
-                    <div class="bubble-en">${esc(exchange.english || "")}</div>
-                </div>
-            `;
-        }).join("");
-        chatContent.innerHTML = html;
-        addTimer(() => { chatArea.scrollTop = chatArea.scrollHeight; }, 80);
-    }
-
-    function renderBottom() {
-        const d = state.dialogue;
-        if (d.dialogueComplete) {
-            dialogueBottom.innerHTML = `<button type="button" class="btn-primary" id="dlgContinue">Continue ${ICO.arrowRight}</button>`;
-            dialogueBottom.querySelector("#dlgContinue").addEventListener("click", () => {
-                if (state.dialogueStandalone) {
-                    state.phase = "results";
-                    render();
-                    return;
-                }
-                recordPageScoreEntry("dialogue", d.scores.length ? (d.scores.reduce((a, b) => a + b, 0) / d.scores.length) : 0, "speak");
-                goNextPage();
-            });
-            return;
-        }
-        const showMic = d.exchangeState === "user_ready" || d.exchangeState === "user_retry" || d.exchangeState === "user_recording";
-        if (!showMic) {
-            dialogueBottom.innerHTML = '<div class="mic-hint"></div>';
-            return;
-        }
-        dialogueBottom.innerHTML = `
-            <button type="button" class="mic-btn ${d.exchangeState !== "user_recording" ? "pulse" : "recording"}" id="dlgMic">${ICO.mic}</button>
-            <div class="mic-hint">${d.exchangeState === "user_recording" ? "Listening..." : "Hold until word appears, then let go"}</div>
-            ${d.exchangeState === "user_retry" ? `<button type="button" class="retry-button" id="dlgRetry">${ICO.rotateCcw} Try again</button>` : ""}
-        `;
-        const mic = dialogueBottom.querySelector("#dlgMic");
-        attachMicHandlers(
-            mic,
-            () => {
-                if (state.dialogue.exchangeState !== "user_ready" && state.dialogue.exchangeState !== "user_retry") return;
-                state.dialogue.exchangeState = "user_recording";
-                state.dialogue.recordingStart = Date.now();
-                renderBottom();
-            },
-            () => {
-                if (state.dialogue.exchangeState !== "user_recording") return;
-                if (Date.now() - state.dialogue.recordingStart < 400) return;
-                processUserResult();
-            }
-        );
-        const retryBtn = dialogueBottom.querySelector("#dlgRetry");
-        if (retryBtn) {
-            retryBtn.addEventListener("click", () => {
-                state.dialogue.exchangeState = "user_ready";
-                state.dialogue.liveTranscript = "";
-                renderChat();
-                renderBottom();
-            });
-        }
-    }
-
-    function handleDialogueComplete() {
-        const d = state.dialogue;
-        d.dialogueComplete = true;
-        renderChat();
-        renderBottom();
-    }
-
-    function moveForwardFromUser() {
-        const d = state.dialogue;
-        const nextIdx = d.currentExchange + 1;
-        d.completedExchanges.push(d.currentExchange);
-        d.liveTranscript = "";
-        d.exchangeState = "tutor_playing";
-        if (nextIdx >= exchanges.length) {
-            handleDialogueComplete();
-            return;
-        }
-        d.currentExchange = nextIdx;
-        d.attempts = 0;
-        renderChat();
-        renderBottom();
-        runTurn();
-    }
-
-    function processUserResult() {
-        const d = state.dialogue;
-        const exchange = exchanges[d.currentExchange];
-        d.attempts += 1;
-        if (d.attempts === 1) {
-            d.liveTranscript = exchange.french.split(" ").slice(0, 1).join(" ").toLowerCase();
-            d.score = 0.42;
-            d.exchangeState = "user_retry";
-            renderChat();
-            renderBottom();
-            return;
-        }
-        d.liveTranscript = exchange.french.toLowerCase();
-        d.score = 0.93;
-        d.scores.push(d.score);
-        d.exchangeState = "user_scored";
-        renderChat();
-        renderBottom();
-        addTimer(() => moveForwardFromUser(), 1400);
-    }
-
-    function runTurn() {
-        const d = state.dialogue;
-        const ex = exchanges[d.currentExchange];
-        if (!ex) return;
-        if (ex.speaker === "tutor") {
-            d.exchangeState = "tutor_playing";
-            renderChat();
-            renderBottom();
-            addTimer(() => {
-                const nextIdx = d.currentExchange + 1;
-                if (nextIdx >= exchanges.length) {
-                    handleDialogueComplete();
-                    return;
-                }
-                if (exchanges[nextIdx].speaker === "user") {
-                    d.currentExchange = nextIdx;
-                    d.exchangeState = "user_ready";
-                    d.attempts = 0;
-                    renderChat();
-                    renderBottom();
-                } else {
-                    d.currentExchange = nextIdx;
-                    runTurn();
-                }
-            }, 1100);
-            return;
-        }
-        d.exchangeState = "user_ready";
-        renderChat();
-        renderBottom();
-    }
-
-    renderChat();
-    renderBottom();
-    runTurn();
-}
-
-function renderPages() {
-    const lesson = currentLesson();
-    const page = currentPage();
-    if (!lesson || !page) return;
-    if (page.type === "narrate") return renderNarratePage(page, lesson);
-    if (page.type === "speak") return renderSpeakPage(page);
-    if (page.type === "respond") return renderRespondPage(page);
-    if (page.type === "dialogue") return renderDialoguePage();
-    if (page.type === "picture_prompt") return renderRespondPage(page);
-    return renderNarratePage(page, lesson);
-}
-
-function render() {
-    clearTimers();
-    setHeader();
-    if (state.phase === "start") {
-        renderStart();
-        return;
-    }
-    if (state.phase === "lesson_start") {
-        renderLessonStartScreen();
-        return;
-    }
-    if (state.phase === "pages") {
-        renderPages();
-        return;
-    }
-    if (state.phase === "test") {
-        renderMiniTest();
-        return;
-    }
-    if (state.phase === "results") {
-        renderResults();
-        return;
-    }
-    if (state.phase === "dialogue") {
-        renderDialoguePage();
-        return;
-    }
-    renderGamePreview();
-}
-
-els.backBtn.addEventListener("click", () => {
-    if (state.phase === "start") return;
-    if (state.phase === "results" || state.phase === "game" || state.phase === "dialogue" || state.phase === "test") {
-        state.phase = "start";
-        state.selectedLessonId = null;
-        render();
-        return;
-    }
-    state.phase = "start";
-    state.selectedLessonId = null;
-    render();
-});
-
-render();
-
-let autoplayBusy = false;
-function autoplayHoldMic(button, holdMs = 900) {
-    if (!button || autoplayBusy) return;
-    autoplayBusy = true;
-    button.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-    setTimeout(() => {
-        button.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
-        autoplayBusy = false;
-    }, holdMs);
-}
-
-function runAutoplayStep() {
-    if (!autoplay || autoplayBusy) return;
-    if (state.phase === "start") {
-        document.querySelector("[data-lesson]")?.click();
-        return;
-    }
-    if (state.phase === "lesson_start") {
-        document.getElementById("beginLessonBtn")?.click();
-        return;
-    }
-    if (state.phase === "pages") {
-        const continueBtn = document.getElementById("continueBtn");
-        if (continueBtn) {
-            continueBtn.click();
-            return;
-        }
-        const respondNext = document.getElementById("respondNext");
-        if (respondNext) {
-            respondNext.click();
-            return;
-        }
-        const retryBtn = document.getElementById("retryBtn");
-        if (retryBtn) {
-            retryBtn.click();
-            return;
-        }
-        const micBtn = document.querySelector(".mic-btn:not(.recording)");
-        if (micBtn) autoplayHoldMic(micBtn);
-        return;
-    }
-    if (state.phase === "test") {
-        const testNext = document.getElementById("testNext");
-        if (testNext) {
-            testNext.click();
-            return;
-        }
-        const testMic = document.getElementById("testMic");
-        if (testMic && !testMic.classList.contains("recording")) autoplayHoldMic(testMic);
-        return;
-    }
-    if (state.phase === "dialogue") {
-        const micBtn = document.querySelector(".mic-btn:not(.recording)");
-        if (micBtn) {
-            autoplayHoldMic(micBtn);
-            return;
-        }
-        document.getElementById("dlgContinue")?.click();
-        return;
-    }
-    if (state.phase === "results" && loop) {
-        document.getElementById("backLessonsBtn")?.click();
-    }
-}
-
-if (autoplay) {
-    setTimeout(runAutoplayStep, 700);
-    setInterval(runAutoplayStep, autoplayStepMs);
-}
+  const _q = new URLSearchParams(window.location.search);
+  if (_q.get('embed') === '1') document.body.classList.add('embed-lesson');
+  function fitLessonEmbed() {
+    if (!document.body.classList.contains('embed-lesson')) return;
+    const el = document.getElementById('deviceFrame');
+    if (!el) return;
+    const w = 393;
+    const h = 851;
+    const scale = Math.min(window.innerWidth / w, window.innerHeight / h);
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+    el.style.transformOrigin = 'top center';
+    el.style.transform = 'scale(' + scale + ')';
+  }
+  fitLessonEmbed();
+  window.addEventListener('resize', fitLessonEmbed);
+})();
 </script>
 </body>
 </html>
