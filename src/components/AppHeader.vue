@@ -1,7 +1,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import LogoFull from './brand/LogoFull.vue'
 
+const router = useRouter()
+const route = useRoute()
 const menuOpen = ref(false)
 const scrolled = ref(false)
 
@@ -11,9 +14,13 @@ function onScroll() {
 
 function scrollTo(id) {
   menuOpen.value = false
-  const el = document.getElementById(id)
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  if (route.path !== '/') {
+    router.push('/#' + id)
+  } else {
+    const el = document.getElementById(id)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   }
 }
 
