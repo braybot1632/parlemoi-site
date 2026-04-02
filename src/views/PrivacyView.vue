@@ -14,7 +14,7 @@ import LegalNav from '../components/LegalNav.vue'
 
       <p>We built ParleMoi with privacy as a core design principle. We collect as little data as possible, process most things directly on your device, and never sell your personal information. This policy is written in plain language so you can understand exactly what happens with your data.</p>
 
-      <p>If you have any questions about this policy, you can reach us at <a href="mailto:support@parlemoi.app" class="text-orange hover:underline">support@parlemoi.app</a> or visit <a href="https://parlemoi.app" class="text-orange hover:underline">https://parlemoi.app</a>.</p>
+      <p>If you have any questions about this policy, you can reach us at <a href="mailto:braydonpaul@parlifica.com" class="text-orange hover:underline">braydonpaul@parlifica.com</a> or visit <a href="https://parlemoi.app" class="text-orange hover:underline">https://parlemoi.app</a>.</p>
 
       <hr class="border-card-border my-8">
 
@@ -138,7 +138,7 @@ import LegalNav from '../components/LegalNav.vue'
         <li>The right to withdraw consent for the collection, use, or disclosure of your personal information.</li>
       </ul>
 
-      <p>Because ParleMoi stores virtually no personal data on its servers, most of these rights are already satisfied by design. Your on-device data is under your full control. If you have questions or wish to exercise your rights, contact us at <a href="mailto:support@parlemoi.app" class="text-orange hover:underline">support@parlemoi.app</a>.</p>
+      <p>Because ParleMoi stores virtually no personal data on its servers, most of these rights are already satisfied by design. Your on-device data is under your full control. If you have questions or wish to exercise your rights, contact us at <a href="mailto:braydonpaul@parlifica.com" class="text-orange hover:underline">braydonpaul@parlifica.com</a>.</p>
 
       <h3 class="font-display text-lg text-navy mt-7 mb-2">6.2 European Union Residents (GDPR)</h3>
 
@@ -156,7 +156,7 @@ import LegalNav from '../components/LegalNav.vue'
 
       <p>Our legal basis for processing transcribed conversation text is legitimate interest, specifically to provide you with the AI conversation feature you initiated. Since we do not permanently store personal data on our servers, most data subject requests are already addressed by our minimal-collection approach. You can delete all locally stored data at any time by clearing the app or uninstalling it.</p>
 
-      <p>To exercise any of these rights, contact us at <a href="mailto:support@parlemoi.app" class="text-orange hover:underline">support@parlemoi.app</a>.</p>
+      <p>To exercise any of these rights, contact us at <a href="mailto:braydonpaul@parlifica.com" class="text-orange hover:underline">braydonpaul@parlifica.com</a>.</p>
 
       <h3 class="font-display text-lg text-navy mt-7 mb-2">6.3 California Residents (CCPA)</h3>
 
@@ -171,7 +171,7 @@ import LegalNav from '../components/LegalNav.vue'
 
       <p><strong class="text-navy">We do not sell your data.</strong> We have never sold personal information and have no plans to do so. Because we collect minimal data and do not store it on our servers, most CCPA requests are already satisfied by our privacy-first design.</p>
 
-      <p>To exercise your rights or make a verifiable consumer request, contact us at <a href="mailto:support@parlemoi.app" class="text-orange hover:underline">support@parlemoi.app</a>.</p>
+      <p>To exercise your rights or make a verifiable consumer request, contact us at <a href="mailto:braydonpaul@parlifica.com" class="text-orange hover:underline">braydonpaul@parlifica.com</a>.</p>
 
       <hr class="border-card-border my-8">
 
@@ -179,7 +179,7 @@ import LegalNav from '../components/LegalNav.vue'
 
       <p>ParleMoi is designed for adults aged 18 and older. The app is not directed at children under the age of 13, and we do not knowingly collect personal information from children under 13, in compliance with the Children's Online Privacy Protection Act (COPPA).</p>
 
-      <p>If you believe that a child under 13 has used the app and that personal data may have been transmitted, please contact us at <a href="mailto:support@parlemoi.app" class="text-orange hover:underline">support@parlemoi.app</a> and we will take appropriate steps to investigate and address the concern.</p>
+      <p>If you believe that a child under 13 has used the app and that personal data may have been transmitted, please contact us at <a href="mailto:braydonpaul@parlifica.com" class="text-orange hover:underline">braydonpaul@parlifica.com</a> and we will take appropriate steps to investigate and address the concern.</p>
 
       <hr class="border-card-border my-8">
 
@@ -212,7 +212,7 @@ import LegalNav from '../components/LegalNav.vue'
       <p>
         <strong class="text-navy">Braydon Viragh</strong><br>
         Montreal, Quebec, Canada<br>
-        Email: <a href="mailto:support@parlemoi.app" class="text-orange hover:underline">support@parlemoi.app</a><br>
+        Email: <a href="mailto:braydonpaul@parlifica.com" class="text-orange hover:underline">braydonpaul@parlifica.com</a><br>
         Website: <a href="https://parlemoi.app" class="text-orange hover:underline">https://parlemoi.app</a>
       </p>
 

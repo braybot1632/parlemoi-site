@@ -24,12 +24,12 @@ import LogoFull from './brand/LogoFull.vue'
           <router-link to="/privacy" class="text-text-muted hover:text-navy transition-colors">Privacy</router-link>
           <router-link to="/terms" class="text-text-muted hover:text-navy transition-colors">Terms</router-link>
           <router-link to="/eula" class="text-text-muted hover:text-navy transition-colors">EULA</router-link>
-          <a href="mailto:support@parlemoiapp.com" class="text-text-muted hover:text-navy transition-colors">Contact</a>
+          <a href="mailto:braydonpaul@parlifica.com" class="text-text-muted hover:text-navy transition-colors">Contact</a>
         </nav>
       </div>
 
       <div class="mt-8 pt-6 border-t border-card-border flex flex-col sm:flex-row justify-between gap-4 text-sm text-text-muted">
-        <p>Questions? Feedback? <a href="mailto:support@parlemoiapp.com" class="text-text-secondary hover:text-navy transition-colors">support@parlemoiapp.com</a>, We read every email.</p>
+        <p>Questions? Feedback? <a href="mailto:braydonpaul@parlifica.com" class="text-text-secondary hover:text-navy transition-colors">braydonpaul@parlifica.com</a>, We read every email.</p>
         <p>&copy; 2026 ParleMoi · Parlifica Inc.</p>
       </div>
     </div>

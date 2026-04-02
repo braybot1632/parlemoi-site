@@ -14,7 +14,7 @@ import LegalNav from '../components/LegalNav.vue'
       <p>
         <strong class="text-navy">Developer:</strong> Braydon Viragh<br>
         Montreal, Quebec, Canada<br>
-        Contact: <a href="mailto:support@parlemoi.app" class="text-orange hover:underline">support@parlemoi.app</a>
+        Contact: <a href="mailto:braydonpaul@parlifica.com" class="text-orange hover:underline">braydonpaul@parlifica.com</a>
       </p>
 
       <hr class="border-card-border my-8">
@@ -113,7 +113,7 @@ import LegalNav from '../components/LegalNav.vue'
         <strong class="text-navy">ParleMoi</strong><br>
         Braydon Viragh<br>
         Montreal, Quebec, Canada<br>
-        Email: <a href="mailto:support@parlemoi.app" class="text-orange hover:underline">support@parlemoi.app</a>
+        Email: <a href="mailto:braydonpaul@parlifica.com" class="text-orange hover:underline">braydonpaul@parlifica.com</a>
       </p>
 
       <hr class="border-card-border my-8">

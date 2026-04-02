@@ -313,7 +313,7 @@ import LegalNav from '../components/LegalNav.vue'
       </p>
 
       <p>
-        <strong class="text-navy">Email:</strong> <a href="mailto:support@parlemoi.app" class="text-orange hover:underline">support@parlemoi.app</a><br>
+        <strong class="text-navy">Email:</strong> <a href="mailto:braydonpaul@parlifica.com" class="text-orange hover:underline">braydonpaul@parlifica.com</a><br>
         <strong class="text-navy">Website:</strong> <a href="https://parlemoi.app" class="text-orange hover:underline">https://parlemoi.app</a>
       </p>
 
