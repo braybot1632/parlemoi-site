@@ -70,11 +70,11 @@ async function onSubmit() {
     <div class="relative z-10 max-w-4xl mx-auto px-6 pt-24 pb-20 text-center">
       <!-- Headline -->
       <h1
-        class="hero-headline font-display font-bold text-navy transition-all duration-1000 delay-150"
+        class="hero-headline font-display font-bold transition-all duration-1000 delay-150"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        ParleMoi,<br />
-        <span class="text-orange">Speak and Learn.</span>
+        <span class="text-navy">Parle</span><span class="text-orange">Moi</span><br />
+        <span class="text-navy">Speak and Learn.</span>
       </h1>
 
       <!-- Subheadline -->
@@ -85,7 +85,7 @@ async function onSubmit() {
         The app that gets you speaking French.
       </p>
 
-      <!-- Beta signup form — clear path: headline → tagline → action -->
+      <!-- Beta signup form -->
       <div
         class="mt-12 md:mt-16 max-w-md mx-auto transition-all duration-1000 delay-400"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
@@ -118,7 +118,7 @@ async function onSubmit() {
         <p v-if="error" class="mt-3 text-sm text-error">{{ error }}</p>
       </div>
 
-      <!-- Secondary: platforms + quiet origin / social (same band, low emphasis) -->
+      <!-- Secondary: platforms + social (same band, low emphasis) -->
       <div
         class="mt-14 md:mt-20 max-w-xl mx-auto pt-8 md:pt-10 border-t border-card-border/50 transition-all duration-1000 delay-500"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
@@ -138,8 +138,6 @@ async function onSubmit() {
         <p
           class="mt-5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-text-muted font-normal"
         >
-          <span>Built in Montreal</span>
-          <span class="text-card-border select-none" aria-hidden="true">·</span>
           <a
             href="https://www.instagram.com/parlemoi.app"
             target="_blank"

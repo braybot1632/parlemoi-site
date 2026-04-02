@@ -675,8 +675,10 @@
 
     const PRACTICE_ROUNDS = 4;
     const MAX_ATTEMPTS = 3;
-    const PASS_THRESHOLD = 0.35;
-    const PERFECT_THRESHOLD = 0.85;
+    /** Only a full token match counts as success; anything else is shown as an error state. */
+    function isPerfectScore(score) {
+      return score >= 1 - 1e-9;
+    }
 
     const timers = [];
     const params = new URLSearchParams(window.location.search);
@@ -746,31 +748,32 @@
       return { display, digits, expectedFrench };
     }
 
-    function evaluateScore({ score, attempts, maxAttempts, perfectThreshold, passThreshold }) {
-      if (score >= perfectThreshold) {
+    function evaluateScore({ score, attempts, maxAttempts }) {
+      if (isPerfectScore(score)) {
         return { outcome: "perfect", shouldAdvance: true };
       }
       if (attempts >= maxAttempts) {
-        return {
-          outcome: score >= passThreshold ? "pass" : "fail",
-          shouldAdvance: true
-        };
+        return { outcome: "fail", shouldAdvance: true };
       }
       return { outcome: "retry", shouldAdvance: false };
     }
 
     function scoreColor(score) {
       if (score === null) return Colors.textMuted;
-      if (score >= PERFECT_THRESHOLD) return Colors.success;
-      if (score >= PASS_THRESHOLD) return Colors.partial;
+      if (isPerfectScore(score)) return Colors.success;
       return Colors.error;
     }
 
     function scoreLabel(score) {
       if (score === null) return "";
-      if (score >= PERFECT_THRESHOLD) return "Excellent!";
-      if (score >= PASS_THRESHOLD) return "Good";
-      return "Try again";
+      if (isPerfectScore(score)) return "Excellent!";
+      return "Not quite";
+    }
+
+    function scorePercentDisplay(score) {
+      if (score === null) return "";
+      if (isPerfectScore(score)) return "100%";
+      return `${Math.round(score * 100)}%`;
     }
 
     function fitSingleLine(selector, maxPx, minPx) {
@@ -814,7 +817,18 @@
       state.engine.comboMultiplier = 1;
     }
 
+    function finishPracticeGameOver() {
+      clearAllTimers();
+      state.isRecording = false;
+      state.phase = "done";
+      render();
+    }
+
     function nextRound() {
+      if (state.engine.lives <= 0) {
+        finishPracticeGameOver();
+        return;
+      }
       const nextIndex = state.roundIndex + 1;
       if (state.mode === "practice" && nextIndex >= PRACTICE_ROUNDS) {
         state.phase = "done";
@@ -822,7 +836,6 @@
         return;
       }
 
-      /* Always advance through PRACTICE_ROUNDS levels: hearts can hit 0, but you still finish the current round and complete the session. */
       state.roundIndex = nextIndex;
       state.currentPhone = generatePhoneNumber();
       state.attempts = 0;
@@ -904,7 +917,7 @@
     }
 
     function beginRecording() {
-      if (state.phase !== "playing" || state.isRecording) return;
+      if (state.phase !== "playing" || state.isRecording || state.engine.lives <= 0) return;
       state.isRecording = true;
       state.showResult = false;
       state.transcript = "";
@@ -956,31 +969,36 @@
       const evaluation = evaluateScore({
         score,
         attempts: state.attempts,
-        maxAttempts: MAX_ATTEMPTS,
-        perfectThreshold: PERFECT_THRESHOLD,
-        passThreshold: PASS_THRESHOLD
+        maxAttempts: MAX_ATTEMPTS
       });
 
-      if (evaluation.outcome === "perfect" || evaluation.outcome === "pass") {
-        const points = Math.round(score * 100);
-        state.totalPoints += points;
+      if (evaluation.outcome === "perfect") {
+        state.totalPoints += 100;
         state.correctCount += 1;
         engineOnCorrect();
         render();
-        schedule(() => nextRound(), 1880);
+        schedule(() => nextRound(), 2880);
         return;
       }
 
       if (evaluation.outcome === "fail") {
         engineOnIncorrect();
         render();
-        schedule(() => nextRound(), 2350);
+        if (state.engine.lives <= 0) {
+          schedule(() => finishPracticeGameOver(), 3350);
+          return;
+        }
+        schedule(() => nextRound(), 3350);
         return;
       }
 
       engineOnIncorrect();
       render();
-      schedule(() => autoSimulatePress(), 720);
+      if (state.engine.lives <= 0) {
+        schedule(() => finishPracticeGameOver(), 1720);
+        return;
+      }
+      schedule(() => autoSimulatePress(), 1720);
     }
 
     function startCountdown() {
@@ -1103,8 +1121,8 @@
             ${
               state.showResult && state.lastScore !== null
                 ? `<div class="score-badge-row result-reveal">
-                    <div class="score-badge ${state.lastScore >= PASS_THRESHOLD ? "score-badge--pass" : "score-badge--fail"}">
-                      ${Math.round(state.lastScore * 100)}%
+                    <div class="score-badge ${isPerfectScore(state.lastScore) ? "score-badge--pass" : "score-badge--fail"}">
+                      ${scorePercentDisplay(state.lastScore)}
                     </div>
                     <div class="score-label" style="color:${c}">${label}</div>
                   </div>`
@@ -1115,7 +1133,7 @@
           </div>
           <div class="hint-slot">
             ${
-              state.showResult && state.lastScore !== null && state.lastScore < PASS_THRESHOLD
+              state.showResult && state.lastScore !== null && !isPerfectScore(state.lastScore)
                 ? `<div class="hint-card">
                     <div class="hint-label">Expected:</div>
                     <div class="hint-text">${state.currentPhone.expectedFrench}</div>
