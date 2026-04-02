@@ -85,13 +85,11 @@ async function onSubmit() {
         The app that gets you speaking French.
       </p>
 
-      <!-- Beta signup form -->
+      <!-- Beta signup form — clear path: headline → tagline → action -->
       <div
-        class="mt-10 max-w-md mx-auto transition-all duration-1000 delay-500"
+        class="mt-12 md:mt-16 max-w-md mx-auto transition-all duration-1000 delay-400"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
-        <p class="text-sm font-medium text-orange uppercase tracking-wider mb-4">Sign up to be a beta tester</p>
-
         <div v-if="submitted" class="glass rounded-2xl p-6">
           <p class="text-navy font-medium">You're on the list.</p>
           <p class="text-text-muted text-sm mt-1">We'll email you when the beta is ready.</p>
@@ -106,7 +104,7 @@ async function onSubmit() {
             v-model="email"
             type="email"
             required
-            placeholder="Your email address"
+            placeholder="Email for beta access"
             class="flex-1 px-5 py-3.5 rounded-full bg-white border border-card-border text-navy placeholder-text-muted text-sm focus:outline-none focus:border-orange/50 transition-colors"
           />
           <button
@@ -120,35 +118,38 @@ async function onSubmit() {
         <p v-if="error" class="mt-3 text-sm text-error">{{ error }}</p>
       </div>
 
-      <!-- Store buttons, Coming Soon -->
+      <!-- Secondary: platforms + quiet origin / social (same band, low emphasis) -->
       <div
-        class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 transition-all duration-1000 delay-600"
+        class="mt-14 md:mt-20 max-w-xl mx-auto pt-8 md:pt-10 border-t border-card-border/50 transition-all duration-1000 delay-500"
         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
       >
-        <div class="inline-flex items-center gap-3 text-text-secondary font-medium px-7 py-3.5 rounded-full text-sm border border-card-border">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.7 7.72C5.57 5.94 7.36 4.86 9.28 4.84C10.56 4.82 11.78 5.7 12.57 5.7C13.36 5.7 14.85 4.63 16.4 4.8C17.07 4.83 18.89 5.08 20.07 6.76C19.95 6.84 17.62 8.23 17.65 11.1C17.68 14.54 20.62 15.71 20.66 15.73C20.63 15.82 20.19 17.36 19.11 18.95L18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg>
-          App Store
-          <span class="text-xs text-orange font-medium uppercase tracking-wider">Coming Soon</span>
+        <div class="flex flex-wrap items-center justify-center gap-3 text-xs text-text-muted">
+          <div class="inline-flex items-center gap-2 rounded-full border border-card-border/70 bg-white/60 px-3.5 py-2">
+            <svg class="w-4 h-4 shrink-0 opacity-80" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.7 7.72C5.57 5.94 7.36 4.86 9.28 4.84C10.56 4.82 11.78 5.7 12.57 5.7C13.36 5.7 14.85 4.63 16.4 4.8C17.07 4.83 18.89 5.08 20.07 6.76C19.95 6.84 17.62 8.23 17.65 11.1C17.68 14.54 20.62 15.71 20.66 15.73C20.63 15.82 20.19 17.36 19.11 18.95L18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg>
+            <span class="font-medium text-text-secondary">App Store</span>
+            <span class="text-text-muted">soon</span>
+          </div>
+          <div class="inline-flex items-center gap-2 rounded-full border border-card-border/70 bg-white/60 px-3.5 py-2">
+            <svg class="w-4 h-4 shrink-0 opacity-80" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg>
+            <span class="font-medium text-text-secondary">Google Play</span>
+            <span class="text-text-muted">soon</span>
+          </div>
         </div>
-        <div class="inline-flex items-center gap-3 text-text-secondary font-medium px-7 py-3.5 rounded-full text-sm border border-card-border">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg>
-          Google Play
-          <span class="text-xs text-orange font-medium uppercase tracking-wider">Coming Soon</span>
-        </div>
-      </div>
-
-      <!-- Trust signals -->
-      <div
-        class="mt-6 flex flex-wrap items-center justify-center gap-3 transition-all duration-1000 delay-700"
-        :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
-      >
-        <p class="text-sm text-text-muted">
-          Built in Montreal.
+        <p
+          class="mt-5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-text-muted font-normal"
+        >
+          <span>Built in Montreal</span>
+          <span class="text-card-border select-none" aria-hidden="true">·</span>
+          <a
+            href="https://www.instagram.com/parlemoi.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1 text-text-muted hover:text-navy transition-colors"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            @parlemoi.app
+          </a>
         </p>
-        <a href="https://www.instagram.com/parlemoi.app" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-navy transition-colors">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-          @parlemoi.app
-        </a>
       </div>
 
     </div>

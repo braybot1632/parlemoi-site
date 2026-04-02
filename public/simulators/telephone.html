@@ -122,6 +122,11 @@
       flex-direction: column;
       padding: 32px;
       text-align: center;
+      animation: readyFadeIn 0.55s ease-out both;
+    }
+    @keyframes readyFadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .ready-icon {
       width: 64px;
@@ -165,6 +170,13 @@
       color: #2c2c2c;
       font-size: 80px;
       font-weight: 800;
+    }
+    #countdownValue.cd-pop {
+      animation: countdownPop 0.55s cubic-bezier(0.34, 1.15, 0.64, 1) both;
+    }
+    @keyframes countdownPop {
+      from { opacity: 0; transform: scale(0.65); }
+      to { opacity: 1; transform: scale(1); }
     }
     .countdown-go { color: #4caf7d; font-size: 64px; }
 
@@ -369,6 +381,28 @@
       gap: 10px;
       min-height: 40px;
     }
+    .score-badge-row.result-reveal {
+      animation: resultRowIn 0.75s cubic-bezier(0.25, 0.85, 0.3, 1) both;
+    }
+    @keyframes resultRowIn {
+      from { opacity: 0; transform: translate3d(0, 14px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    .score-badge-row.result-reveal .score-badge {
+      animation: resultBadgeIn 0.55s cubic-bezier(0.25, 0.85, 0.3, 1) both;
+    }
+    @keyframes resultBadgeIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .score-badge-row.result-reveal .score-label {
+      opacity: 0;
+      animation: resultLabelIn 0.6s cubic-bezier(0.25, 0.85, 0.3, 1) 0.22s both;
+    }
+    @keyframes resultLabelIn {
+      from { opacity: 0; transform: translate3d(0, 8px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
     /* Match scenario.html: --correct + soft panel (respond-feedback.correct) */
     .score-badge {
       padding: 8px 20px;
@@ -417,6 +451,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      animation: hintSlideUp 0.68s cubic-bezier(0.25, 0.85, 0.3, 1) both;
+    }
+    @keyframes hintSlideUp {
+      from { opacity: 0; transform: translate3d(0, 12px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
     }
     .hint-slot {
       min-height: 92px;
@@ -471,6 +510,11 @@
       background: #e8863a;
       border-color: #f4a261;
       box-shadow: 0 8px 20px rgba(232, 134, 58, 0.35);
+      animation: micRecordingPulse 1.35s ease-in-out infinite;
+    }
+    @keyframes micRecordingPulse {
+      0%, 100% { box-shadow: 0 8px 20px rgba(232, 134, 58, 0.35); }
+      50% { box-shadow: 0 8px 28px rgba(232, 134, 58, 0.5); }
     }
     .mic-icon { width: 28px; height: 28px; }
     .mic-hint {
@@ -490,6 +534,11 @@
       justify-content: center;
       padding: 32px;
       text-align: center;
+      animation: summaryEnter 0.5s ease-out both;
+    }
+    @keyframes summaryEnter {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .summary-tier {
       margin-bottom: 10px;
@@ -624,7 +673,7 @@
       "9": "neuf"
     };
 
-    const PRACTICE_ROUNDS = 5;
+    const PRACTICE_ROUNDS = 4;
     const MAX_ATTEMPTS = 3;
     const PASS_THRESHOLD = 0.35;
     const PERFECT_THRESHOLD = 0.85;
@@ -773,6 +822,7 @@
         return;
       }
 
+      /* Always advance through PRACTICE_ROUNDS levels: hearts can hit 0, but you still finish the current round and complete the session. */
       state.roundIndex = nextIndex;
       state.currentPhone = generatePhoneNumber();
       state.attempts = 0;
@@ -825,14 +875,13 @@
     function buildRevealSchedule(words) {
       // Mimic telephone cadence: 1 | 3 | 3 | 4 digits with pauses between groups.
       const batchBreakpoints = [1, 4, 7];
-      const stepDurations = [];
-      for (let i = 0; i < words.length; i += 1) {
-        stepDurations.push(130);
-        if (batchBreakpoints.includes(i + 1)) {
-          stepDurations.push(320);
-        }
-      }
-      return stepDurations;
+      return words.map((_, i) => {
+        const digitMs = 168 + Math.floor(Math.random() * 48);
+        const gapMs = batchBreakpoints.includes(i + 1)
+          ? 400 + Math.floor(Math.random() * 90)
+          : 0;
+        return { digitMs, gapMs };
+      });
     }
 
     function startGame() {
@@ -870,7 +919,8 @@
       const revealSchedule = buildRevealSchedule(state.simulatedSpeechWords);
       let elapsed = 0;
       for (let i = 0; i < state.simulatedSpeechWords.length; i += 1) {
-        elapsed += revealSchedule[i * 2] || 130;
+        const step = revealSchedule[i] || { digitMs: 180, gapMs: 0 };
+        elapsed += step.digitMs;
         schedule(() => {
           if (!state.isRecording) return;
           state.simulatedSpeechIndex = i + 1;
@@ -878,7 +928,7 @@
           state.transcript = nextWords.join(" ");
           render();
         }, elapsed);
-        elapsed += revealSchedule[(i * 2) + 1] || 0;
+        elapsed += step.gapMs;
       }
     }
 
@@ -902,7 +952,6 @@
       state.transcript = spokenText;
       state.showResult = true;
       state.attempts += 1;
-      render();
 
       const evaluation = evaluateScore({
         score,
@@ -918,20 +967,20 @@
         state.correctCount += 1;
         engineOnCorrect();
         render();
-        schedule(() => nextRound(), 1500);
+        schedule(() => nextRound(), 1880);
         return;
       }
 
       if (evaluation.outcome === "fail") {
         engineOnIncorrect();
         render();
-        schedule(() => nextRound(), 2000);
+        schedule(() => nextRound(), 2350);
         return;
       }
 
       engineOnIncorrect();
       render();
-      schedule(() => autoSimulatePress(), 550);
+      schedule(() => autoSimulatePress(), 720);
     }
 
     function startCountdown() {
@@ -943,6 +992,9 @@
         const el = document.getElementById("countdownValue");
         if (!el) return;
         el.textContent = steps[idx];
+        el.classList.remove("cd-pop");
+        void el.offsetWidth;
+        el.classList.add("cd-pop");
         if (steps[idx] === "GO!") el.classList.add("countdown-go");
         else el.classList.remove("countdown-go");
         idx += 1;
@@ -1016,7 +1068,7 @@
     }
 
     function renderCountdown() {
-      return `<div class="countdown-screen"><div id="countdownValue">3</div></div>`;
+      return `<div class="countdown-screen"><div id="countdownValue" class="cd-pop">3</div></div>`;
     }
 
     function renderPlaying() {
@@ -1050,7 +1102,7 @@
           <div class="result-slot">
             ${
               state.showResult && state.lastScore !== null
-                ? `<div class="score-badge-row">
+                ? `<div class="score-badge-row result-reveal">
                     <div class="score-badge ${state.lastScore >= PASS_THRESHOLD ? "score-badge--pass" : "score-badge--fail"}">
                       ${Math.round(state.lastScore * 100)}%
                     </div>

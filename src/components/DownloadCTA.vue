@@ -85,7 +85,7 @@ async function onSubmit() {
             v-model="email"
             type="email"
             required
-            placeholder="Your email address"
+            placeholder="Email for beta access"
             class="flex-1 px-5 py-3.5 rounded-full bg-white border border-card-border text-navy placeholder-text-muted text-sm focus:outline-none focus:border-orange/50 transition-colors"
           />
           <button

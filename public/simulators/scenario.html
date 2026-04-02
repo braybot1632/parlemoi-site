@@ -152,7 +152,7 @@
     .progress-fill {
       height: 4px;
       background: var(--orange);
-      transition: width 0.4s ease;
+      transition: width 0.72s cubic-bezier(0.25, 0.85, 0.3, 1);
     }
 
     .chat-scroll {
@@ -232,6 +232,9 @@
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
     }
     .respond-panel.is-hidden { display: none; }
+    .respond-panel.respond-panel--in {
+      animation: panelSlideUp 0.62s cubic-bezier(0.25, 0.85, 0.3, 1) both;
+    }
     .respond-label {
       color: var(--orange);
       font-size: 11px;
@@ -298,6 +301,65 @@
       line-height: 18px;
     }
 
+    /* Chat lines: fade + slide up */
+    @keyframes chatLineIn {
+      from { opacity: 0; transform: translate3d(0, 10px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    .chat-line-enter {
+      animation: chatLineIn 0.65s cubic-bezier(0.25, 0.85, 0.3, 1) both;
+    }
+
+    @keyframes panelSlideUp {
+      from { opacity: 0; transform: translate3d(0, 12px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+
+    /* “Thinking” before score (human-like latency) */
+    .feedback-checking {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 0;
+    }
+    .checking-label {
+      color: var(--textSecondary);
+      font-size: 14px;
+      font-style: italic;
+    }
+    .checking-dots {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .checking-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--orange);
+      opacity: 0.35;
+      animation: dotBounce 1.22s ease-in-out infinite;
+    }
+    .checking-dots span:nth-child(2) { animation-delay: 0.18s; }
+    .checking-dots span:nth-child(3) { animation-delay: 0.36s; }
+    @keyframes dotBounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+      40% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    @keyframes feedbackResultIn {
+      from { opacity: 0; transform: translate3d(0, 10px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    .respond-feedback.feedback-result-in .feedback-row,
+    .respond-feedback.feedback-result-in .feedback-transcript {
+      animation: feedbackResultIn 0.72s cubic-bezier(0.25, 0.85, 0.3, 1) both;
+    }
+    .respond-feedback.feedback-result-in .feedback-transcript {
+      animation-delay: 0.2s;
+    }
+
     .system-row {
       display: flex;
       justify-content: center;
@@ -325,6 +387,14 @@
       padding: 14px;
       border: 1px solid var(--border);
     }
+    /* Enter animation runs once when the bar is first mounted — not on every transcript character */
+    .listening-indicator.listen-bar-enter {
+      animation: listenBarIn 0.55s cubic-bezier(0.25, 0.85, 0.3, 1) both;
+    }
+    @keyframes listenBarIn {
+      from { opacity: 0; transform: translate3d(0, 8px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
     .listening-text {
       color: var(--textSecondary);
       font-size: 15px;
@@ -337,6 +407,7 @@
       flex: 1;
       min-width: 0;
       line-height: 1.35;
+      transition: color 0.2s ease;
     }
     .listen-pulse {
       animation: listenFade 1.2s ease-in-out infinite;
@@ -494,10 +565,12 @@
       { text: "Oui j'habite Montréal", pct: 73 },
       { text: "Oui, j'habite à Montréal.", pct: 100 },
     ];
-    const LISTEN_PULSE_BEFORE_TYPE_MS = 420;
-    const FEEDBACK_TO_BUBBLE_MS = 600;
-    const BUBBLE_TO_HIDE_PANEL_MS = 550;
-    const TRY_AGAIN_PAUSE_MS = 750;
+    const LISTEN_PULSE_BEFORE_TYPE_MS = 720;
+    const FEEDBACK_TO_BUBBLE_MS = 920;
+    const BUBBLE_TO_HIDE_PANEL_MS = 720;
+    const TRY_AGAIN_PAUSE_MS = 880;
+    const CHECKING_PRONUNCIATION_MS = 820;
+    const PAUSE_AFTER_TRANSCRIPT_MS = 340;
 
     const EXCHANGES = [
       { speaker: 'tutor', french: "Bonjour! Comment vous appelez-vous?", english: 'Hello! What is your name?' },
@@ -568,7 +641,11 @@
       fb.classList.remove('correct', 'wrong');
       fr.innerHTML = `<span class="q">"</span>${escapeHtml(ex.french)}<span class="q">"</span>`;
       en.textContent = ex.english;
+      panel.classList.remove('respond-panel--in');
       panel.classList.remove('is-hidden');
+      void panel.offsetWidth;
+      panel.classList.add('respond-panel--in');
+      schedule(() => panel.classList.remove('respond-panel--in'), 680);
     }
 
     function hideRespondPanel() {
@@ -604,12 +681,13 @@
           renderBottom('none', '');
           const perfect = a.pct >= 100;
           showRespondFeedback(perfect, a.pct, a.text);
+          const scoreToBubbleMs = CHECKING_PRONUNCIATION_MS + FEEDBACK_TO_BUBBLE_MS;
           schedule(() => {
             if (demoAbort) return;
             if (perfect || isLast) {
               pushChat(userBubbleHtml(a.text));
             }
-          }, FEEDBACK_TO_BUBBLE_MS);
+          }, scoreToBubbleMs);
           schedule(() => {
             if (demoAbort) return;
             if (perfect || isLast) {
@@ -617,7 +695,7 @@
               renderBottom('none', '');
               schedule(() => {
                 if (!demoAbort && typeof onComplete === 'function') onComplete();
-              }, 200);
+              }, 320);
             } else {
               clearRespondFeedbackOnly();
               schedule(() => {
@@ -629,7 +707,7 @@
                 attemptK(k + 1);
               }, 350 + TRY_AGAIN_PAUSE_MS);
             }
-          }, FEEDBACK_TO_BUBBLE_MS + BUBBLE_TO_HIDE_PANEL_MS);
+          }, scoreToBubbleMs + BUBBLE_TO_HIDE_PANEL_MS);
         });
       }
       attemptK(0);
@@ -640,11 +718,23 @@
       if (!fb) return;
       const iconOk = '<svg viewBox="0 0 24 24" fill="none" stroke="#4CAF7D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 12 2 2 4-4"/></svg>';
       const iconBad = '<svg viewBox="0 0 24 24" fill="none" stroke="#D35454" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>';
-      fb.className = `respond-feedback ${correct ? 'correct' : 'wrong'}`;
-      fb.innerHTML = `
+      fb.classList.remove('correct', 'wrong', 'feedback-result-in');
+      fb.classList.remove('is-hidden');
+      fb.innerHTML =
+        '<div class="feedback-checking" aria-live="polite">' +
+        '<div class="checking-dots"><span></span><span></span><span></span></div>' +
+        '<span class="checking-label">Checking pronunciation…</span></div>';
+      schedule(() => {
+        if (demoAbort) return;
+        requestAnimationFrame(() => {
+          if (demoAbort) return;
+          fb.className = `respond-feedback feedback-result-in ${correct ? 'correct' : 'wrong'}`;
+          fb.innerHTML = `
         <div class="feedback-row">${correct ? iconOk : iconBad}<span class="feedback-pct ${correct ? 'ok' : 'bad'}">${pct}%</span></div>
         <div class="feedback-transcript">You said: "${escapeHtml(transcript)}"</div>`;
-      fb.classList.remove('is-hidden');
+          fb.classList.remove('is-hidden');
+        });
+      }, CHECKING_PRONUNCIATION_MS);
     }
 
     function setProgress(idx, total) {
@@ -661,6 +751,9 @@
     let demoAbort = false;
     let chatHtml = '';
 
+    const LISTEN_MIC_SVG =
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8863A" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>';
+
     function renderBottom(mode, text) {
       const bottom = document.getElementById('bottomArea');
       if (!bottom) return;
@@ -669,10 +762,29 @@
         return;
       }
       if (mode === 'listen') {
-        const body = text && text.length > 0
-          ? `<span class="listening-text listening-live">${escapeHtml(text)}</span>`
-          : `<span class="listening-text listen-pulse">Listening...</span>`;
-        bottom.innerHTML = `<div class="listening-indicator"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8863A" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>${body}</div>`;
+        const existing = bottom.querySelector('.listening-indicator');
+        const bodyEl = bottom.querySelector('[data-listen-body]');
+        if (existing && bodyEl) {
+          if (text && text.length > 0) {
+            bodyEl.className = 'listening-text listening-live';
+            bodyEl.textContent = text;
+          } else {
+            bodyEl.className = 'listening-text listen-pulse';
+            bodyEl.textContent = 'Listening...';
+          }
+          return;
+        }
+        const body = `<span class="listening-text listen-pulse" data-listen-body>Listening...</span>`;
+        bottom.innerHTML = `<div class="listening-indicator listen-bar-enter">${LISTEN_MIC_SVG}${body}</div>`;
+        const slot = bottom.querySelector('[data-listen-body]');
+        const bar = bottom.querySelector('.listening-indicator');
+        if (text && text.length > 0 && slot) {
+          slot.className = 'listening-text listening-live';
+          slot.textContent = text;
+        }
+        if (bar) {
+          schedule(() => bar.classList.remove('listen-bar-enter'), 580);
+        }
         return;
       }
       if (mode === 'ready') {
@@ -680,8 +792,18 @@
       }
     }
 
+    /** Variable per-character delay (spaces, punctuation, micro-pauses) — slower, more human */
+    function nextCharDelayMs(ch, baseMs) {
+      let d = baseMs;
+      if (/[.!?]/.test(ch)) d += 200;
+      else if (ch === ',' || ch === ';' || ch === ':') d += 110;
+      else if (ch === ' ') d += 55;
+      d += Math.floor(Math.random() * 28);
+      return d;
+    }
+
     /** Pulsing "Listening..." then type spoken line like live transcription */
-    function runTypingTranscript(full, charMs, onDone) {
+    function runTypingTranscript(full, baseCharMs, onDone) {
       renderBottom('listen', '');
       schedule(() => {
         if (demoAbort) return;
@@ -691,9 +813,10 @@
           i += 1;
           renderBottom('listen', full.slice(0, i));
           if (i < full.length) {
-            schedule(tick, charMs);
+            const ch = full[i - 1];
+            schedule(tick, nextCharDelayMs(ch, baseCharMs));
           } else {
-            onDone();
+            schedule(onDone, PAUSE_AFTER_TRANSCRIPT_MS);
           }
         }
         tick();
@@ -703,7 +826,18 @@
     function pushChat(html) {
       chatHtml += html;
       const scroll = document.getElementById('chatScroll');
-      if (scroll) scroll.innerHTML = chatHtml;
+      if (scroll) {
+        scroll.innerHTML = chatHtml;
+        const blocks = scroll.querySelectorAll('.tutor-row, .user-row, .system-row');
+        const last = blocks[blocks.length - 1];
+        if (last) {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              last.classList.add('chat-line-enter');
+            });
+          });
+        }
+      }
       requestAnimationFrame(scrollChatToEnd);
     }
 
@@ -722,13 +856,13 @@
     function runStory() {
       demoAbort = false;
       const total = EXCHANGES.length;
-      const charMs = 38;
-      const charMs2 = 32;
-      const afterFirstUserTutorDelay = 700;
-      const afterTutor2PanelDelay = 1700;
-      const afterPanelSpeakDelay = 1300;
-      const loopTailMs = 6200;
-      const charMs3 = 32;
+      const charMs = 58;
+      const charMs2 = 52;
+      const afterFirstUserTutorDelay = 820;
+      const afterTutor2PanelDelay = 1900;
+      const afterPanelSpeakDelay = 1500;
+      const loopTailMs = 6800;
+      const charMs3 = 48;
 
       schedule(() => {
         if (demoAbort) return;

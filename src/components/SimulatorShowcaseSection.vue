@@ -30,7 +30,7 @@ const demoRows = [
   <section id="simulator-showcase" class="section-pad relative">
     <div class="max-w-6xl mx-auto px-6">
       <!-- Audiobook lessons intro (nav: Lessons) -->
-      <div id="audiobook-lessons" class="text-center mb-16 reveal scroll-mt-24">
+      <div id="audiobook-lessons" class="text-center pb-12 md:pb-16 reveal scroll-mt-24">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Audiobook Lessons</p>
         <h2 class="font-display text-3xl md:text-4xl font-bold text-navy mb-6" style="letter-spacing: -0.02em;">
           Lessons that teach before they test
@@ -47,12 +47,17 @@ const demoRows = [
         </div>
       </div>
 
+      <!-- Break between “lessons story” and game demos (avoids phone mockup visually colliding with copy above) -->
+      <div class="max-w-2xl mx-auto px-4 mb-2" aria-hidden="true">
+        <div class="h-px bg-gradient-to-r from-transparent via-card-border to-transparent opacity-90"></div>
+      </div>
+
       <!-- Z-pattern demos (nav: Games) -->
-      <div id="voice-games" class="space-y-16 scroll-mt-24">
+      <div id="voice-games" class="pt-12 md:pt-16 space-y-20 md:space-y-24 scroll-mt-24">
         <article
           v-for="(row, index) in demoRows"
           :key="row.id"
-          class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center"
+          class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start"
         >
           <div
             class="reveal"
@@ -91,6 +96,8 @@ const demoRows = [
           We believe that providing engaging games will accelerate the learning experience.
         </p>
       </div>
+
+      <div class="divider-gradient mt-16 md:mt-20" aria-hidden="true"></div>
     </div>
   </section>
 </template>

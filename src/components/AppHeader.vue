@@ -31,12 +31,12 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <LogoFull :width="120" :height="30" />
       </a>
 
-      <nav class="hidden md:flex items-center gap-8">
+      <nav class="hidden md:flex items-center gap-7">
         <button @click="scrollTo('voice-games')" class="text-sm text-text-secondary hover:text-navy transition-colors cursor-pointer">Games</button>
         <button @click="scrollTo('audiobook-lessons')" class="text-sm text-text-secondary hover:text-navy transition-colors cursor-pointer">Lessons</button>
         <button @click="scrollTo('scenarios')" class="text-sm text-text-secondary hover:text-navy transition-colors cursor-pointer">Scenarios</button>
         <button @click="scrollTo('features')" class="text-sm text-text-secondary hover:text-navy transition-colors cursor-pointer">Features</button>
-        <button @click="scrollTo('hero')" class="glow-btn text-sm font-medium text-white px-5 py-2 rounded-full cursor-pointer">Join the Beta</button>
+        <button @click="scrollTo('hero')" class="text-sm text-text-secondary hover:text-navy transition-colors cursor-pointer">Beta</button>
       </nav>
 
       <button
@@ -61,7 +61,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <button @click="scrollTo('audiobook-lessons')" class="text-left text-sm text-text-secondary hover:text-navy cursor-pointer py-2">Lessons</button>
         <button @click="scrollTo('scenarios')" class="text-left text-sm text-text-secondary hover:text-navy cursor-pointer py-2">Scenarios</button>
         <button @click="scrollTo('features')" class="text-left text-sm text-text-secondary hover:text-navy cursor-pointer py-2">Features</button>
-        <button @click="scrollTo('hero')" class="text-left text-sm text-text-secondary hover:text-navy cursor-pointer py-2">Join the Beta</button>
+        <button @click="scrollTo('hero')" class="text-left text-sm text-text-secondary hover:text-navy cursor-pointer py-2">Beta signup</button>
       </div>
     </Transition>
   </header>

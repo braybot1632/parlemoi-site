@@ -13,10 +13,11 @@ describe('AppHeader', () => {
     const wrapper = mount(AppHeader)
     const nav = wrapper.find('nav')
     expect(nav.exists()).toBe(true)
+    expect(nav.text()).toContain('Games')
+    expect(nav.text()).toContain('Lessons')
+    expect(nav.text()).toContain('Scenarios')
     expect(nav.text()).toContain('Features')
-    expect(nav.text()).toContain('How It Works')
-    expect(nav.text()).toContain('Pricing')
-    expect(nav.text()).toContain('Get the App')
+    expect(nav.text()).toContain('Beta')
   })
 
   it('has a mobile menu toggle button with aria-label', () => {
@@ -39,11 +40,10 @@ describe('AppHeader', () => {
     await toggle.trigger('click')
 
     // Mobile menu should now show navigation items
-    const mobilePanel = wrapper.find('.md\\:hidden.bg-darkest\\/95')
+    const mobilePanel = wrapper.find('.md\\:hidden.bg-white\\/95')
     expect(mobilePanel.exists()).toBe(true)
     expect(mobilePanel.text()).toContain('Features')
-    expect(mobilePanel.text()).toContain('How It Works')
-    expect(mobilePanel.text()).toContain('Pricing')
+    expect(mobilePanel.text()).toContain('Beta signup')
   })
 
   it('closes mobile menu on second hamburger click', async () => {
@@ -53,7 +53,7 @@ describe('AppHeader', () => {
     await toggle.trigger('click')
     await toggle.trigger('click')
 
-    const mobilePanel = wrapper.find('.md\\:hidden.bg-darkest\\/95')
+    const mobilePanel = wrapper.find('.md\\:hidden.bg-white\\/95')
     expect(mobilePanel.exists()).toBe(false)
   })
 

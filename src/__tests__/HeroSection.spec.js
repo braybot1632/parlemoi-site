@@ -5,36 +5,30 @@ import HeroSection from '../components/HeroSection.vue'
 describe('HeroSection', () => {
   it('renders the headline', () => {
     const wrapper = mount(HeroSection)
-    expect(wrapper.text()).toContain('Learn French by')
-    expect(wrapper.text()).toContain('actually speaking it.')
+    expect(wrapper.text()).toContain('ParleMoi')
+    expect(wrapper.text()).toContain('Speak and Learn.')
   })
 
   it('renders the subheadline', () => {
     const wrapper = mount(HeroSection)
-    expect(wrapper.text()).toContain('Real conversations with AI tutors')
-    expect(wrapper.text()).toContain('No cartoon owls')
+    expect(wrapper.text()).toContain('speaking French')
   })
 
-  it('renders the availability badge', () => {
+  it('includes Montreal and Instagram in the secondary hero band', () => {
     const wrapper = mount(HeroSection)
-    expect(wrapper.text()).toContain('Now Available on iOS and Android')
+    expect(wrapper.text()).toContain('Built in Montreal')
+    expect(wrapper.text()).toContain('@parlemoi.app')
   })
 
-  it('has iOS and Android download links', () => {
+  it('renders beta signup affordances', () => {
     const wrapper = mount(HeroSection)
-    expect(wrapper.text()).toContain('Download for iOS')
-    expect(wrapper.text()).toContain('Get for Android')
+    expect(wrapper.text()).toContain('Join the Beta')
+    expect(wrapper.find('input[type="email"]').exists()).toBe(true)
   })
 
   it('has section id "hero"', () => {
     const wrapper = mount(HeroSection)
     expect(wrapper.find('#hero').exists()).toBe(true)
-  })
-
-  it('has the scroll indicator', () => {
-    const wrapper = mount(HeroSection)
-    const indicator = wrapper.find('.animate-bounce')
-    expect(indicator.exists()).toBe(true)
   })
 
   it('has gradient mesh orbs for background', () => {
