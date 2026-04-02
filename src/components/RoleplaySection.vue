@@ -44,9 +44,9 @@ const scenarioSimSrc = '/simulators/scenario.html?embed=1&autoplay=1&loop=1&dela
             <p
               class="text-sm md:text-base text-text-secondary leading-relaxed border-l-2 border-orange/40 pl-4 py-0.5"
             >
-              Each one is scored on <span class="text-navy/90 font-medium">pronunciation</span>,
-              <span class="text-navy/90 font-medium">vocabulary</span>, and whether you
-              <span class="text-navy/90 font-medium">got what you needed</span>.
+              Each one is scored on <span class="text-orange font-medium">pronunciation</span>,
+              <span class="text-orange font-medium">vocabulary</span>, and whether you
+              <span class="text-orange font-medium">got what you needed</span>.
             </p>
           </div>
           <div class="flex justify-center lg:justify-end">

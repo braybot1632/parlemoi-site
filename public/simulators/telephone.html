@@ -718,6 +718,8 @@
       totalPoints: 0,
       simulatedSpeechWords: [],
       simulatedSpeechIndex: 0,
+      /** First simulated recording is intentionally wrong (demo error UI); all others are 100% correct. */
+      simSessionErrorShown: false,
       mode: "practice",
       engine: {
         lives: 3,
@@ -847,31 +849,23 @@
       schedule(() => autoSimulatePress(), 450);
     }
 
-    function getSimulatedTokens(expectedFrench, attemptNumber) {
+    function buildOneWrongDigitTokens(words) {
+      const out = [...words];
+      if (out.length === 0) return out;
+      const idx = Math.floor(Math.random() * out.length);
+      const options = Object.values(DIGIT_FRENCH).filter((w) => w !== out[idx]);
+      if (options.length === 0) return out;
+      out[idx] = options[Math.floor(Math.random() * options.length)];
+      return out;
+    }
+
+    function getSimulatedTokens(expectedFrench) {
       const words = expectedFrench.split(" ");
-      const chancePerfect = attemptNumber >= 2 ? 0.75 : 0.55;
-      const chanceMostlyRight = attemptNumber >= 2 ? 0.2 : 0.3;
-      const roll = Math.random();
-
-      if (roll <= chancePerfect) return [...words];
-
-      if (roll <= chancePerfect + chanceMostlyRight) {
-        return words.map((w, idx) => {
-          if (idx > 0 && Math.random() < 0.15) {
-            const options = Object.values(DIGIT_FRENCH);
-            return options[Math.floor(Math.random() * options.length)];
-          }
-          return w;
-        });
+      if (!state.simSessionErrorShown) {
+        state.simSessionErrorShown = true;
+        return buildOneWrongDigitTokens(words);
       }
-
-      return words.map((w, idx) => {
-        if (idx % 2 === 0 || Math.random() < 0.55) {
-          const options = Object.values(DIGIT_FRENCH);
-          return options[Math.floor(Math.random() * options.length)];
-        }
-        return w;
-      });
+      return [...words];
     }
 
     function simpleTokenScore(spokenText, expectedText) {
@@ -911,6 +905,7 @@
       state.engine.score = 0;
       state.engine.combo = 0;
       state.engine.comboMultiplier = 1;
+      state.simSessionErrorShown = false;
       state.phase = "playing";
       render();
       schedule(() => autoSimulatePress(), 650);
@@ -923,10 +918,7 @@
       state.transcript = "";
       state.lastScore = null;
       state.simulatedSpeechIndex = 0;
-      state.simulatedSpeechWords = getSimulatedTokens(
-        state.currentPhone.expectedFrench,
-        state.attempts + 1
-      );
+      state.simulatedSpeechWords = getSimulatedTokens(state.currentPhone.expectedFrench);
       render();
 
       const revealSchedule = buildRevealSchedule(state.simulatedSpeechWords);

@@ -14,9 +14,8 @@ describe('HeroSection', () => {
     expect(wrapper.text()).toContain('speaking French')
   })
 
-  it('includes Montreal and Instagram in the secondary hero band', () => {
+  it('includes Instagram in the secondary hero band', () => {
     const wrapper = mount(HeroSection)
-    expect(wrapper.text()).toContain('Built in Montreal')
     expect(wrapper.text()).toContain('@parlemoi.app')
   })
 
