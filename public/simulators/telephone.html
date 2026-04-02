@@ -28,20 +28,41 @@
       width: 100vw;
       height: 100vh;
     }
-    .iphone-frame {
+    /* Matches public/simulators/worddrop.html mockup + notch + screen */
+    .mockup {
       width: 411px;
       height: 915px;
-      border: 14px solid #252525;
-      border-radius: 44px;
-      background: #111;
+      background: #000;
+      border-radius: 48px;
+      border: 14px solid #000;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       overflow: hidden;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
       position: relative;
+    }
+    .notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 146px;
+      height: 34px;
+      background: #000;
+      border-radius: 0 0 22px 22px;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .screen {
+      width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      background: #fffdf9;
     }
     .status-bar {
       height: 28px;
+      flex-shrink: 0;
       color: #646464;
       background: #fffdf9;
       display: flex;
@@ -70,6 +91,7 @@
     .status-right { letter-spacing: 0.5px; font-size: 12px; }
     .app-header {
       height: 58px;
+      flex-shrink: 0;
       background: #fffdf9;
       display: flex;
       align-items: center;
@@ -107,6 +129,7 @@
     }
     .game-container {
       flex: 1;
+      min-height: 0;
       background: #fbf9f5;
       display: flex;
       flex-direction: column;
@@ -607,26 +630,29 @@
   </style>
 </head>
 <body>
-  <div class="iphone-frame">
-    <div class="status-bar">
-      <div class="status-left">
-        <span class="status-logo" aria-label="ParleMoi">
-          <svg viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
-            <text x="0" y="56" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="48" letter-spacing="-1">
-              <tspan class="brand-main">Parle</tspan><tspan class="brand-accent">Moi</tspan>
-            </text>
-          </svg>
-        </span>
+  <div class="mockup">
+    <div class="notch" aria-hidden="true"></div>
+    <div class="screen">
+      <div class="status-bar">
+        <div class="status-left">
+          <span class="status-logo" aria-label="ParleMoi">
+            <svg viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+              <text x="0" y="56" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="48" letter-spacing="-1">
+                <tspan class="brand-main">Parle</tspan><tspan class="brand-accent">Moi</tspan>
+              </text>
+            </svg>
+          </span>
+        </div>
+        <div class="status-right">◌ ⌁ ◔ ◢ 35%</div>
       </div>
-      <div class="status-right">◌ ⌁ ◔ ◢ 35%</div>
+      <div class="app-header">
+        <button type="button" class="back-btn" aria-label="Go back">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <div class="app-title">Telephone Practice</div>
+      </div>
+      <div id="gameContainer" class="game-container"></div>
     </div>
-    <div class="app-header">
-      <button type="button" class="back-btn" aria-label="Go back">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-      </button>
-      <div class="app-title">Telephone Practice</div>
-    </div>
-    <div id="gameContainer" class="game-container"></div>
   </div>
 
   <script>
@@ -689,7 +715,7 @@
 
     function fitEmbedMockup() {
       if (!document.body.classList.contains("embed")) return;
-      const mockup = document.querySelector(".iphone-frame");
+      const mockup = document.querySelector(".mockup");
       if (!mockup) return;
       const pixel6Width = 393;
       const pixel6Height = 851;
@@ -718,8 +744,11 @@
       totalPoints: 0,
       simulatedSpeechWords: [],
       simulatedSpeechIndex: 0,
-      /** First simulated recording is intentionally wrong (demo error UI); all others are 100% correct. */
-      simSessionErrorShown: false,
+      /**
+       * Simulated STT: exactly one imperfect utterance per practice session (first graded attempt).
+       * Cleared in handleScoreResult so every later recording uses exact expected tokens → 100% score.
+       */
+      simOneImperfectUtterancePending: false,
       mode: "practice",
       engine: {
         lives: 3,
@@ -859,13 +888,17 @@
       return out;
     }
 
+    function tokenizeExpectedFrench(expectedFrench) {
+      return expectedFrench.trim().split(/\s+/).filter(Boolean);
+    }
+
+    /** One wrong simulated answer per session; all others mirror expectedFrench exactly (100%). */
     function getSimulatedTokens(expectedFrench) {
-      const words = expectedFrench.split(" ");
-      if (!state.simSessionErrorShown) {
-        state.simSessionErrorShown = true;
+      const words = tokenizeExpectedFrench(expectedFrench);
+      if (state.simOneImperfectUtterancePending) {
         return buildOneWrongDigitTokens(words);
       }
-      return [...words];
+      return words.slice();
     }
 
     function simpleTokenScore(spokenText, expectedText) {
@@ -905,7 +938,7 @@
       state.engine.score = 0;
       state.engine.combo = 0;
       state.engine.comboMultiplier = 1;
-      state.simSessionErrorShown = false;
+      state.simOneImperfectUtterancePending = true;
       state.phase = "playing";
       render();
       schedule(() => autoSimulatePress(), 650);
@@ -923,9 +956,11 @@
 
       const revealSchedule = buildRevealSchedule(state.simulatedSpeechWords);
       let elapsed = 0;
+      let lastRevealAt = 0;
       for (let i = 0; i < state.simulatedSpeechWords.length; i += 1) {
         const step = revealSchedule[i] || { digitMs: 180, gapMs: 0 };
         elapsed += step.digitMs;
+        lastRevealAt = elapsed;
         schedule(() => {
           if (!state.isRecording) return;
           state.simulatedSpeechIndex = i + 1;
@@ -935,6 +970,7 @@
         }, elapsed);
         elapsed += step.gapMs;
       }
+      state.simulatedRevealEndMs = lastRevealAt;
     }
 
     function endRecording() {
@@ -953,6 +989,7 @@
     }
 
     function handleScoreResult(score, spokenText) {
+      state.simOneImperfectUtterancePending = false;
       state.lastScore = score;
       state.transcript = spokenText;
       state.showResult = true;
@@ -1189,10 +1226,11 @@
     }
 
     function autoSimulatePress() {
-      if (state.phase !== "playing" || state.isRecording) return;
+      if (state.phase !== "playing" || state.isRecording || state.engine.lives <= 0) return;
       beginRecording();
-      const holdMs = 2800 + Math.floor(Math.random() * 900);
-      schedule(() => endRecording(), holdMs);
+      if (!state.isRecording) return;
+      const endMs = state.simulatedRevealEndMs ?? 0;
+      schedule(() => endRecording(), endMs + 320);
     }
 
     function render() {
