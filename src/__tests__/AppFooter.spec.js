@@ -42,7 +42,7 @@ describe('AppFooter', () => {
     const router = createTestRouter()
     const wrapper = mount(AppFooter, { global: { plugins: [router] } })
     await router.isReady()
-    const contactLink = wrapper.find('a[href="mailto:support@parlemoi.app"]')
+    const contactLink = wrapper.find('a[href="mailto:support@parlemoiapp.com"]')
     expect(contactLink.exists()).toBe(true)
     expect(contactLink.text()).toBe('Contact')
   })
@@ -52,6 +52,7 @@ describe('AppFooter', () => {
     const wrapper = mount(AppFooter, { global: { plugins: [router] } })
     await router.isReady()
     expect(wrapper.text()).toContain('2026 ParleMoi')
+    expect(wrapper.text()).toContain('Parlifica Inc.')
   })
 
   it('has legal nav with aria-label', async () => {
