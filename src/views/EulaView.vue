@@ -10,7 +10,7 @@ import LegalNav from '../components/LegalNav.vue'
     <p class="font-bold text-text-muted mb-1">ParleMoi, Language Learning Application</p>
     <p class="font-bold text-text-muted mb-6">Effective Date: March 14, 2026</p>
 
-    <div class="legal-prose text-text-light/85 leading-relaxed space-y-4">
+    <div class="legal-prose text-navy leading-relaxed space-y-4">
       <p>
         <strong class="text-navy">Developer:</strong> Braydon Viragh<br>
         Montreal, Quebec, Canada<br>

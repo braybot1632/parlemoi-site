@@ -9,7 +9,7 @@ import LegalNav from '../components/LegalNav.vue'
     <h1 class="font-display text-3xl md:text-4xl text-navy mb-2">Privacy Policy</h1>
     <p class="font-bold text-text-muted mb-6">Effective Date: March 14, 2026</p>
 
-    <div class="legal-prose text-text-light/85 leading-relaxed space-y-4">
+    <div class="legal-prose text-navy leading-relaxed space-y-4">
       <p>This Privacy Policy explains how ParleMoi ("the App," "we," "us," or "our") collects, uses, and protects your information. ParleMoi is a French language learning app developed by Braydon Viragh, based in Montreal, Quebec, Canada.</p>
 
       <p>We built ParleMoi with privacy as a core design principle. We collect as little data as possible, process most things directly on your device, and never sell your personal information. This policy is written in plain language so you can understand exactly what happens with your data.</p>
