@@ -23,11 +23,10 @@ const scenarioSimSrc = '/simulators/scenario.html?embed=1&autoplay=1&loop=1&dela
       <div class="text-center max-w-3xl mx-auto mb-10 md:mb-12 reveal">
         <p class="text-sm text-orange font-medium tracking-wider uppercase mb-4">Scenarios</p>
         <h2 class="font-display text-3xl md:text-4xl font-bold text-navy mb-4" style="letter-spacing: -0.02em;">
-          Practice real conversations
+          Conversations that guide you
         </h2>
         <p class="text-text-secondary text-base md:text-lg leading-relaxed">
-          Short dialogues for everyday settings: you answer in spoken French and review how you did on pronunciation and word choice.
-        </p>
+          We teach you how everyday scenarios play out, so you know what to expect, how to respond, and how to keep things going beyond the basics.       </p>
       </div>
 
       <!-- One module: copy + preview (same Z-pattern rhythm as game simulators) -->
@@ -36,16 +35,21 @@ const scenarioSimSrc = '/simulators/scenario.html?embed=1&autoplay=1&loop=1&dela
       >
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
           <div class="text-left lg:pt-1">
-            <p class="text-sm font-medium text-orange uppercase tracking-wider mb-4">How it works</p>
+            <p class="text-sm font-medium text-orange uppercase tracking-wider mb-4">AI-Suggested Responses</p>
             <p class="text-text-secondary leading-relaxed text-base md:text-lg mb-6">
-              Each scenario is a short exchange: the other person’s line appears on screen, and you respond aloud in French.
-              Afterward you get feedback on pronunciation and vocabulary, and on whether your answer fits what the situation called for.
+              As you engage in conversation, ParleMoi automatically generates a suggested response for you.
+              A <span class="text-orange font-medium">"Respond with:"</span> prompt will appear containing the appropriate phrase for the given situation.
+              Simply read it, vocalize it, and receive a score on your pronunciation.
+            </p>
+            <p class="text-text-secondary leading-relaxed text-base md:text-lg mb-6">
+              Each suggested response teaches you how the conversation should flow. By the time you’re ready to practice in the world, you’ll have the confidence to keep up.
             </p>
             <p
               class="text-sm md:text-base text-text-secondary leading-relaxed border-l-2 border-orange/40 pl-4 py-0.5"
             >
-              Each one is scored on <span class="text-orange font-medium">pronunciation</span> and
-              <span class="text-orange font-medium">vocabulary</span>.
+              Scored on <span class="text-orange font-medium">pronunciation</span>,
+              <span class="text-orange font-medium">vocabulary</span>, and
+              <span class="text-orange font-medium">conversational accuracy</span>.
             </p>
           </div>
           <div class="flex justify-center lg:justify-end">
