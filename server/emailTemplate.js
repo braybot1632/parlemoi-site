@@ -145,16 +145,75 @@ export function p(text) {
 
 export function betaWelcomeEmail() {
   return brandedEmail({
-    title: 'Welcome to ParleMoi Beta',
-    preheader: "Thanks for signing up for ParleMoi beta \u2014 we'll reach out when it's ready.",
-    headline: 'Thanks for joining ParleMoi.',
+    title: 'Thanks for Your Interest in ParleMoi',
+    preheader: "Thank you for your interest in ParleMoi \u2014 we'll be in touch with a TestFlight invite soon.",
+    headline: 'Thank you for your interest.',
     body: [
       p('Hello,'),
-      p("Thank you for signing up for the ParleMoi beta. We're currently in active development, building something we believe will genuinely change the way people learn to speak French."),
-      p("Rest assured, we will reach out to you as soon as our beta is ready. You'll be among the first to try it."),
-      p('Hope you enjoy the rest of your day.'),
+      p("Thank you for your interest in ParleMoi. We've been thrilled by the response so far."),
+      p("Due to the high volume of sign-ups, we're onboarding testers in waves. When it's your turn, you'll receive a separate email with a TestFlight invitation link to download and try the app."),
+      p('We appreciate your patience and look forward to having you test ParleMoi soon.'),
     ].join('\n'),
     footerNote: "You're receiving this because you signed up for the ParleMoi beta.",
+  })
+}
+
+const BETA_SURVEY_URL = 'https://braydonviragh.github.io/parlemoi-beta-survey/'
+
+export function betaTestInviteEmail() {
+  return brandedEmail({
+    title: 'Your ParleMoi Beta Access is Ready',
+    preheader: 'Your TestFlight invite is on the way — here\u2019s how to get started with ParleMoi.',
+    headline: 'Your beta access is ready.',
+    body: [
+      p('Hello,'),
+      p('Thank you for signing up to test ParleMoi. We\u2019re excited to have you on board. Your TestFlight invitation is on the way \u2014 here\u2019s everything you need to get started.'),
+
+      `<h2 style="margin: 28px 0 16px; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #1B2A4A; line-height: 1.3;">Getting set up</h2>`,
+
+      `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 24px;">
+        <tr>
+          <td style="padding: 12px 0; border-bottom: 1px solid #E8E4DF; font-family: ${FONT_BODY}; font-size: 15px; line-height: 1.7; color: #4A4A4A;">
+            <span style="display: inline-block; background: #1B2A4A; color: #FFFFFF; width: 24px; height: 24px; border-radius: 50%; text-align: center; font-size: 12px; line-height: 24px; margin-right: 10px; font-weight: 700;">1</span>
+            <strong style="color: #1B2A4A;">Check your email</strong> \u2014 you\u2019ll receive a separate invitation from <strong>Apple TestFlight</strong> shortly. It may take a few minutes to arrive.
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 12px 0; border-bottom: 1px solid #E8E4DF; font-family: ${FONT_BODY}; font-size: 15px; line-height: 1.7; color: #4A4A4A;">
+            <span style="display: inline-block; background: #1B2A4A; color: #FFFFFF; width: 24px; height: 24px; border-radius: 50%; text-align: center; font-size: 12px; line-height: 24px; margin-right: 10px; font-weight: 700;">2</span>
+            <strong style="color: #1B2A4A;">Install TestFlight</strong> \u2014 if you don\u2019t already have it, download the <a href="https://apps.apple.com/app/testflight/id899247664" style="color: #E8863A; text-decoration: none;">TestFlight app</a> from the App Store (it\u2019s free, made by Apple).
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 12px 0; border-bottom: 1px solid #E8E4DF; font-family: ${FONT_BODY}; font-size: 15px; line-height: 1.7; color: #4A4A4A;">
+            <span style="display: inline-block; background: #1B2A4A; color: #FFFFFF; width: 24px; height: 24px; border-radius: 50%; text-align: center; font-size: 12px; line-height: 24px; margin-right: 10px; font-weight: 700;">3</span>
+            <strong style="color: #1B2A4A;">Accept the invite</strong> \u2014 open the TestFlight email and tap "View in TestFlight". This will open the app and let you install ParleMoi.
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 12px 0; font-family: ${FONT_BODY}; font-size: 15px; line-height: 1.7; color: #4A4A4A;">
+            <span style="display: inline-block; background: #1B2A4A; color: #FFFFFF; width: 24px; height: 24px; border-radius: 50%; text-align: center; font-size: 12px; line-height: 24px; margin-right: 10px; font-weight: 700;">4</span>
+            <strong style="color: #1B2A4A;">Start learning</strong> \u2014 open ParleMoi, complete the onboarding, and explore at your own pace. There\u2019s no right or wrong way to test \u2014 just use it naturally.
+          </td>
+        </tr>
+      </table>`,
+
+      `<h2 style="margin: 8px 0 16px; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #1B2A4A; line-height: 1.3;">After you\u2019ve tested the app</h2>`,
+
+      p('Once you\u2019ve had a chance to explore, we\u2019d love to hear what you think. Your feedback directly shapes what we build next, and the survey is completely anonymous \u2014 no user information is attached \u2014 so please be as candid as possible.'),
+
+      `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 8px 0 24px;">
+        <tr>
+          <td align="center">
+            <a href="${BETA_SURVEY_URL}" style="display: inline-block; padding: 14px 36px; background-color: #E8863A; color: #FFFFFF; font-family: ${FONT_BODY}; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">Take the Feedback Survey</a>
+          </td>
+        </tr>
+      </table>`,
+
+      p('The survey takes about 3 minutes and covers your experience with onboarding, lessons, AI chat, practice scenarios, and mini-games.'),
+      p('Thank you for helping us build something better.'),
+    ].join('\n'),
+    footerNote: "You\u2019re receiving this because you signed up for the ParleMoi beta.",
   })
 }
 
